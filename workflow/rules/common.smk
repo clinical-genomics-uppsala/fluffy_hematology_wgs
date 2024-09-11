@@ -110,7 +110,7 @@ def get_vcf_input(wildcards):
     if aligner is None:
         sys.exit("aligner missing from config, valid options: bwa_gpu or bwa_sentieon")
     elif aligner == "bwa_gpu":
-        vcf_input = "parabricks/pbrun_mutectcaller_t/{}_{}.vep.filter.germline.vcf".format(wildcards.sample, wildcards.type)
+        vcf_input = "parabricks/pbrun_mutectcaller_t/{}_{}.normalized.vep.filter.germline.vcf".format(wildcards.sample, wildcards.type)
     elif aligner == "bwa_sentieon":
         vcf_input = "sentieon/tnscope/{}_TNscope_tn_ML.vcf".format(wildcards.sample)
     else:

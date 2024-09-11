@@ -5,6 +5,7 @@ __license__ = "GPL-3"
 
 
 include: "rules/common.smk"
+include: "rules/annotate.smk"
 include: "rules/cnvkit.smk"
 include: "rules/cnvkit_table.smk"
 include: "rules/dux4_rearrangements.smk"
@@ -96,40 +97,21 @@ use rule * from annotation as annotation_*
 
 use rule vep from annotation as annotation_vep with:
     input:
-        vcf="parabricks/pbrun_mutectcaller_tn/{sample}.vcf.gz",
-        tabix="parabricks/pbrun_mutectcaller_tn/{sample}.vcf.gz.tbi",
+        vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz",
+        tabix="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.tbi",
         cache=config["vep"]["vep_cache"],
         fasta=config["reference"]["fasta"],
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_tn/{sample}.vep.vcf"),
+        vcf=temp("parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vep.vcf"),
     log:
-        "parabricks/pbrun_mutectcaller_tn/{sample}.vep.vcf.log",
+        "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vep.vcf.log",
     benchmark:
         repeat(
-            "parabricks/pbrun_mutectcaller_tn/{sample}.vep.vcf.benchmark.tsv",
+            "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vep.vcf.benchmark.tsv",
             config.get("vep", {}).get("benchmark_repeats", 1),
         )
     message:
-        "{rule}: Annotate {wildcards.sample}.vcf"
-
-
-use rule vep from annotation as annotation_vep_t with:
-    input:
-        vcf="parabricks/pbrun_mutectcaller_t/{sample}_T.vcf.gz",
-        tabix="parabricks/pbrun_mutectcaller_t/{sample}_T.vcf.gz.tbi",
-        cache=config["vep"]["vep_cache"],
-        fasta=config["reference"]["fasta"],
-    output:
-        vcf=temp("parabricks/pbrun_mutectcaller_t/{sample}_T.vep.vcf"),
-    log:
-        "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.vcf.log",
-    benchmark:
-        repeat(
-            "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.vcf.benchmark.tsv",
-            config.get("vep", {}).get("benchmark_repeats", 1),
-        )
-    message:
-        "{rule}: Annotate {wildcards.sample}_T.vcf"
+        "{rule}: Annotate {input.vcf} with vep"
 
 
 use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation_tn with:
@@ -147,7 +129,7 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
             config.get("snpeff", {}).get("benchmark_repeats", 1),
         )
     message:
-        "{rule}: Annotate cnv_sv/manta_run_workflow_tn/{wildcards.sample}/results/variants/somaticSV.snpeff.vcf.gz"
+        "{rule}: Annotate {input.vcf}"
 
 
 use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation_t with:
@@ -324,18 +306,18 @@ use rule filter_vcf from filtering as filtering_filter_vcf
 
 use rule bcftools_filter_include_region from filtering as filtering_bcftools_filter_include_region_snv_t with:
     input:
-        vcf="parabricks/pbrun_mutectcaller_t/{sample}_T.vep.vcf.gz",
-        tabix="parabricks/pbrun_mutectcaller_t/{sample}_T.vep.vcf.gz.tbi",
+        vcf="parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.filter.somatic.vcf.gz",
+        tabix="parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.filter.somatic.vcf.gz.tbi",
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.{bed}.vcf"),
+        vcf=temp("parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.filter.somatic.include.{bed}.vcf"),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SNV"][wildcards.bed],
         extra=config.get("bcftools_SNV", {}).get("extra", ""),
     log:
-        "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.{bed}.vcf.log",
+        "parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.filter.somatic.include.{bed}.vcf.log",
     benchmark:
         repeat(
-            "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.{bed}.vcf.benchmark.tsv",
+            "parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.filter.somatic.include.{bed}.vcf.benchmark.tsv",
             config.get("bcftools_SNV", {}).get("benchmark_repeats", 1),
         )
     message:
@@ -344,18 +326,18 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
 
 use rule bcftools_filter_include_region from filtering as filtering_bcftools_filter_include_region_snv_tn with:
     input:
-        vcf="parabricks/pbrun_mutectcaller_tn/{sample}.vep.vcf.gz",
-        tabix="parabricks/pbrun_mutectcaller_tn/{sample}.vep.vcf.gz.tbi",
+        vcf="parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.vcf.gz",
+        tabix="parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.vcf.gz.tbi",
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.{bed}.vcf"),
+        vcf=temp("parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf"),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SNV"][wildcards.bed],
         extra=config.get("bcftools_SNV", {}).get("extra", ""),
     log:
-        "parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.{bed}.vcf.log",
+        "parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.log",
     benchmark:
         repeat(
-            "parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.{bed}.vcf.benchmark.tsv",
+            "parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.benchmark.tsv",
             config.get("bcftools_SNV", {}).get("benchmark_repeats", 1),
         )
     message:
@@ -556,9 +538,9 @@ if aligner == "bwa_sentieon":
 
 use rule peddy from qc as qc_peddy with:
     input:
-        vcf="parabricks/pbrun_mutectcaller_t/{sample}_T.vcf.gz",
+        vcf="parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vcf.gz",
         ped="qc/peddy/{sample}.peddy.fam",
-        tbi="parabricks/pbrun_mutectcaller_t/{sample}_T.vcf.gz.tbi",
+        tbi="parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vcf.gz.tbi",
     output:
         ped=temp("qc/peddy/{sample}/peddy.peddy.ped"),
         ped_check=temp("qc/peddy/{sample}/peddy.ped_check.csv"),
@@ -710,6 +692,47 @@ use rule cnv_html_report from reports as reports_cnv_html_report with:
         include_table=config.get("cnv_html_report", {}).get("show_table", True),
         tc=get_tc,
         tc_method="pathology",
+
+
+module snv_indels:
+    snakefile:
+        github(
+            "hydra-genetics/snv_indels",
+            path="workflow/Snakefile",
+            tag=config["modules"]["snv_indels"],
+        )
+    config:
+        config
+
+
+use rule vt_decompose from snv_indels as snv_indels_vt_decompose with:
+    input:
+        vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.vcf.gz",
+        tbi="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.vcf.gz.tbi",
+    output:
+        vcf=temp("parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz"),
+    log:
+        "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz.log",
+    benchmark:
+        repeat(
+            "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz.benchmark.tsv",
+            config.get("vt_decompose", {}).get("benchmark_repeats", 1),
+        )
+
+
+use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
+    input:
+        vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz",
+        ref=config["reference"]["fasta"],
+    output:
+        vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz",
+    log:
+        "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.log",
+    benchmark:
+        repeat(
+            "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.benchmark.tsv",
+            config.get("vt_normalize", {}).get("benchmark_repeats", 1),
+        )
 
 
 module misc:

@@ -1,0 +1,51 @@
+filters:
+  af:
+    description: "Softfilter variants where T have AF lower than 5 percent"
+    expression: "FORMAT:AF:0 < 0.05"
+    soft_filter: "True"
+    soft_filter_flag: "AF_lt_0.05"
+  ad:
+    description: "Softfilter variants where T have AD lower than 3?"
+    expression: "FORMAT:AD:1 < 3"
+    soft_filter: "True"
+    soft_filter_flag: "AD_lt_3"
+  dp:
+    description: "Softfilter variants where dp is lower than 10x"
+    expression: "FORMAT:DP < 10"
+    soft_filter: "True"
+    soft_filter_flag: "DP_lt_10"
+  germline:
+    description: "Soft filter germline if >2% in any population from 1000 genomes, ESP or gnomADe"
+    expression: "(VEP:MAX_AF > 0.02)"
+    soft_filter_flag: "PopAF_0.02"
+    soft_filter: "True"
+  intron:
+    description: "Soft filter intronic variants except if also splice"
+    expression: "(exist[intron_variant, VEP:Consequence] and !exist[splice, VEP:Consequence])"
+    soft_filter_flag: "Intron"
+    soft_filter: "True"
+  protein_coding:
+    description: "Soft filter variants not deemed protein_coding"
+    expression: "(VEP:BIOTYPE != protein_coding)"
+    soft_filter_flag: "Biotype"
+    soft_filter: "True"
+  consequences:
+    description: "Soft filter based on consequences"
+    expression:
+      "(exist[intergenic_variant, VEP:Consequence] or exist[NMD_transcript_variant, VEP:Consequence] or
+      exist[non_coding_transcript_variant, VEP:Consequence] or
+      exist[upstream_gene_variant, VEP:Consequence] or
+      exist[downstream_gene_variant, VEP:Consequence] or
+      exist[TFBS_ablation, VEP:Consequence] or
+      exist[TFBS_amplification, VEP:Consequence] or
+      exist[TF_binding_site_variant, VEP:Consequence] or
+      exist[regulatory_region_ablation, VEP:Consequence] or
+      exist[regulatory_region_amplification, VEP:Consequence] or
+      exist[regulatory_region_variant, VEP:Consequence])"
+    soft_filter_flag: "Consequence"
+    soft_filter: "True"
+  n_ratio:
+    description: "Soft filter variants where normal freq is atleast 5 times bigger than tumour freq"
+    expression: "INFO:NA_FALSE:N_ratio > 5"
+    soft_filter_flag: "N_ratio_lgt_5"
+    soft_filter: "True"

@@ -1,13 +1,13 @@
 rule fix_af:
     input:
-        vcf="parabricks/pbrun_mutectcaller_t/{sample}_{type}.vep.filter.germline.vcf",
+        vcf="parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.vcf",
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_t/{sample}_{type}.vep.filter.germline.fix_af.vcf"),
+        vcf=temp("parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.fix_af.vcf"),
     log:
-        "parabricks/pbrun_mutectcaller_t/{sample}_{type}.vep.filter.germline.fix_af.log",
+        "parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.fix_af.log",
     benchmark:
         repeat(
-            "parabricks/pbrun_mutectcaller_t/{sample}_{type}.vep.filter.germline.fix_af.benchmark.tsv",
+            "parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.fix_af.benchmark.tsv",
             config.get("fix_af", {}).get("benchmark_repeats", 1),
         )
     threads: config.get("fix_af", {}).get("threads", config["default_resources"]["threads"])

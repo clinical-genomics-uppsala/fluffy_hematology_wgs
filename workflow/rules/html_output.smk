@@ -9,7 +9,7 @@ rule merge_cnv_json_chr:
         json=get_json_for_merge_cnv_json_chr,
         fai=config.get("reference", {}).get("fai", ""),
         annotation_bed=list(config.get("annotate_cnv", {}).values()),
-        germline_vcf="parabricks/pbrun_mutectcaller_t/{sample}_{type}.vep.filter.germline.fix_af.vcf",
+        germline_vcf="parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.fix_af.vcf",
         cnv_vcfs=get_unfiltered_cnv_vcfs_for_merge_json,
         filtered_cnv_vcfs=get_filtered_cnv_vcfs_for_merge_json,
         filtered_cnv_vcfs_tbi=get_filtered_cnv_vcfs_tbi_for_merge_json,

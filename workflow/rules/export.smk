@@ -4,13 +4,25 @@ __email__ = "arielle.munters@scilifelab.uu.se"
 __license__ = "GPL-3"
 
 
+def check_if_tn(wildcards):
+    if wildcards.analysis == "tn":
+        vcfs = expand(
+            "parabricks/pbrun_mutectcaller_{{analysis}}/{{sample_type}}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz",
+            bed=["all", "aml", "tm"],
+        )
+    else:
+        vcfs = expand(
+            "parabricks/pbrun_mutectcaller_{{analysis}}/{{sample_type}}.normalized.vep.filter.somatic.include.{bed}.vcf.gz",
+            bed=["all", "aml", "tm"],
+        )
+    return vcfs
+
+
 rule export_to_xlsx:
     input:
-        all="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.vep.include.all.vcf.gz",
+        vcfs=check_if_tn,
         all_bed=config["bcftools_SNV"]["all"],
-        aml="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.vep.include.aml.vcf.gz",
         aml_bed=config["bcftools_SNV"]["aml"],
-        tm="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.vep.include.tm.vcf.gz",
         tm_bed=config["bcftools_SNV"]["tm"],
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample_type}.snvs.xlsx"),
@@ -33,6 +45,6 @@ rule export_to_xlsx:
     container:
         config.get("export_to_xlsx", {}).get("container", config["default_container"])
     message:
-        "{rule}: merge {input.all}, {input.aml}, {input.tm} into {output.xlsx}"
+        "{rule}: merge {input.vcfs} into {output.xlsx}"
     script:
         "../scripts/export_to_xlsx.py"

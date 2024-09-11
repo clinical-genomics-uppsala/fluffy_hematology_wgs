@@ -133,6 +133,20 @@ properties:
         type: string
         description: path to CNA gene bed file
 
+  annotate_normal_ratio:
+    type: object
+    description: parameters for annotate_normal_ratio
+    properties:
+      benchmark_repeats:
+        type: integer
+        description: set number of times benchmark should be repeated
+      container:
+        type: string
+        description: name or path to docker/singularity container
+      extra:
+        type: string
+        description: parameters that should be forwarded
+
   arriba:
     type: object
     properties:

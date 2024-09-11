@@ -13,8 +13,6 @@ def index_vep(variantfile):
     return csq_index
 
 
-# No filterings as of now 231027 on any vcf. Should we add?
-# are the files decomposed?
 """ Prepping input data """
 bedfiles = {}
 bedfiles["all"] = snakemake.input.all_bed
@@ -22,23 +20,24 @@ bedfiles["aml"] = snakemake.input.aml_bed
 bedfiles["tm"] = snakemake.input.tm_bed
 
 vcfs = {}
-vcfs["all"] = snakemake.input.all
-vcfs["aml"] = snakemake.input.aml
-vcfs["tm"] = snakemake.input.tm
+vcfs["all"] = [x for x in snakemake.input.vcfs if "include.all" in x][0]
+vcfs["aml"] = [x for x in snakemake.input.vcfs if "include.aml" in x][0]
+vcfs["tm"] = [x for x in snakemake.input.vcfs if "include.tm" in x][0]
 subsections = ["all", "aml", "tm"]
 vcf_tables = {}
 for subsection in subsections:
     vcf_tables[subsection] = []
     vcf = VariantFile(vcfs[subsection])
     csq_index = index_vep(vcf)
+    sample_tumor = [x for x in list(vcf.header.samples) if x.endswith("_T")][0]
     if len(list(vcf.header.samples)) > 1:
-        sample_normal = list(vcf.header.samples)[0]
-        sample_tumor = list(vcf.header.samples)[1]
+        sample_normal = [x for x in list(vcf.header.samples) if x.endswith("_N")][0]
     else:
-        sample_tumor = list(vcf.header.samples)[0]
         af_normal = ""
+        dp_normal = ""
 
     for record in vcf.fetch():
+        filterflag = ",".join(record.filter.keys())
         af = float(record.samples[sample_tumor].get("AF")[0])
         if af > 0.01:
             csq = record.info["CSQ"][0].split("|")
@@ -72,8 +71,10 @@ for subsection in subsections:
 
             if len(list(vcf.header.samples)) > 1:
                 af_normal = float(record.samples[sample_normal].get("AF")[0])
+                dp_normal = int(record.samples[sample_normal].get("DP"))
 
             outline = [
+                filterflag,
                 sample_tumor,
                 gene,
                 record.contig,
@@ -83,6 +84,7 @@ for subsection in subsections:
                 af,
                 af_normal,
                 int(record.info["DP"]),
+                dp_normal,
                 transcript,
                 exon,
                 coding_name,
@@ -138,13 +140,14 @@ worksheet_overview.write(18, 0, "TM exons bedfile: " + bedfiles["tm"])
 for sheet in subsections:
     vcf_data = vcf_tables[sheet]
     worksheet = workbook.add_worksheet(sheet.upper())
-    worksheet.set_column("A:A", 12)
-    worksheet.set_column("D:D", 10)
-    worksheet.set_column("J:J", 15)
+    worksheet.set_column("B:B", 12)
+    worksheet.set_column("E:E", 10)
+    worksheet.set_column("L:L", 15)
     worksheet.write("A1", "Variants in " + sheet.upper() + " regions", heading_format)
     worksheet.write("A3", "Sample: " + str(sample_tumor))
 
     tableheading = [
+        "FilterFlag",
         "DNAnr",
         "Gene",
         "Chr",
@@ -154,6 +157,7 @@ for sheet in subsections:
         "AF",
         "Normal AF",
         "DP",
+        "Normal DP",
         "Transcript",
         "Exon",
         "Mutation cds",
@@ -168,7 +172,7 @@ for sheet in subsections:
     heading_list = [{"header": a} for a in tableheading]
 
     worksheet.add_table(
-        "A5:S" + str(len(vcf_data) + 6), {"data": vcf_data, "columns": heading_list, "style": "Table Style Light 1"}
+        "A5:U" + str(len(vcf_data) + 6), {"data": vcf_data, "columns": heading_list, "style": "Table Style Light 1"}
     )
 # Add bedfile sheets
 for sheet in subsections:
