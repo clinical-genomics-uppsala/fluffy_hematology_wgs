@@ -95,7 +95,7 @@ module annotation:
 use rule * from annotation as annotation_*
 
 
-use rule vep from annotation as annotation_vep with:
+use rule vep from annotation as annotation_vep_snvs with:
     input:
         vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz",
         tabix="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.tbi",

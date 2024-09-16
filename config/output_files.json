@@ -36,12 +36,7 @@
   "Results/{sample}/SNV_indels/{sample}_TN.vep.tm.vcf.gz.tbi": {"name": "_results_tbi_tm", "file": "parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.include.tm.vcf.gz.tbi", "types": ["TN"]},
   "Results/{sample}/SNV_indels/{sample}_TN.xlsx": {"name": "_results_xlsx_tn", "file": "export_to_xlsx/tn/{sample}.snvs.xlsx", "types": ["TN"]},
   
-  "Results/{sample}/SNV_indels/{sample}_mutectcaller_T.all.tsv": {"name": "_results_tsv_all_t", "file": "tsv_files/{sample}_T_mutectcaller_t.all.tsv", "types": ["T"]},
-  "Results/{sample}/SNV_indels/{sample}_mutectcaller_T.aml.tsv": {"name": "_results_tsv_aml_t", "file": "tsv_files/{sample}_T_mutectcaller_t.aml.tsv", "types": ["T"]},
-
-  "Results/{sample}/SNV_indels/{sample}_mutectcaller_TN.all.tsv": {"name": "_results_tsv_all", "file": "tsv_files/{sample}_mutectcaller_tn.all.tsv", "types": ["TN"]},
-  "Results/{sample}/SNV_indels/{sample}_mutectcaller_TN.aml.tsv": {"name": "_results_tsv_aml", "file": "tsv_files/{sample}_mutectcaller_tn.aml.tsv", "types": ["TN"]},
-  "Results/{sample}/SNV_indels/{sample}.pindel.vcf": {"name": "_results_pindel_vcf", "file": "cnv_sv/pindel_vcf/{sample}_T.no_tc.vcf", "types": ["T"]},
+  "Results/{sample}/SNV_indels/{sample}.pindel.vcf": {"name": "_results_pindel_vcf", "file": "cnv_sv/pindel_vcf/{sample}_T.no_tc.vep_annotated.vcf", "types": ["T"]},
   "Results/{sample}/CNV/{sample}_T.pathology.vcf.gz": {"name": "_results_cnvkit_vcf", "file": "cnv_sv/cnvkit_vcf/{sample}_T.pathology.vcf.gz", "types": ["T"]},
   "Results/{sample}/CNV/{sample}_T.pathology.vcf.gz.tbi": {"name": "_results_cnvkit_tbi", "file": "cnv_sv/cnvkit_vcf/{sample}_T.pathology.vcf.gz.tbi", "types": ["T"]},
   "Results/{sample}/CNV/{sample}_T.CNV.xlsx": {"name": "_results_cnvkit_table", "file": "cnv_sv/cnvkit_table/{sample}_T.CNV.xlsx", "types": ["T"]},
