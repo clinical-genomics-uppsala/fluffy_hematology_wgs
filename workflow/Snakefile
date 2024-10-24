@@ -17,21 +17,23 @@ include: "rules/manta_to_tsv.smk"
 include: "rules/peddy_create_ped.smk"
 
 
+ruleorder: annotation_simple_sv_annotation_tn > misc_bgzip
 ruleorder: cnv_sv_manta_run_workflow_tn > misc_tabix
 ruleorder: cnv_sv_manta_run_workflow_tn > misc_bgzip
 ruleorder: cnv_sv_manta_run_workflow_t > misc_tabix
 ruleorder: cnv_sv_manta_run_workflow_t > misc_bgzip
-ruleorder: _results_manta_tn_tbi > misc_tabix
-ruleorder: _results_manta_t_tbi > misc_tabix
-ruleorder: _results_cnvkit_tbi > misc_tabix
-ruleorder: _results_vcf_tn > misc_bgzip
-ruleorder: _results_gatk_vcf > misc_bgzip
-ruleorder: _results_gatk_vcf_tbi > misc_tabix
-ruleorder: annotation_simple_sv_annotation_tn > misc_bgzip
-ruleorder: _results_pindel_vcf > misc_bgzip
+ruleorder: fix_af > filtering_filter_vcf 
 ruleorder: gatk_model_segments > cnv_sv_gatk_model_segments
-ruleorder: _results_svdb_vcf > misc_bgzip
-ruleorder: _results_svdb_tbi > misc_tabix
+
+ruleorder: copy_parabricks_tn_vcf > misc_bgzip
+ruleorder: copy_manta_tn_tbi > misc_tabix
+ruleorder: copy_manta_t_tbi > misc_tabix
+ruleorder: copy_cnvkit_tbi > misc_tabix
+ruleorder: copy_gatk_vcf > misc_bgzip
+ruleorder: copy_gatk_tbi > misc_tabix
+ruleorder: copy_pindel_vcf > misc_bgzip
+ruleorder: copy_cnv_svdb_vcf > misc_bgzip
+ruleorder: copy_cnv_svdb_tbi > misc_tabix
 
 
 aligner = config.get("aligner", None)
@@ -44,31 +46,30 @@ elif aligner == "bwa_gpu":
     include: "rules/mutectcaller_to_tsv.smk"
     include: "rules/sample_order_multiqc.smk"
 
-    ruleorder: _results_manta_tn_tbi_all > misc_tabix
-    ruleorder: _results_manta_tn_tbi_aml > misc_tabix
-    ruleorder: _results_manta_t_tbi_all > misc_tabix
-    ruleorder: _results_manta_t_tbi_aml > misc_tabix
-    ruleorder: _results_tbi_tn > misc_tabix
-    ruleorder: _results_tbi_all > misc_tabix
-    ruleorder: _results_tbi_aml > misc_tabix
-    ruleorder: _results_crai > misc_samtools_index
-    ruleorder: _results_vcf_t > misc_bgzip
-    ruleorder: _results_tbi_t > misc_tabix
-    ruleorder: _results_tbi_tn > misc_tabix
-    ruleorder: _results_vcf_aml > misc_bgzip
-    ruleorder: _results_vcf_aml_t > misc_bgzip
-    ruleorder: _results_tbi_aml > misc_tabix
-    ruleorder: _results_tbi_aml_t > misc_tabix
-    ruleorder: _results_vcf_all > misc_bgzip
-    ruleorder: _results_tbi_all > misc_tabix
-    ruleorder: _results_vcf_all_t > misc_bgzip
-    ruleorder: _results_tbi_all_t > misc_tabix
-    ruleorder: _results_vcf_tm > misc_bgzip
-    ruleorder: _results_tbi_tm > misc_tabix
-    ruleorder: _results_vcf_tm_t > misc_bgzip
-    ruleorder: _results_tbi_tm_t > misc_tabix
     ruleorder: parabricks_pbrun_fq2bam > alignment_samtools_index
-    ruleorder: _results_star_crai > alignment_samtools_index
+    ruleorder: copy_crai_t_and_n > misc_samtools_index
+    ruleorder: copy_rna_bai > alignment_samtools_index
+
+    ruleorder: copy_parabricks_tn_tbi > misc_tabix
+    ruleorder: copy_parabricks_tn_vcf_all_subsample > misc_bgzip
+    ruleorder: copy_parabricks_tn_tbi_all_subsample > misc_tabix
+    ruleorder: copy_parabricks_tn_vcf_aml_subsample > misc_bgzip
+    ruleorder: copy_parabricks_tn_tbi_aml_subsample > misc_tabix
+    ruleorder: copy_parabricks_tn_vcf_tm_subsample > misc_bgzip
+    ruleorder: copy_parabricks_tn_tbi_tm_subsample > misc_tabix
+    ruleorder: copy_manta_tn_tbi_all_subsample > misc_tabix
+    ruleorder: copy_manta_tn_tbi_aml_subsample > misc_tabix
+
+    ruleorder: copy_parabricks_t_vcf > misc_bgzip
+    ruleorder: copy_parabricks_t_tbi > misc_tabix
+    ruleorder: copy_parabricks_t_vcf_all_subsample > misc_bgzip
+    ruleorder: copy_parabricks_t_tbi_all_subsample > misc_tabix
+    ruleorder: copy_parabricks_t_vcf_aml_subsample > misc_bgzip
+    ruleorder: copy_parabricks_t_tbi_aml_subsample > misc_tabix
+    ruleorder: copy_parabricks_t_vcf_tm_subsample > misc_bgzip
+    ruleorder: copy_parabricks_t_tbi_tm_subsample > misc_tabix
+    ruleorder: copy_manta_t_tbi_all_subsample > misc_tabix
+    ruleorder: copy_manta_t_tbi_aml_subsample > misc_tabix
 
 elif aligner == "bwa_sentieon":
 
@@ -78,7 +79,7 @@ elif aligner == "bwa_sentieon":
 
 rule all:
     input:
-        unpack(compile_output_list),
+        unpack(compile_output_file_list),
 
 
 module annotation:
@@ -95,7 +96,7 @@ module annotation:
 use rule * from annotation as annotation_*
 
 
-use rule vep from annotation as annotation_vep with:
+use rule vep from annotation as annotation_vep_snvs with:
     input:
         vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz",
         tabix="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.tbi",
@@ -161,7 +162,12 @@ module alignment:
         config
 
 
-use rule star from alignment as alignment_star
+use rule star from alignment as alignment_star with:
+    output:
+        bam=temp("alignment/star/{sample}_{type}.bam"),
+        sj=temp("alignment/star/{sample}_{type}.SJ.out.tab"),
+        reads_per_gene=temp("alignment/star/{sample}_{type}.ReadsPerGene.out.tab"),
+        log_final=temp("alignment/star/{sample}_{type}.Log.final.out"),
 
 
 use rule samtools_index from alignment as alignment_samtools_index

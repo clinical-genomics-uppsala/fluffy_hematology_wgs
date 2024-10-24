@@ -2,24 +2,46 @@ decimalPoint_format: ','
 extra_fn_clean_exts: ##from this until end
     - '.duplication_metrics'
     - type: regex
+      pattern: '^HG[0-9]+-[A-Za-z0-9-]+_'
+    - type: regex
       pattern: '_fastq[12]'
-extra_fn_clean_trim:
-  - 'Sample_WA-3560_'
+
+table_sample_merge:
+  "R1": "_R1_001"
+  "R2": "_R2_001"
+  "L008": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "_S[0-9]{1,2}_L008"
+  "L007": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "_S[0-9]{1,2}_L007"
+  "L006": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "_S[0-9]{1,2}_L006"
+  "L005": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "_[0-9]{1,2}_L005"
+  "L004": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "_S[0-9]{1,2}_L004"
+  "L003": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "_S[0-9]{1,2}_L003"
+  "L002": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "_S[0-9]{1,2}_L002"
+  "L001": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "_S[0-9]{1,2}_L001"
 
 report_header_info:
   - Contact E-mail: "igp-klinsek-bioinfo@lists.uu.se"
   - Application Type: "TrueSeq PCR Free WGS"
   - Project Type: "Whole Genome"
- 
-custom content:
-  order:
-    - fastqc
-    - mosdepth
-    - fastp
-    - peddy
-    - samtools
-    - picard
 
+sp:
+  dna_number_table:
+    fn: "*DNA_number.table.tsv"
 
 custom_data:
   dna_number_table:
@@ -32,11 +54,45 @@ custom_data:
           title: "DNA number"
           description: "DNA number based on SampleSheet"
 
-sp:
-  dna_number_table:
-    fn: "*DNA_number.table.tsv"
+# mosdepth custom thresholds
+mosdepth_config:
+  general_stats_coverage:
+    - 1
+    - 5
+    - 10
+    - 15
+    - 20
+    - 30
+    - 50
 
+# Remove suffix in general stats
+custom_table_header_config:
+  general_stats_table:
+    raw_total_sequences:
+      suffix: ""
+      title: "Total seqs [M]"
+    reads_mapped:
+      suffix: ""
+      title: "Reads mapped [M]"
+    reads_mapped_percent:
+      suffix: ""
+    reads_properly_paired_percent:
+      suffix: ""
+    median_coverage:
+      suffix: ""
+    10_x_pc:
+      suffix: ""
+    30_x_pc:
+      suffix: ""
+    50_x_pc:
+      suffix: ""
+    PERCENT_DUPLICATION:
+      suffix: ""
+      title: "Duplication [%]"
+    summed_mean:
+      suffix: ""
 
+# General stats column visibility
 table_columns_visible:
   FastQC:
     percent_duplicates: False
@@ -45,7 +101,7 @@ table_columns_visible:
     percent_fails: False
     total_sequences: False
   fastp:
-    pct_adapter: True
+    pct_adapter: False
     pct_surviving: False
     after_filtering_gc_content: False
     filtering_result_passed_filter_reads: False
@@ -68,41 +124,33 @@ table_columns_visible:
     sex_het_ratio: False
     error_sex_check: True
     predicted_sex_sex_check: True
-  Picard:
-    PCT_PF_READS_ALIGNED: False
+  "Picard: HsMetrics":
+    FOLD_ENRICHMENT: False
+    MEDIAN_TARGET_COVERAGE: False
+    PCT_TARGET_BASES_30X: False
+    ZERO_CVG_TARGETS_PCT: False
+  "Picard: InsertSizeMetrics":
     summed_median: False
     summed_mean: True
+  "Picard: Mark Duplicates":
     PERCENT_DUPLICATION: True
+  "Picard: WgsMetrics":
     MEDIAN_COVERAGE: False
     MEAN_COVERAGE: False
     SD_COVERAGE: False
     PCT_30X: False
-    PCT_TARGET_BASES_30X: False
-    FOLD_ENRICHMENT: False
-    TOTAL_READS: True
-  Samtools:
+  "Samtools: stats":
     error_rate: False
     non-primary_alignments: False
     reads_mapped: False
     reads_mapped_percent: True
     reads_properly_paired_percent: True
     reads_MQ0_percent: False
-    raw_total_sequences: True
+    raw_total_sequences: True #tidigare from picard
 
-# mosdepth custom thresholds
-mosdepth_config:
-  general_stats_coverage:
-    - 1
-    - 5
-    - 10
-    - 15
-    - 20
-    - 30
-    - 50
-
-# Patriks plug in, addera egna columner till general stats
+# Custom columns to general stats
 multiqc_cgs:
-  Picard:
+  "Picard: HsMetrics":
     FOLD_80_BASE_PENALTY:
       title: "Fold80"
       description: "Fold80 penalty from picard hs metrics"
@@ -121,25 +169,17 @@ multiqc_cgs:
       max: 100
       scale: "RdYlGn-rev"
       format: "{:.2%}"
-  Samtools:
+  "Samtools: stats":
     average_quality:
       title: "Average Quality"
       description: "Ratio between the sum of base qualities and total length from Samtools stats"
       min: 0
       max: 60
       scale: "RdYlGn"
-  mosdepth:
-     20_x_pc: #Cant get it to work
-        title: "20x percent"
-        description: "Fraction of genome with at least 20X coverage"
-        max: 100
-        min: 0
-        suffix: "%"
-        scale: "RdYlGn"
 
 # Galler alla kolumner oberoende pa module!
 table_columns_placement:
-  dna_number_table:
+  "Custom content: dna_number_table":
     dna_number: 300
   mosdepth:
     median_coverage: 601
@@ -150,7 +190,7 @@ table_columns_placement:
     20_x_pc: 604
     30_x_pc: 605
     50_x_pc: 606
-  Samtools:
+  "Samtools: stats":
     raw_total_sequences: 500
     reads_mapped: 501
     reads_mapped_percent: 502
@@ -166,19 +206,15 @@ table_columns_placement:
     error_sex_check: 701
     predicted_sex_sex_check: 702
     family_id: 703
-  Picard:
-    TOTAL_READS: 500
-    PCT_SELECTED_BASES: 801
-    FOLD_80_BASE_PENALTY: 802
-    PCT_PF_READS_ALIGNED: 888
-    summed_median: 888
-    PERCENT_DUPLICATION: 803
-    summed_mean: 804
-    STANDARD_DEVIATION: 805
-    ZERO_CVG_TARGETS_PCT: 888
-    MEDIAN_COVERAGE: 888
-    MEAN_COVERAGE: 888
-    SD_COVERAGE: 888
-    PCT_30X: 888
-    PCT_TARGET_BASES_30X: 888
+  "Picard: HsMetrics":
     FOLD_ENRICHMENT: 888
+    MEDIAN_TARGET_COVERAGE: 888
+    PCT_TARGET_BASES_30X: 888
+    FOLD_80_BASE_PENALTY: 801
+    PCT_SELECTED_BASES: 800
+    ZERO_CVG_TARGETS_PCT: 805
+  "Picard: InsertSizeMetrics":
+    summed_median: 803
+    summed_mean: 803
+  "Picard: Mark Duplicates":
+    PERCENT_DUPLICATION: 802

@@ -1,0 +1,354 @@
+directory: ./Results
+
+files:
+  - name: Spring compression
+    input: "compression/spring/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring"
+    output: Archive/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring
+    types: ["T", "N", "R"]
+
+  - name: MultiQC DNA
+    input: "qc/multiqc/multiqc_DNA.html"
+    output: multiqc_TN.html
+    types: ["T", "N"]
+  
+  - name: Cram T and N
+    input: compression/crumble/{sample}_{type}.crumble.cram
+    output: "{sample}/Cram/{sample}_{type}.crumble.cram"
+    types: ["T", "N"]
+
+  - name: Crai T and N
+    input: compression/crumble/{sample}_{type}.crumble.cram.crai
+    output: "{sample}/Cram/{sample}_{type}.crumble.cram.crai"
+    types: ["T", "N"]
+
+  # Tumor
+    # SNV indels
+  - name: Parabricks T vcf
+    input: "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.vcf.gz"
+    output: "{sample}/SNV_indels/{sample}_T.vep.vcf.gz"
+    types: ["T"]
+  
+  - name: Parabricks T tbi
+    input: "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.vcf.gz.tbi"
+    output: "{sample}/SNV_indels/{sample}_T.vep.vcf.gz.tbi"
+    types: ["T"]
+
+  - name: Parabricks T vcf ALL subsample
+    input: "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.all.vcf.gz"
+    output: "{sample}/SNV_indels/{sample}_T.vep.all.vcf.gz" 
+    types: ["T"]
+  
+  - name: Parabricks T tbi ALL subsample
+    input: "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.all.vcf.gz.tbi"
+    output: "{sample}/SNV_indels/{sample}_T.vep.all.vcf.gz.tbi"
+    types: ["T"]
+
+  - name: Parabricks T vcf AML subsample
+    input: "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.aml.vcf.gz"
+    output: "{sample}/SNV_indels/{sample}_T.vep.aml.vcf.gz"
+    types: ["T"]
+
+  - name: Parabricks T tbi AML subsample
+    input: "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.aml.vcf.gz.tbi"
+    output: "{sample}/SNV_indels/{sample}_T.vep.aml.vcf.gz.tbi"
+    types: ["T"]
+
+  - name: Parabricks T vcf TM subsample
+    input: "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.tm.vcf.gz"
+    output: "{sample}/SNV_indels/{sample}_T.vep.tm.vcf.gz"
+    types: ["T"]  
+
+  - name: Parabricks T tbi TM subsample
+    input: "parabricks/pbrun_mutectcaller_t/{sample}_T.vep.include.tm.vcf.gz.tbi"
+    output: "{sample}/SNV_indels/{sample}_T.vep.tm.vcf.gz.tbi"
+    types: ["T"]
+
+  - name: Parabricks T xlsx
+    input: "export_to_xlsx/t/{sample}_T.snvs.xlsx"
+    output: "{sample}/SNV_indels/{sample}_T.xlsx"
+    types: ["T"]
+
+  - name: Pindel vcf
+    input: "cnv_sv/pindel_vcf/{sample}_T.no_tc.vep_annotated.vcf"
+    output: "{sample}/SNV_indels/{sample}.pindel.vcf"
+    types: ["T"]
+
+    # CNV
+  - name: CNVkit vcf
+    input: "cnv_sv/cnvkit_vcf/{sample}_T.pathology.vcf.gz"
+    output: "{sample}/CNV/vcfs/{sample}_T.cnvkit.pathology.vcf.gz"
+    types: ["T"]
+
+  - name: CNVkit tbi
+    input: "cnv_sv/cnvkit_vcf/{sample}_T.pathology.vcf.gz.tbi"
+    output: "{sample}/CNV/vcfs/{sample}_T.cnvkit.pathology.vcf.gz.tbi"
+    types: ["T"]
+
+  - name: GATK vcf
+    input: "cnv_sv/gatk_vcf/{sample}_T.pathology.vcf.gz"
+    output: "{sample}/CNV/vcfs/{sample}_T.gatk.pathology.vcf.gz"
+    types: ["T"]
+  
+  - name: GATK tbi
+    input: "cnv_sv/gatk_vcf/{sample}_T.pathology.vcf.gz.tbi"
+    output: "{sample}/CNV/vcfs/{sample}_T.gatk.pathology.vcf.gz.tbi"
+    types: ["T"]
+  
+  - name: CNVkit xlsx
+    input: "cnv_sv/cnvkit_table/{sample}_T.CNV.xlsx"
+    output: "{sample}/CNV/{sample}_T.CNVkit.xlsx"
+    types: ["T"]
+  
+  - name: CNVkit plot whole
+    input: "cnv_sv/cnvkit_scatter/{sample}_T.png"
+    output: "{sample}/CNV/{sample}_T.png"
+    types: ["T"]
+  
+  - name: CNVkit plot per chr
+    input: "cnv_sv/cnvkit_scatter/{sample}_T_chr{chr}.png"
+    output: "{sample}/CNV/{sample}_T_chr{chr}.png"
+    types: ["T"]
+    
+  - name: CNV report per chr
+    input: "reports/cnv_html_report/{sample}_T.pathology.chr{chr}.cnv_report.html"
+    output: "{sample}/CNV/cnv_html_report/{sample}_T.pathology.chr{chr}.cnv_report.html"
+    types: ["T"]
+  
+  - name: CNV svdb vcf
+    input: "cnv_sv/svdb_query/{sample}_T.pathology.svdb_query.vcf.gz"
+    output: "{sample}/CNV/{sample}_T.pathology.cnv-calls.vcf.gz"
+    types: ["T"]
+  
+  - name: CNV svdb tbi
+    input: "cnv_sv/svdb_query/{sample}_T.pathology.svdb_query.vcf.gz.tbi"
+    output: "{sample}/CNV/{sample}_T.pathology.cnv-calls.vcf.gz.tbi"
+    types: ["T"]
+
+    # DNA fusions
+  - name: DUX4 igh read count
+    input: "reports/dux_read_counts/{sample}_T.dux4_igh.txt"
+    output: "{sample}/DNA_fusions/{sample}_T.dux4_igh_read_count.txt"
+    types: ["T"]
+
+  - name: DUX4 ERG read count
+    input: "reports/dux_read_counts/{sample}_T.dux4_erg.txt"
+    output: "{sample}/DNA_fusions/{sample}_T.dux4_erg_read_count.txt"
+    types: ["T"]
+
+    # SVs
+  - name: Manta T vcf
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_T.ssa.vcf.gz"
+    types: ["T"]
+      
+  - name: Manta T tbi
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_T.ssa.vcf.gz.tbi"
+    types: ["T"]
+
+  - name: Manta T vcf ALL subsample
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.include.all.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_T.ssa.all.vcf.gz"
+    types: ["T"]
+
+  - name: Manta T tbi ALL subsample
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.include.all.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_T.ssa.all.vcf.gz.tbi"
+    types: ["T"]
+
+  - name: Manta T vcf AML subsample
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.include.aml.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_T.ssa.aml.vcf.gz"
+    types: ["T"]
+
+  - name: Manta T tbi AML subsample
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.include.aml.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_T.ssa.aml.vcf.gz.tbi"
+    types: ["T"]
+
+  - name: Manta T tsv del subsample
+    input: "tsv_files/{sample}_manta_t.del.tsv"
+    output: "{sample}/SV/{sample}_manta_T.del.tsv"
+    types: ["T"]
+
+  - name: Manta T tsv ins subsample
+    input: "tsv_files/{sample}_manta_t.ins.tsv"
+    output: "{sample}/SV/{sample}_manta_T.ins.tsv"
+    types: ["T"]
+
+  - name: Manta T tsv dup subsample
+    input: "tsv_files/{sample}_manta_t.dup.tsv"
+    output: "{sample}/SV/{sample}_manta_T.dup.tsv"
+    types: ["T"]
+
+  - name: Manta T tsv bnd subsample
+    input: "tsv_files/{sample}_manta_t.tsv"
+    output: "{sample}/SV/{sample}_manta_T.bnd.tsv"
+    types: ["T"]
+
+  - name: Manta T tsv bnd-all subsample
+    input: "tsv_files/{sample}_manta_t.all.tsv"
+    output: "{sample}/SV/{sample}_manta_T.bnd.all.tsv"
+    types: ["T"]
+
+  - name: Manta T tsv bnd-aml subsample
+    input: "tsv_files/{sample}_manta_t.aml.tsv"
+    output: "{sample}/SV/{sample}_manta_T.bnd.aml.tsv"
+    types: ["T"]
+
+  # Matched samples TN
+    # SNV indels
+  - name: Parabricks TN vcf
+    input: "parabricks/pbrun_mutectcaller_tn/{sample}.vep.vcf.gz"
+    output: "{sample}/SNV_indels/{sample}_TN.vep.vcf.gz"
+    types:  ["TN"]
+  
+  - name: Parabricks TN tbi
+    input: "parabricks/pbrun_mutectcaller_tn/{sample}.vep.vcf.gz.tbi"
+    output: "{sample}/SNV_indels/{sample}_TN.vep.vcf.gz.tbi"
+    types:  ["TN"]
+
+  - name: Parabricks TN vcf ALL subsample
+    input: "parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.all.vcf.gz"
+    output: "{sample}/SNV_indels/{sample}_TN.vep.all.vcf.gz"
+    types: ["TN"]
+  
+  - name: Parabricks TN tbi ALL subsample
+    input: "parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.all.vcf.gz.tbi"
+    output: "{sample}/SNV_indels/{sample}_TN.vep.all.vcf.gz.tbi"
+    types: ["TN"]
+
+  - name: Parabricks TN vcf AML subsample
+    input: parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.aml.vcf.gz
+    output: "{sample}/SNV_indels/{sample}_TN.vep.aml.vcf.gz"
+    types: ["TN"]
+
+  - name: Parabricks TN tbi AML subsample
+    input: parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.aml.vcf.gz.tbi
+    output: "{sample}/SNV_indels/{sample}_TN.vep.aml.vcf.gz.tbi"
+    types: ["TN"]
+
+  - name: Parabricks TN vcf TM subsample
+    input: parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.tm.vcf.gz
+    output: "{sample}/SNV_indels/{sample}_TN.vep.tm.vcf.gz"
+    types: ["TN"]
+
+  - name: Parabricks TN tbi TM subsample
+    input: parabricks/pbrun_mutectcaller_tn/{sample}.vep.include.tm.vcf.gz.tbi
+    output: "{sample}/SNV_indels/{sample}_TN.vep.tm.vcf.gz.tbi"
+    types: ["TN"]
+
+  - name: Parabricks TN xlsx
+    input: "export_to_xlsx/tn/{sample}.snvs.xlsx"
+    output: "{sample}/SNV_indels/{sample}_TN.xlsx"
+    types: ["TN"]
+
+    # SVs
+  - name: Manta TN vcf
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.vcf.gz" 
+    types: ["TN"]
+
+  - name: Manta TN tbi
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.vcf.gz.tbi"
+    types: ["TN"]
+
+  - name: Manta TN vcf ALL subsample
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.include.all.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.all.vcf.gz"
+    types: ["TN"]
+
+  - name: Manta TN tbi ALL subsample
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.include.all.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.all.vcf.gz.tbi"
+    types: ["TN"]
+
+  - name: Manta TN vcf AML subsample
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.include.aml.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.aml.vcf.gz"
+    types: ["TN"]
+
+  - name: Manta TN tbi AML subsample
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.include.aml.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.aml.vcf.gz.tbi"
+    types: ["TN"]
+
+  - name: Manta TN tsv del subsample
+    input: "tsv_files/{sample}_manta_tn.del.tsv"
+    output: "{sample}/SV/{sample}_manta_TN.del.tsv"
+    types: ["TN"]
+
+  - name: Manta TN tsv ins subsample
+    input: "tsv_files/{sample}_manta_tn.ins.tsv"
+    output: "{sample}/SV/{sample}_manta_TN.ins.tsv"
+    types: ["TN"]
+
+  - name: Manta TN tsv dup subsample
+    input: "tsv_files/{sample}_manta_tn.dup.tsv"
+    output: "{sample}/SV/{sample}_manta_TN.dup.tsv"
+    types: ["TN"]
+
+  - name: Manta TN tsv bnd subsample
+    input: "tsv_files/{sample}_manta_tn.tsv"
+    output: "{sample}/SV/{sample}_manta_TN.bnd.tsv"
+    types: ["TN"]
+
+  - name: Manta TN tsv bnd-all subsample
+    input: "tsv_files/{sample}_manta_tn.all.tsv"
+    output: "{sample}/SV/{sample}_manta_TN.bnd.all.tsv"
+    types: ["TN"]
+
+  - name: Manta TN tsv bnd-aml subsample
+    input: "tsv_files/{sample}_manta_tn.aml.tsv"
+    output: "{sample}/SV/{sample}_manta_TN.bnd.aml.tsv"
+    types: ["TN"]
+
+
+  # RNA
+  - name: MultiQC RNA
+    input: "qc/multiqc/multiqc_RNA.html"
+    output: multiqc_R.html
+    types: ["R"]
+  
+    # alignment
+  - name: RNA bam
+    input: "alignment/star/{sample}_R.bam"
+    output: "{sample}/Cram/{sample}_R.bam"
+    types: ["R"]
+
+  - name: RNA bai
+    input: "alignment/star/{sample}_R.bam.bai"
+    output: "{sample}/Cram/{sample}_R.bam.bai"
+    types: ["R"]
+
+    # Fusions
+  - name: Arriba tsv
+    input: "fusions/arriba/{sample}_R.fusions.tsv"
+    output: "{sample}/RNA_fusions/{sample}_R.arriba.tsv"
+    types: ["R"]
+  
+  - name: Arriba pdf
+    input: fusions/arriba_draw_fusion/{sample}_R.pdf
+    output: "{sample}/RNA_fusions/{sample}_R.arriba.plot.pdf"
+    types: ["R"]
+
+  - name: Star-fusion tsv
+    input: fusions/star_fusion/{sample}_R/star-fusion.fusion_predictions.tsv
+    output: "{sample}/RNA_fusions/{sample}_R.star_fusion.tsv"
+    types: ["R"]
+  
+  - name: Fusioncather tsv
+    input: fusions/fusioncatcher/{sample}_R/final-list_candidate-fusion-genes.txt
+    output: "{sample}/RNA_fusions/{sample}_R.fusioncatcher.tsv"
+    types: ["R"]
+  
+  - name: Fusioncatcher dux4-igh counts
+    input: fusions/fusioncatcher/{sample}_R/dux4-igh_counts.txt
+    output: "{sample}/RNA_fusions/{sample}_R.fusioncatcher_dux4-igh_counts.txt"
+    types: ["R"]
+
+  - name: Fusioncatcher dux4-igh calls
+    input: fusions/fusioncatcher/{sample}_R/dux4-igh_hits.txt
+    output: "{sample}/RNA_fusions/{sample}_R.fusioncatcher_dux4-igh_filtered-results.txt"
+    types: ["R"]

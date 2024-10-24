@@ -1,4 +1,4 @@
-output: "../../config/output_files.json"
+output: "../../config/output_files.yaml"
 
 reference:
   design_bed: "reference/homo_sapiens.wgs.bed"

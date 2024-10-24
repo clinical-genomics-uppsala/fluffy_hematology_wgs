@@ -1,7 +1,7 @@
 resources: "resources.yaml"
 samples: "samples.tsv"
 units: "units.tsv"
-output: "config/output_files.json"
+output: "config/output_files.yaml"
 
 aligner: "bwa_gpu" # bwa_gpu or bwa_sentieon
 
@@ -14,7 +14,7 @@ modules:
   fusions: "12f8354"
   parabricks: "v1.1.0"
   prealignment: "v1.1.0"
-  qc: "v0.3.0"
+  qc: "53c3a82" #"v0.3.0"
   reports: "7c8b8c5"
   snv_indels: "v0.6.0"
   misc: "v0.1.0"
@@ -167,7 +167,7 @@ mosdepth_bed:
   design_bed: ""
 
 multiqc:
-  container: "docker://hydragenetics/multiqc:1.11"
+  container: "docker://hydragenetics/multiqc:1.21"
   reports:
     DNA:
       config: "config/multiqc_dna_config.yaml"
@@ -217,6 +217,8 @@ multiqc:
         - "prealignment/sortmerna/{sample}_{type}.rrna.log"
         - "qc/multiqc/RNA_number.table.tsv"
         - "qc/picard_collect_alignment_summary_metrics/{sample}_{type}.alignment_summary_metrics.txt"
+        - "alignment/star/{sample}_{type}.Log.final.out"
+        - "alignment/star/{sample}_{type}.ReadsPerGene.out.tab"
 
 pbrun_fq2bam:
   container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.0.0-1"

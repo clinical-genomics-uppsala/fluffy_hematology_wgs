@@ -19,4 +19,7 @@ with open(input_file, "r") as samplesheet:
         else:
             sex = "0"
         with open("qc/peddy/" + line[header_line.index("sample")] + ".peddy.fam", "w+") as pedfile:
-            pedfile.write("\t".join([line[header_line.index("sample")], line[header_line.index("sample")] + "_T", "0", "0", sex, "-9"]) + "\n")
+            pedfile.write(
+                "\t".join([line[header_line.index("sample")], line[header_line.index("sample")] + "_T", "0", "0", sex, "-9"])
+                + "\n"
+            )

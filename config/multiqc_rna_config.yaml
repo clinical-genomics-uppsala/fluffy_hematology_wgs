@@ -2,22 +2,25 @@ decimalPoint_format: ','
 extra_fn_clean_exts: ##from this until end
     - '.duplication_metrics'
     - type: regex
-      pattern: '_fastq[12]'
-extra_fn_clean_trim:
-  - 'Sample_WA-3560_'
+      pattern: '^IHT[0-9]+-WP2_'
+    - type: regex
+      pattern: "_fastq[12]"
+
+table_sample_merge:
+  "R1": "_R1_001"
+  "R2": "_R2_001"
+  "L008": # to remove SX_L00X from ending to enable grouping 
+    - type: "regex"
+      pattern: "S[0-9]{1,2}_L008"
 
 report_header_info:
   - Contact E-mail: "igp-klinsek-bioinfo@lists.uu.se"
   - Application Type: "Whole Transcriptome Sequencing"
   - Project Type: "WTS"
 
-custom content:
-  order:
-    - mosdepth
-    - rseqc
-    - sortmerna
-    - fastp
-    - fastqc
+sp:
+  rna_number_table:
+    fn: "*RNA_number.table.tsv"
 
 custom_data:
   rna_number_table:
@@ -31,11 +34,56 @@ custom_data:
           description: "RNA number based on SampleSheet"
           placement: 300
 
-sp:
-  rna_number_table:
-    fn: "*RNA_number.table.tsv"
+# mosdepth custom thresholds
+mosdepth_config:
+  general_stats_coverage:
+    - 1
+    - 5
+    - 10
+    - 15
+    - 20
+    - 30
+    - 50
 
+# Remove suffix from General stats columns
+custom_table_header_config:
+  general_stats_table:
+    reads_properly_paired_percent:
+      suffix: ""
+    median_coverage:
+      title: "Median Coverage"
+      suffix: ""
+    10_x_pc:
+      suffix: ""
+    30_x_pc:
+      suffix: ""
+    50_x_pc:
+      suffix: ""
+    PERCENT_DUPLICATION:
+      suffix: ""
+    summed_mean:
+      suffix: ""
+    PCT_SELECTED_BASES:
+      suffix: ""
+    ZERO_CVG_TARGETS_PCT:
+      suffix: ""
+    total_reads:
+      suffix: ""
+      title: "Total readpairs [M]"
+    mapped_percent:
+      suffix: ""
+      title: "Aligned [%]"
+    uniquely_mapped_percent:
+      suffix: ""
+      title: "Uniq aligned [%]"
+    multimapped:
+      suffix: ""
+      title: "Multimapped [M]"
+    rRNA_pct:
+      suffix: ""
+      title: "rRNA [%]"
 
+# General stats column visibility
 table_columns_visible:
   FastQC:
     percent_duplicates: False
@@ -60,16 +108,24 @@ table_columns_visible:
     20_x_pc: False
     30_x_pc: False
     50_x_pc: False
+  STAR:
+    star-total_reads: True
+    star-mapped: False
+    star-mapped_percent: True
+    star-uniquely_mapped: False
+    star-uniquely_mapped_percent: True
+    star-multimapped: True
   SortMeRNA:
     rRNA_pct: True
-  Picard:
-    PCT_PF_READS_ALIGNED: True
+  # Picard:
+  #   PCT_PF_READS_ALIGNED: True
+  "Picard: Mark Duplicates":
     PERCENT_DUPLICATION: True
-  Samtools:
-    error_rate: False
-    non-primary_alignments: False
-    reads_mapped: True
-    reads_mapped_percent: True
-    reads_properly_paired_percent: True
-    reads_MQ0_percent: False
-    raw_total_sequences: True
+
+
+# multiqc_cgs:
+#   "Picard: Alignment Summary":
+#     MEAN_READ_LENGTH:
+#       title: "Mean Read Length"
+#       description: "Mean read length from Picard Alignment Summary Metrics"
+#       format: "{:.1f}"
