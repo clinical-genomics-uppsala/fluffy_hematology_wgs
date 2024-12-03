@@ -1,5 +1,45 @@
 # Changelog
 
+## [1.2.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.1.0...v1.2.0) (2024-12-03)
+
+
+### Features
+
+* add n_ratio annotation to tn vcfs ([a92c8fb](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/a92c8fb0abaf0ef0039f02605ee5604e506a2027))
+* add preliminary soft filters ([cdf9c63](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/cdf9c63ac5d4e6fe0f52d49eac4c09db72f54a41))
+* add xlsx summary file for rna fusions ([9b5d4c5](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/9b5d4c52d09e42c8bb2262f14ad6773885e09dd9))
+* filter out variants with n_ratio lgt 5 ([ada2826](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/ada2826d6aa45790e82f6c975f23ad33cc1e3f3e))
+* update multiqc version ([fe942e1](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/fe942e1db279442d6db84a6e09d25da42850420a))
+* update sample_order_multiqc to not need SampleSheet ([10536c5](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/10536c5cda5dddb7f062cab017a8d8f2bd6c3b19))
+
+
+### Bug Fixes
+
+* add decompress to manta vcf and annotation for normal ratio header to Tonly samples ([969616b](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/969616b3a1536c0901d47aba96e03f6e8b915658))
+* add missing commas ([9286065](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/928606504db97582804016f397666fefe6edd0f5))
+* add ratio to T ([65c4786](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/65c47863fc38bf427d015900ad88c7f684ab85cd))
+* add rna xlsx file to {sample}-folder in results ([3ee70a6](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/3ee70a6c4e6f459eed510a7fadf1d9406ddac954))
+* add rule to fix svdb 2.6.0 header issue ([c7f401d](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/c7f401d43b15924b9eb83d2de512f9d4321ce91b))
+* add ruleorder and update multiqc rna config ([a629104](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/a6291041d00d90d53cd84aa730df0fe1034de7db))
+* add wildcard constraint for tag in filtering_filter_vcf ([4399702](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/4399702ade3c61240a1f855108883f07546d4542))
+* correct formatting of table if no variants found ([6f73dc3](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/6f73dc338af9850bbdbb438aeb4691e7083ae920))
+* make sure pindel runs for Tonly not just TN-samples ([31bab5a](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/31bab5abf9d7454cdd05e69bf54e06b37553d095))
+* manta ins indentation error ([d716fbd](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/d716fbd7c4803a8139fea83ba6d71e0a77f8f025))
+* name of filter yaml in config ([e8a19a3](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/e8a19a3020c487e69ad2e4f280e3ba6929560cd5))
+* spelling ([b48f02f](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/b48f02fdebaf7f5418d446e467d17cd36732207d))
+* spelling and updating formatting ([1e018de](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/1e018de1e382d36bf1e77e4ef83a2896b1fb76ac))
+* update annotate_ratio output format, filter ratio to &gt;5, set N_ratio to one value in annotation ([71c8871](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/71c8871d2d11f388f13f9381e2fce6aea76c3c9c))
+* update export script and input function ([cbe3098](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/cbe3098589a89c955877dba3a02918d73fdf1cdd))
+* update requirements to hydra genetics 3.0.0 ([41ed4c5](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/41ed4c547fc2069bbe95aa31bb71faf1373840f2))
+* update requirements.txt based on working env on marvin ([4be8aa9](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/4be8aa9a5e328d1fd64b7e613541f0e6a7ef2360))
+* update snpeff naming after update of annotation module ([5cf852b](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/5cf852bc8fcdf26bcf26bfecb3d497dc0084356e))
+
+
+### Performance Improvements
+
+* add pulp and smart_open ([8171f82](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/8171f827e1aa0fa4c8a98b3eab08fb462b79b606))
+* put samples without s-index last ([7172fdd](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/7172fdd30441f373da0d29cd93a84fe418ae2b16))
+
 ## [1.1.0](https://www.github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.0.1...v1.1.0) (2024-01-11)
 
 
