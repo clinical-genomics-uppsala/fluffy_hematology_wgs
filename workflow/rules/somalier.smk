@@ -4,6 +4,129 @@ __email__ = "nina.hollfelder@scilifelab.uu.se"
 __license__ = "GPL-3"
 
 
+rule somalier_create_ped_T:
+    input:
+        config["samples"],
+    output:
+        [f"qc/somalier/{sample}_T.fam" for sample in get_samples(samples)],
+    log:
+        "qc/somalier/somalier_create_ped_T.fam.log",
+    benchmark:
+        repeat(
+            "qc/somalier/somalier_create_ped_T.fam.benchmark.tsv",
+            config.get("somalier_create_ped_T", {}).get("benchmark_repeats", 1),
+        )
+    threads: config.get("somalier_create_ped_T", {}).get("threads", config["default_resources"]["threads"])
+    resources:
+        mem_mb=config.get("somalier_create_ped_T", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("somalier_create_ped_T", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("somalier_create_ped_T", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("somalier_create_ped_T", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("somalier_create_ped_T", {}).get("time", config["default_resources"]["time"]),
+    container:
+        config.get("somalier_create_ped_T", {}).get("container", config["default_container"])
+    message:
+        "{rule}: Create fam file for all T samples for somalier input"
+    script:
+        "../scripts/somalier_create_ped_T.py"
+
+
+rule somalier_create_ped_N:
+    input:
+        config["samples"],
+    output:
+        [f"qc/somalier/{sample}_N.fam" for sample in get_samples(samples)],
+    log:
+        "qc/somalier/somalier_create_ped_N.fam.log",
+    benchmark:
+        repeat(
+            "qc/somalier/somalier_create_ped_N.fam.benchmark.tsv",
+            config.get("somalier_create_ped_N", {}).get("benchmark_repeats", 1),
+        )
+    threads: config.get("somalier_create_ped_N", {}).get("threads", config["default_resources"]["threads"])
+    resources:
+        mem_mb=config.get("somalier_create_ped_N", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("somalier_create_ped_N", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("somalier_create_ped_N", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("somalier_create_ped_N", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("somalier_create_ped_N", {}).get("time", config["default_resources"]["time"]),
+    container:
+        config.get("somalier_create_ped_N", {}).get("container", config["default_container"])
+    message:
+        "{rule}: Create fam file for all T samples for somalier input"
+    script:
+        "../scripts/somalier_create_ped_N.py"
+
+
+rule somalier_combine_fam:
+    input:
+        fam=[
+            "qc/somalier/%s_%s.fam" % (sample,t)
+            for sample in get_samples(samples)
+            for t in get_unit_types(units, sample)  
+            if t in ["N", "T"]
+            ],
+    output:
+        ped="qc/somalier/somalier_all.ped",
+    log:
+        "qc/peddy/somalier_all.ped.log",
+    benchmark:
+        repeat(
+            "qc/somalier/somalier_all.ped.benchmark.tsv",
+            config.get("somalier_combine_fam", {}).get("benchmark_repeats", 1),
+        )
+    resources:
+        mem_mb=config.get("somalier_combine_fam", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("somalier_combine_fam", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("somalier_combine_fam", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("somalier_combine_fam", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("somalier_combine_fam", {}).get("time", config["default_resources"]["time"]),
+    container:
+        config.get("somalier_combine_fam", {}).get("container", config["default_container"])
+    message:
+        "{rule}: creates combined somalier_all.ped for sex check"
+    shell:
+        """
+        cat {input.fam} > {output.ped}
+        """
+
+
+rule somalier_create_groupfile:
+    input:
+        samples=config["samples"],
+        units=config["units"]
+    output:
+        "qc/somalier/somalier.groups"
+    log:
+        "qc/somalier/somalier.groups.log",
+    benchmark:
+        repeat(
+            "qc/somalier/somalier.groups.benchmark.tsv",
+            config.get("somalier_create_groupfile", {}).get("benchmark_repeats", 1),
+        )
+    threads: config.get("somalier_create_groupfile", {}).get("threads", config["default_resources"]["threads"])
+    resources:
+        mem_mb=config.get("somalier_create_groupfile", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("somalier_create_groupfile", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("somalier_create_groupfile", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("somalier_create_groupfile", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("somalier_create_groupfile", {}).get("time", config["default_resources"]["time"]),
+    container:
+        config.get("somalier_create_groupfile", {}).get("container", config["default_container"])
+    message:
+        "{rule}: Create group file for somalier input"
+    shell:
+        """
+        for i in $( cut -f1 {input.samples} | tail -n+2 )
+        do
+        var=$(grep $i {input.units} | cut -f2 | uniq | tr "\\n" "," | sed "s/,$/\\n/")
+        if [ $var == "N,T" ] || [ $var == "T,N" ]
+        then echo ${{i}}_N,${{i}}_T
+        fi
+        done > {output}
+        """
+
+
 if aligner == "bwa_gpu": 
 
     rule somalier_extract:
@@ -46,13 +169,13 @@ rule somalier_relate:
                 for t in get_unit_types(units, sample)
 		if t in ["N", "T"]                
 		],
+	ped="qc/somalier/somalier_all.ped",
+	group="qc/somalier/somalier.groups",
     output:
         pairs="qc/somalier/somalier_relate.pairs.tsv",
         groups="qc/somalier/somalier_relate.groups.tsv",
         samples="qc/somalier/somalier_relate.samples.tsv",
         html="qc/somalier/somalier_relate.html",
-    wildcard_constraints:
-        type="T|N",
     log:
         "qc/somalier/somalier_relate.log",
     params:
@@ -60,7 +183,7 @@ rule somalier_relate:
         outname="qc/somalier/somalier_relate",
     benchmark:
         repeat(
-            "qc/somalier/somalier_relate.becnhmark.tsv",
+            "qc/somalier/somalier_relate.benchmark.tsv",
             config.get("somalier_relate", {}).get("benchmark_repeats", 1),
         )
     threads:
@@ -76,14 +199,14 @@ rule somalier_relate:
     message:
         "{rule}: Running somalier relate for inferring sex and checking T/N"
     shell:
-        "somalier relate {params.extra} -o {params.outname} {input.samples}"
+        "somalier relate {params.extra} --ped {input.ped} -g {input.group} -o {params.outname} {input.samples}"
 
 
 rule somalier_tn_test: 
     input:
         pairs="qc/somalier/somalier_relate.pairs.tsv",
     output:
-        tncheck="qc/somalier/TMmismatch.txt",
+        tncheck="qc/somalier/TNmismatch.txt",
     log:
         "qc/somalier/TMmismatch.log",
     params:

@@ -22,6 +22,11 @@ files:
     output: "{sample}/Cram/{sample}_{type}.crumble.cram.crai"
     types: ["T", "N"]
 
+  - name: TN mismatch crosscheck
+    input: "qc/somalier/TNmismatch.txt"
+    output: TN_mismatched.txt
+    types: ["T", "N"]
+
   # Tumor
     # SNV indels
   - name: Parabricks T vcf
