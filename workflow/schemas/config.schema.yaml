@@ -847,6 +847,44 @@ properties:
       - container
       - db
 
+  somalier_extract:
+    type: object
+    description: parameters for somalier_extract
+    properties:
+      container:
+        type: string
+        description: name or path to docker/singularity container
+      sites:
+        type: string
+        description: somalier-specific sites file that is version dependent
+      extra:
+        type: string
+        description: parameters to be forwarded
+    required:
+      - container
+      - sites
+
+  somalier_mqc:
+    type: object
+    description: parameters for somalier_mqc
+    properties:
+      config:
+        type: string
+        description: path to somalier config file for MultiQC
+
+  somalier_relate:
+    type: object
+    description: parameters for somalier_relate
+    properties:
+      container:
+        type: string
+        description: name or path to docker/singularity container
+      extra:
+        type: string
+        description: parameters to be forwarded
+    required:
+      - container
+        
   sortmerna:
     type: object
     description: parameters for sortmerna
