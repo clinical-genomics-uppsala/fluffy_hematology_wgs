@@ -126,6 +126,36 @@ rule somalier_create_groupfile:
         done > {output}
         """
 
+rule somalier_custom_multiqc:
+    input:
+        conf=config["somalier_mqc"]["config"],
+        samples="qc/somalier/somalier_relate.samples.tsv",
+    output:
+        "qc/somalier/somalier_samples_mqc.tsv"
+    log:
+        "qc/somalier/somalier_custom_multiqc.log",
+    params:
+        extra=config.get("somalier_custom_multiqc", {}).get("extra", ""),
+    benchmark:
+        repeat(
+            "qc/somalier/somalier_custom_multiqc.becnhmark.tsv",
+            config.get("somalier_custom_multiqc", {}).get("benchmark_repeats", 1),
+        )
+    threads:
+        config.get("somalier_custom_multiqc", {}).get("threads", config["default_resources"]["threads"]),
+    resources:
+        threads=config.get("somalier_custom_multiqc", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("somalier_custom_multiqc", {}).get("time", config["default_resources"]["time"]),
+        mem_mb=config.get("somalier_custom_multiqc", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("somalier_custom_multiqc", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("somalier_custom_multiqc", {}).get("partition", config["default_resources"]["partition"]),
+    container:
+        config.get("somalier_custom_multiqc", {}).get("container", config["default_container"])
+    message:
+        "{rule}: creating custom input for somalier to MultiQC general stats"
+    script:
+        "../scripts/somalier_mqc_config.py"
+
 
 if aligner == "bwa_gpu": 
 
