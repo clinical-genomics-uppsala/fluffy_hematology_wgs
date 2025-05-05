@@ -61,11 +61,11 @@ rule somalier_create_ped_N:
 rule somalier_combine_fam:
     input:
         fam=[
-            "qc/somalier/%s_%s.fam" % (sample,t)
+            "qc/somalier/%s_%s.fam" % (sample, t)
             for sample in get_samples(samples)
-            for t in get_unit_types(units, sample)  
+            for t in get_unit_types(units, sample)
             if t in ["N", "T"]
-            ],
+        ],
     output:
         ped="qc/somalier/somalier_all.ped",
     log:
@@ -94,9 +94,9 @@ rule somalier_combine_fam:
 rule somalier_create_groupfile:
     input:
         samples=config["samples"],
-        units=config["units"]
+        units=config["units"],
     output:
-        "qc/somalier/somalier.groups"
+        "qc/somalier/somalier.groups",
     log:
         "qc/somalier/somalier.groups.log",
     benchmark:
@@ -126,12 +126,13 @@ rule somalier_create_groupfile:
         done > {output}
         """
 
+
 rule somalier_custom_multiqc:
     input:
         conf=config["somalier_mqc"]["config"],
         samples="qc/somalier/somalier_relate.samples.tsv",
     output:
-        "qc/somalier/somalier_samples_mqc.tsv"
+        "qc/somalier/somalier_samples_mqc.tsv",
     log:
         "qc/somalier/somalier_custom_multiqc.log",
     params:
@@ -141,8 +142,7 @@ rule somalier_custom_multiqc:
             "qc/somalier/somalier_custom_multiqc.becnhmark.tsv",
             config.get("somalier_custom_multiqc", {}).get("benchmark_repeats", 1),
         )
-    threads:
-        config.get("somalier_custom_multiqc", {}).get("threads", config["default_resources"]["threads"]),
+    threads: config.get("somalier_custom_multiqc", {}).get("threads", config["default_resources"]["threads"])
     resources:
         threads=config.get("somalier_custom_multiqc", {}).get("threads", config["default_resources"]["threads"]),
         time=config.get("somalier_custom_multiqc", {}).get("time", config["default_resources"]["time"]),
@@ -157,7 +157,7 @@ rule somalier_custom_multiqc:
         "../scripts/somalier_mqc_config.py"
 
 
-if aligner == "bwa_gpu": 
+if aligner == "bwa_gpu":
 
     rule somalier_extract:
         input:
@@ -175,8 +175,7 @@ if aligner == "bwa_gpu":
                 "qc/somalier/log/{sample}_{type}.cohort.benchmark.tsv",
                 config.get("somalier_extract", {}).get("benchmark_repeats", 1),
             )
-        threads:
-            config.get("somalier_extract", {}).get("threads", config["default_resources"]["threads"]),
+        threads: config.get("somalier_extract", {}).get("threads", config["default_resources"]["threads"])
         resources:
             threads=config.get("somalier_extract", {}).get("threads", config["default_resources"]["threads"]),
             time=config.get("somalier_extract", {}).get("time", config["default_resources"]["time"]),
@@ -194,13 +193,13 @@ if aligner == "bwa_gpu":
 rule somalier_relate:
     input:
         samples=[
-                "qc/somalier/cohort/%s_%s.somalier" % (sample,t)
-                for sample in get_samples(samples)
-                for t in get_unit_types(units, sample)
-		if t in ["N", "T"]                
-		],
-	ped="qc/somalier/somalier_all.ped",
-	group="qc/somalier/somalier.groups",
+            "qc/somalier/cohort/%s_%s.somalier" % (sample, t)
+            for sample in get_samples(samples)
+            for t in get_unit_types(units, sample)
+            if t in ["N", "T"]
+        ],
+        ped="qc/somalier/somalier_all.ped",
+        group="qc/somalier/somalier.groups",
     output:
         pairs="qc/somalier/somalier_relate.pairs.tsv",
         groups="qc/somalier/somalier_relate.groups.tsv",
@@ -216,8 +215,7 @@ rule somalier_relate:
             "qc/somalier/somalier_relate.benchmark.tsv",
             config.get("somalier_relate", {}).get("benchmark_repeats", 1),
         )
-    threads:
-        config.get("somalier_relate", {}).get("threads", config["default_resources"]["threads"]),
+    threads: config.get("somalier_relate", {}).get("threads", config["default_resources"]["threads"])
     resources:
         threads=config.get("somalier_relate", {}).get("threads", config["default_resources"]["threads"]),
         time=config.get("somalier_relate", {}).get("time", config["default_resources"]["time"]),
@@ -232,7 +230,7 @@ rule somalier_relate:
         "somalier relate {params.extra} --ped {input.ped} -g {input.group} -o {params.outname} {input.samples}"
 
 
-rule somalier_tn_test: 
+rule somalier_tn_test:
     input:
         pairs="qc/somalier/somalier_relate.pairs.tsv",
     output:
@@ -246,8 +244,7 @@ rule somalier_tn_test:
             "qc/somalier/somalier_tn_test.benchmark.tsv",
             config.get("somalier_tn_test", {}).get("benchmark_repeats", 1),
         )
-    threads:
-        config.get("somalier_tn_test", {}).get("threads", config["default_resources"]["threads"]),
+    threads: config.get("somalier_tn_test", {}).get("threads", config["default_resources"]["threads"])
     resources:
         threads=config.get("somalier_tn_test", {}).get("threads", config["default_resources"]["threads"]),
         time=config.get("somalier_tn_test", {}).get("time", config["default_resources"]["time"]),

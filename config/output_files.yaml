@@ -1,10 +1,10 @@
 directory: ./Results
 
 files:
-  - name: Spring compression
-    input: "compression/spring/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring"
-    output: Archive/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring
-    types: ["T", "N", "R"]
+        #  - name: Spring compression
+        #input: "compression/spring/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring"
+    #output: Archive/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring
+    # types: ["T", "N", "R"]
 
   # DNA
   - name: MultiQC DNA
