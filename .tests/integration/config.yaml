@@ -77,7 +77,7 @@ snpeff:
   db: "SnpEff/GRCh38.99"
 
 somalier_extract:
-  sites: "reference/sites.vc.gz"
+  sites: "reference/sites.vcf.gz"
 
 sortmerna:
   fasta:
