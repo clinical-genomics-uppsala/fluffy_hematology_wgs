@@ -4,7 +4,6 @@ __email__ = "nina.hollfelder@scilifelab.uu.se"
 __license__ = "GPL-3"
 
 
-
 rule somalier_create_ped_T:
     input:
         config["samples"],
@@ -19,7 +18,7 @@ rule somalier_create_ped_T:
         )
     threads: config.get("somalier_create_ped_T", {}).get("threads", config["default_resources"]["threads"])
     params:
-        sample_type="T"
+        sample_type="T",
     resources:
         mem_mb=config.get("somalier_create_ped_T", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
         mem_per_cpu=config.get("somalier_create_ped_T", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
@@ -48,7 +47,7 @@ rule somalier_create_ped_N:
         )
     threads: config.get("somalier_create_ped_N", {}).get("threads", config["default_resources"]["threads"])
     params:
-        sample_type="N"
+        sample_type="N",
     resources:
         mem_mb=config.get("somalier_create_ped_N", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
         mem_per_cpu=config.get("somalier_create_ped_N", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
