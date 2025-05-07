@@ -78,6 +78,7 @@ snpeff:
 
 somalier_extract:
   sites: "reference/sites.vcf.gz"
+  extract_folder: "qc/somalier/cohort/"
 
 sortmerna:
   fasta:
