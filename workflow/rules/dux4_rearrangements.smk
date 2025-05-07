@@ -83,8 +83,8 @@ rule dux4_igh_fusioncatcher_count:
     input:
         fq="fusions/fusioncatcher/{sample}_{type}/final-list_candidate-fusion-genes.txt",
     output:
-        cnts=temp("fusions/fusioncatcher/{sample}_{type}/dux4-igh_counts.txt"),
-        hits=temp("fusions/fusioncatcher/{sample}_{type}/dux4-igh_hits.txt"),
+        cnts=temp("fusions/fusioncatcher/{sample}_{type}/dux4_counts.txt"),
+        hits=temp("fusions/fusioncatcher/{sample}_{type}/dux4_hits.txt"),
     log:
         "fusions/fusioncatcher/{sample}_{type}/dux4-igh.log",
     benchmark:
@@ -108,8 +108,8 @@ rule dux4_igh_fusioncatcher_count:
         "{rule}: get count and results of fusioncatcher translocations in DUX4 with IGH in {input.fq}"
     shell:
         """
-        if grep -E "IGH@.*DUX4|DUX4.*IGH@" {input.fq}; then
-        var=$(grep -E "IGH@.*DUX4|DUX4.*IGH@" {input.fq})
+        if grep -E "IGH@.*DUX4|DUX4.*IGH@|ERG.*DUX4|DUX4.*ERG" {input.fq}; then
+        var=$(grep -E "IGH@.*DUX4|DUX4.*IGH@|ERG.*DUX4|DUX4.*ERG" {input.fq})
         echo "$var" > {output.hits}
         wc -l {output.hits} > {output.cnts}
         else

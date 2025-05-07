@@ -102,7 +102,7 @@ worksheet_overview.write_url(8, 0, "internal:'Arriba'!A1", string="Arriba fusion
 worksheet_overview.write_url(9, 0, "internal:'Fusioncatcher'!A1", string="Fusioncatcher results")
 worksheet_overview.write_url(10, 0, "internal:'StarFusion'!A1", string="StarFusion results")
 
-worksheet_overview.write(12, 0, "DUX4-IGH hits from Fusioncatcher", format_bold)
+worksheet_overview.write(12, 0, "DUX4-IGH and DUX4-ERG hits from Fusioncatcher", format_bold)
 worksheet_overview.write(13, 0, "Number of hits: " + dux_calls)
 
 i = 15

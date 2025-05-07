@@ -92,8 +92,8 @@ rule export_to_xlsx_rna_fusions:
         arriba="fusions/arriba/{sample}_R.fusions.tsv",
         fusioncatcher="fusions/fusioncatcher/{sample}_R/final-list_candidate-fusion-genes.txt",
         star_fusion="fusions/star_fusion/{sample}_R/star-fusion.fusion_predictions.tsv",
-        dux4_igh_counts="fusions/fusioncatcher/{sample}_R/dux4-igh_counts.txt",
-        dux4_igh_calls="fusions/fusioncatcher/{sample}_R/dux4-igh_hits.txt",
+        dux4_igh_counts="fusions/fusioncatcher/{sample}_R/dux4_counts.txt",
+        dux4_igh_calls="fusions/fusioncatcher/{sample}_R/dux4_hits.txt",
     output:
         xlsx=temp("export_to_xlsx/rna/{sample}.rna_fusions.xlsx"),
     params:
