@@ -3,7 +3,6 @@ __copyright__ = "Copyright 2022, Martin Rippin"
 __email__ = "arielle.munters@scilifelab.uu.se, nina.hollfelder@scilifelab.uu.se"
 __license__ = "GPL-3"
 
-
 import itertools
 import numpy as np
 import pandas as pd
