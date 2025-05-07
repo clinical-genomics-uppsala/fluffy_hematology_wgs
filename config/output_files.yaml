@@ -1,10 +1,10 @@
 directory: ./Results
 
 files:
-  - name: Spring compression
-    input: "compression/spring/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring"
-    output: Archive/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring
-    types: ["T", "N", "R"]
+        #  - name: Spring compression
+        #input: "compression/spring/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring"
+    #output: Archive/{sample}_{flowcell}_{lane}_{barcode}_{type}.spring
+    # types: ["T", "N", "R"]
 
   # DNA
   - name: MultiQC DNA
@@ -20,6 +20,11 @@ files:
   - name: Crai T and N
     input: compression/crumble/{sample}_{type}.crumble.cram.crai
     output: "{sample}/Cram/{sample}_{type}.crumble.cram.crai"
+    types: ["T", "N"]
+
+  - name: TN mismatch crosscheck
+    input: "qc/somalier/TNmismatch.txt"
+    output: TN_mismatched.txt
     types: ["T", "N"]
 
   # Tumor

@@ -117,18 +117,11 @@ table_columns_visible:
     20_x_pc: False
     30_x_pc: True
     50_x_pc: True
-  Peddy:
-    family_id: False
-    ancestry-prediction: False
-    ancestry-prob_het_check: False
-    sex_het_ratio: False
-    error_sex_check: True
-    predicted_sex_sex_check: True
   "Picard: HsMetrics":
     FOLD_ENRICHMENT: False
     MEDIAN_TARGET_COVERAGE: False
     PCT_TARGET_BASES_30X: False
-    ZERO_CVG_TARGETS_PCT: False
+    ZERO_CVG_TARGETS_PCT: True
   "Picard: InsertSizeMetrics":
     summed_median: False
     summed_mean: True
@@ -199,13 +192,6 @@ table_columns_placement:
     error_rate: 555
     reads_MQ0_percent: 555
     non-primary_alignments: 555
-  Peddy:
-    ancestry-prediction: 777
-    ancestry-prob_het_check: 777
-    sex_het_ratio: 777
-    error_sex_check: 701
-    predicted_sex_sex_check: 702
-    family_id: 703
   "Picard: HsMetrics":
     FOLD_ENRICHMENT: 888
     MEDIAN_TARGET_COVERAGE: 888

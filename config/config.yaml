@@ -192,9 +192,10 @@ multiqc:
         - "qc/picard_collect_hs_metrics/{sample}_{type}.HsMetrics.txt"
         - "qc/samtools_stats/{sample}_{type}.samtools-stats.txt"
         - "qc/multiqc/DNA_number.table.tsv"
-        - "qc/peddy/peddy_sex_check_mqc.tsv"
-        - "qc/peddy/all.ped"
-        - "qc/peddy/peddy.sex_check.csv"
+        - "qc/somalier/somalier_relate.pairs.tsv"
+        - "qc/somalier/somalier_relate.samples.tsv"
+        - "qc/somalier/somalier_relate.groups.tsv"
+        - "qc/somalier/somalier_samples_mqc.tsv"
     RNA:
       config: "{{FLUFFY_HOME}}/config/multiqc_rna_config.yaml"
       included_unit_types: ["R"]
@@ -296,6 +297,18 @@ simple_sv_annotation:
 snpeff:
   container: "docker://hydragenetics/snpeff:5.0"
   db: ""
+
+somalier_extract:
+  container: "docker://brentp/somalier:v0.2.18"
+  sites: ""
+  extra: ""
+  
+somalier_mqc:
+  config: "{{FLUFFY_HOME}}/config/somalier_mqc.yaml"   
+
+somalier_relate: 
+  container: "docker://brentp/somalier:v0.2.18"
+  extra: "--infer"
 
 sortmerna:
   container: "docker://hydragenetics/sortmerna:4.3.4"

@@ -76,6 +76,10 @@ simple_sv_annotation:
 snpeff:
   db: "SnpEff/GRCh38.99"
 
+somalier_extract:
+  sites: "reference/sites.vcf.gz"
+  extract_folder: "qc/somalier/cohort/"
+
 sortmerna:
   fasta:
     - "reference/id.fasta"
