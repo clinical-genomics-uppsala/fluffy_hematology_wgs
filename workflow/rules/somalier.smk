@@ -4,6 +4,7 @@ __email__ = "nina.hollfelder@scilifelab.uu.se"
 __license__ = "GPL-3"
 
 
+
 rule somalier_create_ped_T:
     input:
         config["samples"],
@@ -17,6 +18,8 @@ rule somalier_create_ped_T:
             config.get("somalier_create_ped_T", {}).get("benchmark_repeats", 1),
         )
     threads: config.get("somalier_create_ped_T", {}).get("threads", config["default_resources"]["threads"])
+    params:
+        sample_type="T"
     resources:
         mem_mb=config.get("somalier_create_ped_T", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
         mem_per_cpu=config.get("somalier_create_ped_T", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
@@ -28,7 +31,7 @@ rule somalier_create_ped_T:
     message:
         "{rule}: Create fam file for all T samples for somalier input"
     script:
-        "../scripts/somalier_create_ped_T.py"
+        "../scripts/somalier_create_ped.py"
 
 
 rule somalier_create_ped_N:
@@ -44,6 +47,8 @@ rule somalier_create_ped_N:
             config.get("somalier_create_ped_N", {}).get("benchmark_repeats", 1),
         )
     threads: config.get("somalier_create_ped_N", {}).get("threads", config["default_resources"]["threads"])
+    params:
+        sample_type="N"
     resources:
         mem_mb=config.get("somalier_create_ped_N", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
         mem_per_cpu=config.get("somalier_create_ped_N", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
@@ -55,7 +60,7 @@ rule somalier_create_ped_N:
     message:
         "{rule}: Create fam file for all T samples for somalier input"
     script:
-        "../scripts/somalier_create_ped_N.py"
+        "../scripts/somalier_create_ped.py"
 
 
 rule somalier_combine_fam:
@@ -237,8 +242,6 @@ rule somalier_tn_test:
         tncheck="qc/somalier/TNmismatch.txt",
     log:
         "qc/somalier/TMmismatch.log",
-    params:
-        extra=config.get("somalier_tn_test", {}).get("extra", ""),
     benchmark:
         repeat(
             "qc/somalier/somalier_tn_test.benchmark.tsv",

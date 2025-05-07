@@ -860,6 +860,9 @@ properties:
       extra:
         type: string
         description: parameters to be forwarded
+      extract_folder:
+        type: string
+        description: directory for output files
     required:
       - container
       - sites

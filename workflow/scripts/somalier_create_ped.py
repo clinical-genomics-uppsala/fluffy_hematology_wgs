@@ -4,7 +4,7 @@
 
 import sys
 
-
+sample_type = snakemake.params["sample_type"]
 input_file = snakemake.input[0]
 
 
@@ -18,8 +18,8 @@ with open(input_file, "r") as samplesheet:
             sex = "2"
         else:
             sex = "0"
-        with open("qc/somalier/" + line[header_line.index("sample")] + "_T.fam", "w+") as pedfile:
+        sample_id = line[header_line.index("sample")]
+        with open(f"qc/somalier/{sample_id}_{sample_type}.fam", "w+") as pedfile:
             pedfile.write(
-                "\t".join([line[header_line.index("sample")], line[header_line.index("sample")] + "_T", "0", "0", sex, "-9"])
-                + "\n"
+                "\t".join([sample_id, f"{sample_id}_{sample_type}", "0", "0", sex, "-9"]) + "\n"
             )
