@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.3.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.2.0...v1.3.0) (2025-05-07)
+
+
+### Features
+
+* DUX4-ERG highlight in RNA excel report ([a239d8f](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/a239d8fa723089232a8b11119a1e5f9b6f83099e))
+* peddy removed from MultiQC ([883cde0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/883cde05cda35d6b9e82adbe11dc995065781667))
+* somalier in MultiQC ([2d6aa3e](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/2d6aa3ed7ed50ee9fa5610b1fb53a8f58f3571c1))
+
+
+### Bug Fixes
+
+* hidden tempfile removed ([9bfbf3f](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/9bfbf3f518b6d1df82f01d863fb9a426286ed539))
+* somalier in MultiQC ([114391a](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/114391a3df914325a8ce0c923ebed326c468d270))
+
 ## [1.2.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.1.0...v1.2.0) (2024-12-03)
 
 
