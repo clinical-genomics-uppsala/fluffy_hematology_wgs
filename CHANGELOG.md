@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.3.0...v1.3.1) (2025-05-12)
+
+
+### Bug Fixes
+
+* depth in excel report ([55b3a48](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/55b3a4813a3b2aa6f488067ea06d2129bc741597))
+
 ## [1.3.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.2.0...v1.3.0) (2025-05-07)
 
 
