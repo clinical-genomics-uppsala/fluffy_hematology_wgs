@@ -28,9 +28,14 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
         return_dict["n_af"] = ""
 
     try:
-        return_dict["dp"] = int(record.info["DP"])
+        return_dict["dp"] = int(record.samples[sample_tumor]["DP"])
     except KeyError:
         return_dict["dp"] = sum(record.samples[sample_tumor].get("AD"))
+
+    if sample_normal != "":
+        return_dict["n_dp"] = int(record.samples[sample_normal]["DP"])
+    else:
+        return_dict["n_dp"] = ""
 
     try:
         return_dict["svlen"] = int(record.info["SVLEN"])
@@ -228,6 +233,7 @@ def create_snv_table(vcf_input):
         {"header": "AF"},
         {"header": "Normal AF"},
         {"header": "DP"},
+        {"header": "Normal DP"},
         {"header": "Transcript"},
         {"header": "Exon"},
         {"header": "Mutation cds"},
@@ -253,6 +259,7 @@ def create_snv_table(vcf_input):
                 record_values["af"],
                 record_values["n_af"],
                 record_values["dp"],
+                record_values["n_dp"],
                 record_values["transcript"],
                 record_values["exon_nr"],
                 record_values["coding_name"],
