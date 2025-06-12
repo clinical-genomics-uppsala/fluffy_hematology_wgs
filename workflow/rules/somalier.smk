@@ -206,7 +206,6 @@ rule somalier_relate:
         group="qc/somalier/somalier.groups",
     output:
         pairs="qc/somalier/somalier_relate.pairs.tsv",
-        groups="qc/somalier/somalier_relate.groups.tsv",
         samples="qc/somalier/somalier_relate.samples.tsv",
         html="qc/somalier/somalier_relate.html",
     log:
