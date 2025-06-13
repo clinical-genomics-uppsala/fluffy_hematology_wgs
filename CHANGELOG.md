@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.3.1...v1.3.2) (2025-06-13)
+
+
+### Bug Fixes
+
+* somalier relate empty group file ([6b8bbd9](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/6b8bbd917362e7b0c27853d8b9d91ccea8aaf329))
+
 ## [1.3.1](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.3.0...v1.3.1) (2025-05-12)
 
 
