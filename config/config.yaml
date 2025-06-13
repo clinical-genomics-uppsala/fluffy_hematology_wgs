@@ -194,7 +194,6 @@ multiqc:
         - "qc/multiqc/DNA_number.table.tsv"
         - "qc/somalier/somalier_relate.pairs.tsv"
         - "qc/somalier/somalier_relate.samples.tsv"
-        - "qc/somalier/somalier_relate.groups.tsv"
         - "qc/somalier/somalier_samples_mqc.tsv"
     RNA:
       config: "{{FLUFFY_HOME}}/config/multiqc_rna_config.yaml"
