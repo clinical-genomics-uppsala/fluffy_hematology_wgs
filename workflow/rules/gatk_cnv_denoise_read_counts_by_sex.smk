@@ -53,7 +53,7 @@ rule gatk_cnv_denoise_read_counts_by_sex:
         hdf5PoN_f=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("pon_female", ""),
         hdf5PoN_m=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("pon_male", ""),
         hdf5Tumor="cnv_sv/gatk_collect_read_counts/{sample}_{type}.counts.hdf5",
-        sex="qc/peddy/{sample}/peddy.sex_check.csv",
+        sex="qc/somalier/somalier_relate.samples.tsv",
     output:
         denoisedCopyRatio=temp("cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.denoisedCR.tsv"),
         stdCopyRatio=temp("cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.standardizedCR.tsv"),
@@ -81,7 +81,7 @@ rule gatk_cnv_denoise_read_counts_by_sex:
         "{rule}: Use gatk_cnv to obtain cnv_sv/gatk_cnv_denoise_read_counts/{wildcards.sample}_{wildcards.type}.clean.denoisedCR.tsv"
     shell:
         """
-        if [ $(awk -F "," '(NR>1) {{print $7}}' {input.sex}) == "male" ]
+        if [[ $(awk -v st="{{wildcards.sample}}_{{wildcards.type}}" '($2 == st) {{print $7}}' {input.sex}) == "male" ]]
         then 
         (gatk --java-options '-Xmx7g' DenoiseReadCounts \
         -I {input.hdf5Tumor} \
@@ -89,7 +89,7 @@ rule gatk_cnv_denoise_read_counts_by_sex:
         --standardized-copy-ratios {output.stdCopyRatio} \
         --denoised-copy-ratios {output.denoisedCopyRatio} \
         {params.extra}) &> {log}
-        elif [ $(awk -F "," '(NR>1) {{print $7}}' {input.sex}) == "female" ]
+        elif [[ $(awk -v st="{{wildcards.sample}}_{{wildcards.type}}" '($2 == st) {{print $7}}' {input.sex}) == "female" ]]
         then
         (gatk --java-options '-Xmx7g' DenoiseReadCounts \
         -I {input.hdf5Tumor} \
@@ -98,7 +98,7 @@ rule gatk_cnv_denoise_read_counts_by_sex:
         --denoised-copy-ratios {output.denoisedCopyRatio} \
         {params.extra}) &> {log}
         else
-        if [ $(awk -F "," '(NR>1) {{print $2}}' {input.sex}) == "male" ]
+        if [[ $(awk -v st="{{wildcards.sample}}_{{wildcards.type}}" '($2 == st) {{print $5}}' {input.sex}) == "1" ]]
         then 
         (gatk --java-options '-Xmx7g' DenoiseReadCounts \
         -I {input.hdf5Tumor} \
