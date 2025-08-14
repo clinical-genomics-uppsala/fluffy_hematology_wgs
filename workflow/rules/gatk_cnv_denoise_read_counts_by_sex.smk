@@ -63,7 +63,7 @@ rule gatk_cnv_denoise_read_counts_by_sex:
         "cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.denoisedCR.tsv.log",
     benchmark:
         repeat(
-            "cnv_sv/gatk_cnv_denoise_read_counts/{sample}_{type}.clean.denoisedCR.tsv.benchmark.tsv",
+            "cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.denoisedCR.tsv.benchmark.tsv",
             config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("benchmark_repeats", 1),
         )
     threads: config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("threads", config["default_resources"]["threads"])
