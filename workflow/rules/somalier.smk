@@ -239,7 +239,7 @@ rule somalier_tn_test:
     output:
         tncheck="qc/somalier/TNmismatch.txt",
     log:
-        "qc/somalier/TMmismatch.log",
+        "qc/somalier/TNmismatch.log",
     benchmark:
         repeat(
             "qc/somalier/somalier_tn_test.benchmark.tsv",
