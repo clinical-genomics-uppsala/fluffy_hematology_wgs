@@ -51,7 +51,7 @@ mosdepth_bed:
   mem_mb: 24576
   threads: 4
 
-pbrun_fq2bam:
+pbrun_fq2bam_recal:
   gres: "--gres=gres:gpu:4"
   mem_mb: 770000
   mem_per_cpu: 4096
