@@ -11,7 +11,7 @@ if aligner == "bwa_gpu":
 
     rule dux4_igh_read_count:
         input:
-            bam="parabricks/pbrun_fq2bam/{sample}_{type}.bam",
+            bam="parabricks/pbrun_fq2bam_recal/{sample}_{type}.bam",
         output:
             cnt=temp("reports/dux_read_counts/{sample}_{type}.dux4_igh.txt"),
         log:
@@ -47,7 +47,7 @@ if aligner == "bwa_gpu":
 
     rule dux4_erg_read_count:
         input:
-            bam="parabricks/pbrun_fq2bam/{sample}_{type}.bam",
+            bam="parabricks/pbrun_fq2bam_recal/{sample}_{type}.bam",
         output:
             cnt=temp("reports/dux_read_counts/{sample}_{type}.dux4_erg.txt"),
         log:

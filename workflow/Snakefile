@@ -24,6 +24,8 @@ ruleorder: filtering_bcftools_filter_include_region_snv_t > bgzip_mutect
 ruleorder: cnv_sv_manta_run_workflow_t > tabix_cnv
 ruleorder: cnv_sv_manta_run_workflow_tn > tabix_cnv
 ruleorder: filtering_bcftools_filter_include_region_sv > bgzip_cnv
+ruleorder: parabricks_pbrun_fq2bam > alignment_samtools_index
+ruleorder: parabricks_pbrun_fq2bam_recal > alignment_samtools_index
 
 
 aligner = config.get("aligner", None)
@@ -200,8 +202,8 @@ if aligner == "bwa_gpu":
 
     use rule gatk_collect_read_counts from cnv_sv as cnv_sv_gatk_collect_read_counts with:
         input:
-            bam="parabricks/pbrun_fq2bam/{sample}_T.bam",
-            bai="parabricks/pbrun_fq2bam/{sample}_T.bam.bai",
+            bam="parabricks/pbrun_fq2bam_recal/{sample}_T.bam",
+            bai="parabricks/pbrun_fq2bam_recal/{sample}_T.bam.bai",
             interval=config.get("reference", {}).get("design_intervals_gatk_cnv", ""),
 
 

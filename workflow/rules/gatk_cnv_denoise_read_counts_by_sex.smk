@@ -11,8 +11,8 @@ if aligner == "bwa_gpu":
 
     rule gatk_cnv_collect_allelic_counts:
         input:
-            bam="parabricks/pbrun_fq2bam/{sample}_T.bam",
-            bai="parabricks/pbrun_fq2bam/{sample}_T.bam.bai",
+            bam="parabricks/pbrun_fq2bam_recal/{sample}_T.bam",
+            bai="parabricks/pbrun_fq2bam_recal/{sample}_T.bam.bai",
             interval=config.get("gatk_cnv_collect_allelic_counts", {}).get("SNP_interval", ""),
             ref=config["reference"]["fasta"],
         output:

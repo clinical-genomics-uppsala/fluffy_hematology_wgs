@@ -167,7 +167,7 @@ if aligner == "bwa_gpu":
         input:
             sites=config.get("somalier_extract").get("sites"),
             fasta=config.get("reference").get("fasta"),
-            sample="parabricks/pbrun_fq2bam/{sample}_{type}.bam",
+            sample="parabricks/pbrun_fq2bam_recal/{sample}_{type}.bam",
         output:
             "qc/somalier/cohort/{sample}_{type}.somalier",
         log:
