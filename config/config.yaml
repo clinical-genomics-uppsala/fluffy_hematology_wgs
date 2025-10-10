@@ -493,7 +493,7 @@ sortmerna:
   index: "/data/ref_genomes/GRCh38/sortmerna/idx"
 
 spring:
-  container: "docker://hydragenetics/spring:1.0.1"
+  container: "docker://hydragenetics/spring:1.1.1"
 
 star:
   container: "docker://hydragenetics/star:2.7.10a"
