@@ -1,5 +1,5 @@
 jobs: 100
-#keep-going: True
+keep-going: True
 restart-times: 1
 rerun-incomplete: True
 use-singularity: True
