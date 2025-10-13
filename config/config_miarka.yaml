@@ -1,0 +1,530 @@
+resources: "{{FLUFFY_HOME}}/config/resources_miarka.yaml"
+samples: "samples.tsv"
+units: "units.tsv"
+output: "{{FLUFFY_HOME}}/config/output_files.yaml"
+
+modules:
+  alignment: "906d25d0d4791eb5a54cba9954fddf29e27b85dd"
+  annotation: "cd97f30"
+  cnv_sv: "v0.4.1"
+  compression: "v1.1.0"
+  filtering: "v0.3.0"
+  fusions: "12f8354"
+  parabricks: "v1.2.1"
+  prealignment: "v1.1.0"
+  qc: "v0.3.0"
+  reports: "7c8b8c5"
+  snv_indels: "v0.6.0"
+  misc: "v0.1.0"
+  sentieon: "b002d39"
+
+default_container: "{{APPTAINER_CACHE}}/common_1.8.1.sif"
+
+reference:
+  design_bed: "{{REFERENCE_DATA}}/fluffy/homo_sapiens.hg38.wgs.bed"
+  design_intervals: "{{REFERENCE_DATA}}/fluffy/GRCmasked/Twist_Comprehensive_Exome_Covered_Targets_hg38.interval_list" #hsmetrics
+  design_intervals_gatk_cnv: "{{REFERENCE_DATA}}/fluffy/gatk/hg38.preprocessed.20250926.interval_list"
+  fasta: "{{REFERENCE_DATA}}/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta"
+  fasta_rna: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+  fai: "{{REFERENCE_DATA}}/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta.fai"
+  genome_dir: "{{REFERENCE_DATA}}/fluffy/homo_sapiens_star/" # req by align not used
+  sites: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens_assembly38.known_indels.vcf.gz"
+  wgs_intervals: "{{REFERENCE_DATA}}/fluffy/homo_sapiens.hg38.wgs.interval_list"
+  skip_chrs:
+    - chrM
+    - chr1_KI270706v1_random
+    - chr1_KI270707v1_random
+    - chr1_KI270708v1_random
+    - chr1_KI270709v1_random
+    - chr1_KI270710v1_random
+    - chr1_KI270711v1_random
+    - chr1_KI270712v1_random
+    - chr1_KI270713v1_random
+    - chr1_KI270714v1_random
+    - chr2_KI270715v1_random
+    - chr2_KI270716v1_random
+    - chr3_GL000221v1_random
+    - chr4_GL000008v2_random
+    - chr5_GL000208v1_random
+    - chr9_KI270717v1_random
+    - chr9_KI270718v1_random
+    - chr9_KI270719v1_random
+    - chr9_KI270720v1_random
+    - chr11_KI270721v1_random
+    - chr14_GL000009v2_random
+    - chr14_GL000225v1_random
+    - chr14_KI270722v1_random
+    - chr14_GL000194v1_random
+    - chr14_KI270723v1_random
+    - chr14_KI270724v1_random
+    - chr14_KI270725v1_random
+    - chr14_KI270726v1_random
+    - chr15_KI270727v1_random
+    - chr16_KI270728v1_random
+    - chr17_GL000205v2_random
+    - chr17_KI270729v1_random
+    - chr17_KI270730v1_random
+    - chr22_KI270731v1_random
+    - chr22_KI270732v1_random
+    - chr22_KI270733v1_random
+    - chr22_KI270734v1_random
+    - chr22_KI270735v1_random
+    - chr22_KI270736v1_random
+    - chr22_KI270737v1_random
+    - chr22_KI270738v1_random
+    - chr22_KI270739v1_random
+    - chrY_KI270740v1_random
+    - chrUn_KI270302v1
+    - chrUn_KI270304v1
+    - chrUn_KI270303v1
+    - chrUn_KI270305v1
+    - chrUn_KI270322v1
+    - chrUn_KI270320v1
+    - chrUn_KI270310v1
+    - chrUn_KI270316v1
+    - chrUn_KI270315v1
+    - chrUn_KI270312v1
+    - chrUn_KI270311v1
+    - chrUn_KI270317v1
+    - chrUn_KI270412v1
+    - chrUn_KI270411v1
+    - chrUn_KI270414v1
+    - chrUn_KI270419v1
+    - chrUn_KI270418v1
+    - chrUn_KI270420v1
+    - chrUn_KI270424v1
+    - chrUn_KI270417v1
+    - chrUn_KI270422v1
+    - chrUn_KI270423v1
+    - chrUn_KI270425v1
+    - chrUn_KI270429v1
+    - chrUn_KI270442v1
+    - chrUn_KI270466v1
+    - chrUn_KI270465v1
+    - chrUn_KI270467v1
+    - chrUn_KI270435v1
+    - chrUn_KI270438v1
+    - chrUn_KI270468v1
+    - chrUn_KI270510v1
+    - chrUn_KI270509v1
+    - chrUn_KI270518v1
+    - chrUn_KI270508v1
+    - chrUn_KI270516v1
+    - chrUn_KI270512v1
+    - chrUn_KI270519v1
+    - chrUn_KI270522v1
+    - chrUn_KI270511v1
+    - chrUn_KI270515v1
+    - chrUn_KI270507v1
+    - chrUn_KI270517v1
+    - chrUn_KI270529v1
+    - chrUn_KI270528v1
+    - chrUn_KI270530v1
+    - chrUn_KI270539v1
+    - chrUn_KI270538v1
+    - chrUn_KI270544v1
+    - chrUn_KI270548v1
+    - chrUn_KI270583v1
+    - chrUn_KI270587v1
+    - chrUn_KI270580v1
+    - chrUn_KI270581v1
+    - chrUn_KI270579v1
+    - chrUn_KI270589v1
+    - chrUn_KI270590v1
+    - chrUn_KI270584v1
+    - chrUn_KI270582v1
+    - chrUn_KI270588v1
+    - chrUn_KI270593v1
+    - chrUn_KI270591v1
+    - chrUn_KI270330v1
+    - chrUn_KI270329v1
+    - chrUn_KI270334v1
+    - chrUn_KI270333v1
+    - chrUn_KI270335v1
+    - chrUn_KI270338v1
+    - chrUn_KI270340v1
+    - chrUn_KI270336v1
+    - chrUn_KI270337v1
+    - chrUn_KI270363v1
+    - chrUn_KI270364v1
+    - chrUn_KI270362v1
+    - chrUn_KI270366v1
+    - chrUn_KI270378v1
+    - chrUn_KI270379v1
+    - chrUn_KI270389v1
+    - chrUn_KI270390v1
+    - chrUn_KI270387v1
+    - chrUn_KI270395v1
+    - chrUn_KI270396v1
+    - chrUn_KI270388v1
+    - chrUn_KI270394v1
+    - chrUn_KI270386v1
+    - chrUn_KI270391v1
+    - chrUn_KI270383v1
+    - chrUn_KI270393v1
+    - chrUn_KI270384v1
+    - chrUn_KI270392v1
+    - chrUn_KI270381v1
+    - chrUn_KI270385v1
+    - chrUn_KI270382v1
+    - chrUn_KI270376v1
+    - chrUn_KI270374v1
+    - chrUn_KI270372v1
+    - chrUn_KI270373v1
+    - chrUn_KI270375v1
+    - chrUn_KI270371v1
+    - chrUn_KI270448v1
+    - chrUn_KI270521v1
+    - chrUn_GL000195v1
+    - chrUn_GL000219v1
+    - chrUn_GL000220v1
+    - chrUn_GL000224v1
+    - chrUn_KI270741v1
+    - chrUn_GL000226v1
+    - chrUn_GL000213v1
+    - chrUn_KI270743v1
+    - chrUn_KI270744v1
+    - chrUn_KI270745v1
+    - chrUn_KI270746v1
+    - chrUn_KI270747v1
+    - chrUn_KI270748v1
+    - chrUn_KI270749v1
+    - chrUn_KI270750v1
+    - chrUn_KI270751v1
+    - chrUn_KI270752v1
+    - chrUn_KI270753v1
+    - chrUn_KI270754v1
+    - chrUn_KI270755v1
+    - chrUn_KI270756v1
+    - chrUn_KI270757v1
+    - chrUn_GL000214v1
+    - chrUn_KI270742v1
+    - chrUn_GL000216v2
+    - chrUn_GL000218v1
+    - chrEBV
+
+
+trimmer_software: "fastp_pe"
+
+aligner: "bwa_gpu"
+
+annotate_cnv:
+  cna_exons: "{{REFERENCE_DATA}}/fluffy/hg38_CNA.bed" 
+
+arriba:
+  assembly: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+  blacklist: "{{REFERENCE_DATA}}/fluffy/blacklist_hg38_GRCh38_v2.3.0.tsv.gz"
+  container: "{{APPTAINER_CACHE}}/arriba_2.3.0.sif"
+  extra: "-p {{REFERENCE_DATA}}/fluffy/protein_domains_hg38_GRCh38_v2.3.0.gff3 -k {{REFERENCE_DATA}}/fluffy/known_fusions_hg38_GRCh38_v2.3.0.tsv.gz"
+  gtf: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.93.chr.gtf"
+
+arriba_draw_fusion:
+  container: "{{APPTAINER_CACHE}}/arriba_2.3.0.sif"
+  cytobands: "{{REFERENCE_DATA}}/fluffy/cytobands_hg38_GRCh38_v2.3.0.tsv"
+  gtf: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.93.chr.gtf"
+  protein_domains: "{{REFERENCE_DATA}}/fluffy/protein_domains_hg38_GRCh38_v2.3.0.gff3"
+
+bcftools_SNV:
+  all: "{{REFERENCE_DATA}}/fluffy/all_snv_38.bed"
+  aml: "{{REFERENCE_DATA}}/fluffy/aml_snv_38_2022-02-25.bed"
+  tm: "{{REFERENCE_DATA}}/fluffy/Twist_myeloid_coding_exons_added_regions.250904.bed"
+
+bcftools_SV:
+  all: "{{REFERENCE_DATA}}/fluffy/all_sv_38.bed"
+  aml: "{{REFERENCE_DATA}}/fluffy/aml_sv_38.bed"
+
+cnvkit_batch:
+  container: "{{APPTAINER_CACHE}}/cnvkit_0.9.9.sif"
+  method: "wgs"
+  normal_reference: "{{REFERENCE_DATA}}/fluffy/cnvkit/Reference_Normal_pool.WGS.250822.bin1000.cnn"
+  extra: "--drop-low-coverage "
+
+cnvkit_call:
+  container: "{{APPTAINER_CACHE}}/cnvkit_0.9.9.sif"
+
+cnvkit_diagram:
+  container: "{{APPTAINER_CACHE}}/cnvkit_0.9.9.sif"
+
+cnv_html_report:
+  show_table: true
+  template_dir: "{{FLUFFY_HOME}}/config/cnv_report_template"
+  cnv_vcf:
+    - annotation: cna_exons
+      filter: cnv_hardfilter
+
+cnvkit_scatter:
+  container: "{{APPTAINER_CACHE}}/cnvkit_0.9.9.sif"
+  extra: "-c {locus} --y-min -5 --y-max 5"
+  cna:
+    "chr4": "DUX4"
+    "chr5": "EBF1"
+    "chr7": "IKZF1"
+    "chr9": "CDKN2A,CDKN2B,PAX5"
+    "chr11": "KMT2A"
+    "chr12": "BTG1,ETV6,ZNF384"
+    "chr13": "RB1"
+    "chr17": "TP53"
+    "chr21": "ERG,RUNX1"
+    "chrX": "CRLF2,CSF2RA,IL3RA,P2RY8"
+
+cnvkit_scatter_whole:
+  container: "{{APPTAINER_CACHE}}/cnvkit_0.9.9.sif"
+  extra: "--y-min -5 --y-max 5"
+
+cnvkit_table:
+  bedfile: "{{REFERENCE_DATA}}/fluffy/cnvkit/hg38_CNA.bed"
+  cyto_coordinates: "{{REFERENCE_DATA}}/fluffy/cnvkit/genomicPos_cytogenCoord.txt"
+
+crumble:
+  container: "{{APPTAINER_CACHE}}/crumble_0.8.3.sif"
+  extra: "-O CRAM"
+
+dux4_igh:
+  region: "chr14:105586437-106879844"
+
+dux4_erg:
+  region: "chr21:38380027-38498442"
+
+fastp_pe:
+  container: "{{APPTAINER_CACHE}}/fastp_0.20.1.sif "
+
+fastqc:
+  container: "{{APPTAINER_CACHE}}/fastqc_0.11.9.sif"
+
+filter_vcf:
+  sample_name_regex: "^([A-Za-z0-9-]+_[RT])$"
+  germline: "{{FLUFFY_HOME}}/config/config_germline_filter.yaml"
+  cnv_hardfilter: "{{FLUFFY_HOME}}/config/config_cnv_hardfilter.yaml"
+  somatic: "{{FLUFFY_HOME}}/config/config_snv_softfilter.yaml"
+
+fusioncatcher:
+  container: "{{APPTAINER_CACHE}}/fusioncatcher_1.33.sif"
+  genome_path: "{{REFERENCE_DATA}}/fluffy/fusioncatcher/human_v102"
+
+gatk_call_copy_ratio_segments:
+  container: "{{APPTAINER_CACHE}}/gatk4_4.2.2.0.sif"
+
+gatk_cnv_collect_allelic_counts:
+  container: "{{APPTAINER_CACHE}}/gatk4_4.2.2.0.sif"
+  SNP_interval: "{{REFERENCE_DATA}}/fluffy/gnomad.genomes.r3.0.sites.maf001.snv-only.hg38.sorted.vcf"
+
+gatk_collect_read_counts:
+  container: "{{APPTAINER_CACHE}}/gatk4_4.2.2.0.sif"
+
+gatk_model_segments:
+  container: "{{APPTAINER_CACHE}}/gatk4_4.2.2.0.sif"
+
+gatk_cnv_denoise_read_counts_by_sex:
+  container: "{{APPTAINER_CACHE}}/gatk4_4.2.2.0.sif"
+  pon_female: "{{REFERENCE_DATA}}/fluffy/gatk_pon/gatk_cnv_panel_of_normal_female.20250926.hdf5"
+  pon_male: "{{REFERENCE_DATA}}/fluffy/gatk_pon/gatk_cnv_panel_of_normal_male.20250926.hdf5" 
+
+manta_config_t:
+  container: "{{APPTAINER_CACHE}}/manta_1.6.0.sif"
+
+manta_config_tn:
+  container: "{{APPTAINER_CACHE}}/manta_1.6.0.sif"
+
+manta_run_workflow_t:
+  container: "{{APPTAINER_CACHE}}/manta_1.6.0.sif"
+
+manta_run_workflow_tn:
+  container: "{{APPTAINER_CACHE}}/manta_1.6.0.sif"
+
+mosdepth:
+  by: "500"
+  container: "{{APPTAINER_CACHE}}/mosdepth_0.3.2.sif"
+  extra: "--fast-mode --no-per-base --mapq 20 "
+  thresholds: "1,5,10,15,20,30,50"
+
+mosdepth_bed:
+  container: "{{APPTAINER_CACHE}}/mosdepth_0.3.2.sif"
+  design_bed: "{{REFERENCE_DATA}}/fluffy/GRCh38_all_exon_sorted.bed"
+
+multiqc:
+  container: "{{APPTAINER_CACHE}}/multiqc_1.25.1.sif"
+  reports:
+    DNA:
+      config: "{{FLUFFY_HOME}}/config/multiqc_dna_config.yaml"
+      included_unit_types: ['T', 'N']
+      qc_files:
+        - "qc/fastqc/{sample}_{type}_{flowcell}_{lane}_{barcode}_{read}_fastqc.zip"
+        - "qc/mosdepth/{sample}_{type}.mosdepth.global.dist.txt"
+        - "qc/mosdepth/{sample}_{type}.mosdepth.region.dist.txt"
+        - "qc/mosdepth/{sample}_{type}.mosdepth.summary.txt"
+        - "qc/mosdepth/{sample}_{type}.regions.bed.gz"
+        - "qc/mosdepth/{sample}_{type}.regions.bed.gz.csi"
+        - "qc/picard_collect_alignment_summary_metrics/{sample}_{type}.alignment_summary_metrics.txt"
+        - "qc/picard_collect_duplication_metrics/{sample}_{type}.duplication_metrics.txt"
+        - "qc/picard_collect_gc_bias_metrics/{sample}_{type}.gc_bias.pdf"
+        - "qc/picard_collect_gc_bias_metrics/{sample}_{type}.gc_bias.detail_metrics"
+        - "qc/picard_collect_gc_bias_metrics/{sample}_{type}.gc_bias.summary_metrics"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.alignment_summary_metrics"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.base_distribution_by_cycle_metrics"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.base_distribution_by_cycle.pdf"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.insert_size_metrics"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.insert_size_histogram.pdf"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.quality_by_cycle_metrics"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.quality_by_cycle.pdf"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.quality_distribution_metrics"
+        - "qc/picard_collect_multiple_metrics/{sample}_{type}.quality_distribution.pdf"
+        - "qc/picard_collect_wgs_metrics/{sample}_{type}.txt"
+        - "qc/picard_collect_hs_metrics/{sample}_{type}.HsMetrics.txt"
+        - "qc/samtools_stats/{sample}_{type}.samtools-stats.txt"
+        - "qc/multiqc/DNA_number.table.tsv"
+        - "qc/somalier/somalier_relate.pairs.tsv"
+        - "qc/somalier/somalier_relate.samples.tsv"
+        - "qc/somalier/somalier_samples_mqc.tsv"
+    RNA:
+      config: "{{FLUFFY_HOME}}/config/multiqc_rna_config.yaml"
+      included_unit_types: ["R"]
+      qc_files:
+        - "qc/fastqc/{sample}_{type}_{flowcell}_{lane}_{barcode}_{read}_fastqc.zip"
+        - "qc/mosdepth_bed/{sample}_{type}.mosdepth.global.dist.txt"
+        - "qc/mosdepth_bed/{sample}_{type}.mosdepth.region.dist.txt"
+        - "qc/mosdepth_bed/{sample}_{type}.mosdepth.summary.txt"
+        - "qc/mosdepth_bed/{sample}_{type}.regions.bed.gz"
+        - "qc/mosdepth_bed/{sample}_{type}.regions.bed.gz.csi"
+        - "qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.txt"
+        - "qc/rseqc_inner_distance/{sample}_{type}.inner_distance.txt"
+        - "qc/rseqc_inner_distance/{sample}_{type}.inner_distance_freq.txt"
+        - "prealignment/fastp_pe/{sample}_{type}_{flowcell}_{lane}_{barcode}_fastp.json"
+        - "prealignment/sortmerna/{sample}_{type}.rrna.log"
+        - "qc/multiqc/RNA_number.table.tsv"
+        - "qc/picard_collect_alignment_summary_metrics/{sample}_{type}.alignment_summary_metrics.txt"
+        - "fusions/star_fusion/{sample}_{type}/Log.final.out"
+        - "fusions/star_fusion/{sample}_{type}/ReadsPerGene.out.tab"
+
+pbrun_fq2bam_recal:
+  container: "{{APPTAINER_CACHE}}/clara-parabricks_4.5.1-1.sif"
+  extra: "--gpusort --gpuwrite --num-cpu-threads-per-stage 10 --bwa-nstreams 2"
+  tmp_dir: "/tmp/"
+
+pbrun_mutectcaller_t:
+  container: "{{APPTAINER_CACHE}}/clara-parabricks_4.5.1-1.sif"
+  tmp_dir: "/tmp/"
+
+pbrun_mutectcaller_tn:
+  container: "{{APPTAINER_CACHE}}/clara-parabricks_4.5.1-1.sif"
+  tmp_dir: "/tmp/"
+
+peddy:
+  container: "{{APPTAINER_CACHE}}/peddy_0.4.8.sif"
+  extra: "--sites hg38 "
+  config: "{{FLUFFY_HOME}}/config/peddy_mqc.yaml"
+
+picard_collect_alignment_summary_metrics:
+  container: "{{APPTAINER_CACHE}}/picard_2.25.0.sif"
+
+picard_collect_duplication_metrics:
+  container: "{{APPTAINER_CACHE}}/picard_2.25.0.sif"
+
+picard_collect_gc_bias_metrics:
+  container: "{{APPTAINER_CACHE}}/picard_2.25.0.sif"
+
+picard_collect_hs_metrics:
+  container: "{{APPTAINER_CACHE}}/picard_2.25.0.sif"
+
+picard_collect_multiple_metrics:
+  container: "{{APPTAINER_CACHE}}/picard_2.25.0.sif"
+  output_ext:
+    - "alignment_summary_metrics"
+    - "base_distribution_by_cycle_metrics"
+    - "base_distribution_by_cycle.pdf"
+    - "insert_size_metrics"
+    - "insert_size_histogram.pdf"
+    - "quality_by_cycle_metrics"
+    - "quality_by_cycle.pdf"
+    - "quality_distribution_metrics"
+    - "quality_distribution.pdf"
+
+picard_collect_wgs_metrics:
+  container: "{{APPTAINER_CACHE}}/picard_2.25.0.sif"
+
+pindel_update_vcf_sequence_dictionary:
+  container: "{{APPTAINER_CACHE}}/picard_2.25.0.sif"
+
+pindel_call:
+  include_bed: "{{REFERENCE_DATA}}/fluffy/pindel/aml_pindel_38_240912.bed"
+  container: "{{APPTAINER_CACHE}}/pindel_0.2.5b9.sif"
+
+pindel2vcf:
+  container: "{{APPTAINER_CACHE}}/pindel_0.2.5b9.sif"
+  extra: "-is 5 -he 0.01 -e 3"
+
+rseqc_gene_body_coverage:
+  bed: "{{REFERENCE_DATA}}/fluffy/hg38_GENCODE.v38.bed"
+  container: "{{APPTAINER_CACHE}}/rseqc_4.0.0.sif"
+
+rseqc_inner_distance:
+  bed: "{{REFERENCE_DATA}}/fluffy/hg38_GENCODE.v38.bed"
+  container: "{{APPTAINER_CACHE}}/rseqc_4.0.0.sif"
+  
+simple_sv_annotation:
+  container: "{{APPTAINER_CACHE}}/simple_sv_annotation_2019.02.18.sif"
+  panel: "{{REFERENCE_DATA}}/fluffy/simple_sv_annotation/az-cancer-panel.txt"
+  fusion_pairs: "{{REFERENCE_DATA}}/fluffy/simple_sv_annotation/fusion_pairs.txt"
+
+snpeff:
+  container: "{{APPTAINER_CACHE}}/snpeff_5.0.sif"
+  db: "{{REFERENCE_DATA}}/fluffy/snpeff/GRCh38.99"
+
+somalier_extract:
+  container: "{{APPTAINER_CACHE}}/somalier_v0.2.18.sif"
+  sites: "{{REFERENCE_DATA}}/fluffy/somalier/sites.hg38.vcf.gz"
+  extra: ""
+
+somalier_mqc:
+  config: "{{FLUFFY_HOME}}/config/somalier_mqc.yaml"
+
+somalier_relate: 
+  container: "{{APPTAINER_CACHE}}/somalier_v0.2.18.sif"
+  extra: "--infer"
+  
+sortmerna:
+  container: "{{APPTAINER_CACHE}}/sortmerna_4.3.4.sif"
+  fasta:
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/rfam-5.8s-database-id98.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/rfam-5s-database-id98.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/silva-bac-16s-id90.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/silva-bac-23s-id98.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/silva-euk-18s-id95.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/silva-euk-28s-id98.fasta"
+  index: "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/idx"
+
+spring:
+  container: "{{APPTAINER_CACHE}}/spring_1.0.1.sif"
+
+star:
+  container: "{{APPTAINER_CACHE}}/star_2.7.10a.sif"
+  genome_index: "{{REFERENCE_DATA}}/fluffy/star_arriba/Homo_sapiens.GRCh38.dna.primary_assembly.star_reference"
+  extra: "--quantMode GeneCounts --sjdbGTFfile {{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.93.chr.gtf --outSAMtype BAM SortedByCoordinate --chimSegmentMin 10 --chimOutType WithinBAM SoftClip --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
+
+star_fusion:
+  container: "{{APPTAINER_CACHE}}/starfusion_1.10.1.sif"
+  extra: "--examine_coding_effect"
+  genome_path: "{{REFERENCE_DATA}}/fluffy/star-fusion/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir"
+
+svdb_merge:
+  tc_method:
+    - name: pathology
+      cnv_caller:
+        - cnvkit
+        - gatk
+  container: "{{APPTAINER_CACHE}}/svdb_2.6.0.sif"
+
+svdb_query:
+  container: "{{APPTAINER_CACHE}}/svdb_2.6.0.sif"
+  db_string: "--db {{REFERENCE_DATA}}/fluffy/230601_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
+ 
+vep:
+  container: "{{APPTAINER_CACHE}}/vep_111.0.sif"
+  vep_cache: "{{REFERENCE_DATA}}/fluffy/vep/"
+  mode: "--offline --cache --merged "
+  extra: "--assembly GRCh38 --check_existing --pick --variant_class --everything "
+
+vt_decompose:
+  container: "{{APPTAINER_CACHE}}/vt_2015.11.10.sif"
+
+vt_normalize:
+  container: "{{APPTAINER_CACHE}}/vt_2015.11.10.sif"
