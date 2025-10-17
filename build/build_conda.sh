@@ -55,6 +55,9 @@ tar -zcvf ${PIPELINE_NAME}_${TAG_OR_BRANCH}.tar.gz ${PIPELINE_NAME}_${TAG_OR_BRA
 # Download containers
 conda activate ./${PIPELINE_NAME}_${TAG_OR_BRANCH}_env
 hydra-genetics prepare-environment create-singularity-files -c config/config_marvin.yaml -o apptainer_cache
+cd apptainer_cache
+for f in *; do mv "$f" "$(echo "$f" | awk -F '__' '{print $(NF)}')"; done 
+cd .. 
 
 # Download references
 for reference_config in "$@"
