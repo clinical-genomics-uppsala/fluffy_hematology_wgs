@@ -392,7 +392,7 @@ mosdepth_bed:
 pindel_call:
   include_bed:
     path: fluffy/pindel/aml_pindel_38_240912.bed
-    checksum: 
+    checksum: 3ba1ea9b1412d826bf58f0f5c9610de6 
     type: file
     url: file:/data/ref_genomes/GRCh38/gene_lists/aml_pindel_38_240912.bed
 
