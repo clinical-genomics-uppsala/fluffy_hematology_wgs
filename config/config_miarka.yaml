@@ -21,7 +21,7 @@ default_container: "{{APPTAINER_CACHE}}/common_1.8.1.sif"
 
 reference:
   design_bed: "{{REFERENCE_DATA}}/fluffy/homo_sapiens.hg38.wgs.bed"
-  design_intervals: "{{REFERENCE_DATA}}/fluffy/GRCmasked/Twist_Comprehensive_Exome_Covered_Targets_hg38.interval_list" #hsmetrics
+  design_intervals: "{{REFERENCE_DATA}}/fluffy/Twist_Comprehensive_Exome_Covered_Targets_hg38.interval_list" #hsmetrics
   design_intervals_gatk_cnv: "{{REFERENCE_DATA}}/fluffy/gatk/hg38.preprocessed.20250926.interval_list"
   fasta: "{{REFERENCE_DATA}}/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta"
   fasta_rna: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
@@ -285,7 +285,7 @@ dux4_erg:
   region: "chr21:38380027-38498442"
 
 fastp_pe:
-  container: "{{APPTAINER_CACHE}}/fastp_0.20.1.sif "
+  container: "{{APPTAINER_CACHE}}/fastp_0.20.1.sif"
 
 fastqc:
   container: "{{APPTAINER_CACHE}}/fastqc_0.11.9.sif"
@@ -461,8 +461,8 @@ rseqc_inner_distance:
   
 simple_sv_annotation:
   container: "{{APPTAINER_CACHE}}/simple_sv_annotation_2019.02.18.sif"
-  panel: "{{REFERENCE_DATA}}/fluffy/simple_sv_annotation/az-cancer-panel.txt"
-  fusion_pairs: "{{REFERENCE_DATA}}/fluffy/simple_sv_annotation/fusion_pairs.txt"
+  panel: "{{REFERENCE_DATA}}/fluffy/az-cancer-panel.txt"
+  fusion_pairs: "{{REFERENCE_DATA}}/fluffy/fusion_pairs.txt"
 
 snpeff:
   container: "{{APPTAINER_CACHE}}/snpeff_5.0.sif"
@@ -492,7 +492,7 @@ sortmerna:
   index: "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/idx"
 
 spring:
-  container: "{{APPTAINER_CACHE}}/spring_1.0.1.sif"
+  container: "{{APPTAINER_CACHE}}/spring_1.1.1.sif"
 
 star:
   container: "{{APPTAINER_CACHE}}/star_2.7.10a.sif"
