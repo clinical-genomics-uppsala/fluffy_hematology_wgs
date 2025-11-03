@@ -16,8 +16,8 @@ arriba:
   time: "72:00:00"
 
 crumble:
-  mem_mb: 12288
-  threads: 2
+  mem_mb: 24576
+  threads: 4
 
 fastp_pe:
   mem_mb: 49152
