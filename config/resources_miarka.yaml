@@ -9,11 +9,15 @@ default_resources:
 
 _copy:
   time: "1:00:00"
-
+  
 arriba:
   mem_mb: 30720
   threads: 5
   time: "72:00:00"
+
+crumble:
+  mem_mb: 12288
+  threads: 2
 
 fastp_pe:
   mem_mb: 49152
@@ -28,8 +32,8 @@ fusioncatcher:
   time: "160:00:00"
 
 gatk_cnv_collect_allelic_counts:
-  mem_mb: 30720 
-  threads: 5
+  mem_mb: 49152 
+  threads: 8
 
 gatk_cnv_model_segments:
   mem_mb: 30720

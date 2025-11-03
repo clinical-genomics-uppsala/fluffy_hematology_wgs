@@ -26,6 +26,7 @@ reference:
   fasta: "{{REFERENCE_DATA}}/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta"
   fasta_rna: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
   fai: "{{REFERENCE_DATA}}/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta.fai"
+  dict: "{{REFERENCE_DATA}}/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.dict"
   genome_dir: "{{REFERENCE_DATA}}/fluffy/homo_sapiens_star/" # req by align not used
   sites: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens_assembly38.known_indels.vcf.gz"
   wgs_intervals: "{{REFERENCE_DATA}}/fluffy/homo_sapiens.hg38.wgs.interval_list"
