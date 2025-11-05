@@ -140,7 +140,7 @@ use rule star from alignment as alignment_star with:
         sj=temp("alignment/star/{sample}_{type}.SJ.out.tab"),
         reads_per_gene=temp("alignment/star/{sample}_{type}.ReadsPerGene.out.tab"),
         log_final=temp("alignment/star/{sample}_{type}.Log.final.out"),
- 
+
 
 use rule samtools_index from alignment as alignment_samtools_index
 
@@ -435,9 +435,7 @@ use rule * from prealignment as prealignment_*
 
 module qc:
     snakefile:
-        get_module_snakefile(
-            config,
-            "hydra-genetics/qc", path="workflow/Snakefile", tag=config["modules"]["qc"])
+        get_module_snakefile(config, "hydra-genetics/qc", path="workflow/Snakefile", tag=config["modules"]["qc"])
     config:
         config
 
@@ -725,9 +723,7 @@ use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
 
 module misc:
     snakefile:
-        get_module_snakefile(
-            config,
-            "hydra-genetics/misc", path="workflow/Snakefile", tag=config["modules"]["misc"])
+        get_module_snakefile(config, "hydra-genetics/misc", path="workflow/Snakefile", tag=config["modules"]["misc"])
     config:
         config
 
