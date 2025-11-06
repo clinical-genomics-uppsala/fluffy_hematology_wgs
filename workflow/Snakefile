@@ -54,7 +54,8 @@ rule all:
 
 module annotation:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/annotation",
             path="workflow/Snakefile",
             tag=config["modules"]["annotation"],
@@ -123,7 +124,8 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
 
 module alignment:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/alignment",
             path="workflow/Snakefile",
             tag=config["modules"]["alignment"],
@@ -145,7 +147,8 @@ use rule samtools_index from alignment as alignment_samtools_index
 
 module cnv_sv:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/cnv_sv",
             path="workflow/Snakefile",
             tag=config["modules"]["cnv_sv"],
@@ -244,7 +247,8 @@ use rule pindel_call from cnv_sv as cnv_sv_pindel_call with:
 
 module compression:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/compression",
             path="workflow/Snakefile",
             tag=config["modules"]["compression"],
@@ -265,7 +269,8 @@ use rule samtools_view from compression as compression_samtools_view with:
 
 module filtering:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/filtering",
             path="workflow/Snakefile",
             tag=config["modules"]["filtering"],
@@ -341,7 +346,8 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
 
 module fusions:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/fusions",
             path="workflow/Snakefile",
             tag=config["modules"]["fusions"],
@@ -380,7 +386,8 @@ use rule star_fusion from fusions as fusions_star_fusion with:
 
 module parabricks:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/parabricks",
             path="workflow/Snakefile",
             tag=config["modules"]["parabricks"],
@@ -398,7 +405,8 @@ use rule pbrun_fq2bam from parabricks as parabricks_pbrun_fq2bam with:
 
 module sentieon:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/sentieon",
             path="workflow/Snakefile",
             tag=config["modules"]["sentieon"],
@@ -412,7 +420,8 @@ use rule * from sentieon as sentieon_*
 
 module prealignment:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/prealignment",
             path="workflow/Snakefile",
             tag=config["modules"]["prealignment"],
@@ -426,7 +435,7 @@ use rule * from prealignment as prealignment_*
 
 module qc:
     snakefile:
-        github("hydra-genetics/qc", path="workflow/Snakefile", tag=config["modules"]["qc"])
+        get_module_snakefile(config, "hydra-genetics/qc", path="workflow/Snakefile", tag=config["modules"]["qc"])
     config:
         config
 
@@ -617,7 +626,8 @@ use rule rseqc_inner_distance from qc as qc_rseqc_inner_distance with:
 
 module reports:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/reports",
             path="workflow/Snakefile",
             tag=config["modules"]["reports"],
@@ -671,7 +681,8 @@ use rule cnv_html_report from reports as reports_cnv_html_report with:
 
 module snv_indels:
     snakefile:
-        github(
+        get_module_snakefile(
+            config,
             "hydra-genetics/snv_indels",
             path="workflow/Snakefile",
             tag=config["modules"]["snv_indels"],
@@ -712,7 +723,7 @@ use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
 
 module misc:
     snakefile:
-        github("hydra-genetics/misc", path="workflow/Snakefile", tag=config["modules"]["misc"])
+        get_module_snakefile(config, "hydra-genetics/misc", path="workflow/Snakefile", tag=config["modules"]["misc"])
     config:
         config
 
