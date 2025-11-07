@@ -2,6 +2,8 @@ resources: "{{FLUFFY_HOME}}/config/resources_miarka.yaml"
 samples: "samples.tsv"
 units: "units.tsv"
 output: "{{FLUFFY_HOME}}/config/output_files.yaml"
+REFERENCE_DATA: "/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files"
+APPTAINER_CACHE: "/proj/ngi2024001/nobackup/bin/wp2_iht/apptainer_cache"
 
 modules:
   alignment: "906d25d0d4791eb5a54cba9954fddf29e27b85dd"
