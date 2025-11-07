@@ -12,7 +12,7 @@ modules:
   compression: "v1.1.0"
   filtering: "v0.3.0"
   fusions: "12f8354"
-  parabricks: "v1.1.0"
+  parabricks: "v1.2.1"
   prealignment: "v1.1.0"
   qc: "v0.3.0"
   reports: "7c8b8c5"
@@ -215,14 +215,14 @@ multiqc:
         - "fusions/star_fusion/{sample}_{type}/Log.final.out"
         - "fusions/star_fusion/{sample}_{type}/ReadsPerGene.out.tab"
 
-pbrun_fq2bam:
-  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.1.1-1"
+pbrun_fq2bam_recal:
+  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1"
 
 pbrun_mutectcaller_t:
-  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.1.1-1"
+  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1"
 
 pbrun_mutectcaller_tn:
-  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.1.1-1"
+  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1"
   
 peddy:
   container: "docker://hydragenetics/peddy:0.4.8"

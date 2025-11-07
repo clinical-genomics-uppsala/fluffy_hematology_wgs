@@ -29,6 +29,7 @@ from hydra_genetics.utils.software_versions import get_pipeline_version
 from hydra_genetics.utils.software_versions import use_container
 from hydra_genetics.utils.software_versions import touch_software_version_file
 from hydra_genetics.utils.software_versions import touch_pipeline_version_file_name
+from hydra_genetics.utils.misc import get_module_snakefile  # Needed for local git
 
 
 hydra_min_version("3.0.0")
@@ -123,7 +124,7 @@ def get_bam_input(wildcards, t_n=None, use_sample_wildcard=True):
     if aligner is None:
         sys.exit("aligner missing from config, valid options: bwa_gpu or bwa_sentieon")
     elif aligner == "bwa_gpu":
-        bam_input = "parabricks/pbrun_fq2bam/{}.bam".format(sample_str)
+        bam_input = "parabricks/pbrun_fq2bam_recal/{}.bam".format(sample_str)
     elif aligner == "bwa_sentieon":
         bam_input = "sentieon/realign/{}_REALIGNED.bam".format(sample_str)
     else:
