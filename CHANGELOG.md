@@ -1,5 +1,36 @@
 # Changelog
 
+## [1.4.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.3.2...v1.4.0) (2025-11-07)
+
+
+### Features
+
+* add build script ([c35e335](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/c35e33543b48bdb121df6bad8df2e53b8d458456))
+* add config file for miarka ([99bdda6](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/99bdda6f87ab9c8a97a79fc34846013f2985c3e7))
+* add references file for miarka ([f155dba](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/f155dba9e02c5d13a842afbf3bcfd415d7457b45))
+* add resources file for miarka ([8229392](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/82293924906a64a75640ab5c5576a235d355e742))
+* miarka ([6756b52](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/6756b52c21142c20272254ac116d81c2d776ea6c))
+* modify common.smk for miarka ([9c7f3b0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/9c7f3b08d105598f11074a4b0d93ddfbae80fadb))
+* modify Snakefile for miarka ([139c462](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/139c462a093a0088595ef3760cea0d510ea39e7c))
+* remove need for wp2_smallscripts ([406467a](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/406467aca1e82d9b91f91f86464dc0e76cf80e97))
+
+
+### Bug Fixes
+
+* adjustments miarka ([bd487e9](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/bd487e95277929c98d442a20d5676b8f4ab51e94))
+* adjustments miarka ([33d97c5](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/33d97c535b4427d5564dcdcce0d980512e23ef1c))
+* benchmark now in folder with output ([c043a97](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/c043a97f2823ce46f36f13797081e5408fd76cc0))
+* build script and req ([be7f110](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/be7f1103ded879a8edb788349baa9ae56969ff8b))
+* config yaml files parabricks update ([e496e3a](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/e496e3a0d508375223f2bdd9892b2530cf57ac64))
+* exchange peddy to somalier in gatkCNV ([4f9778b](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/4f9778b09cad251a1358b810f99aad1be132f51c))
+* forgot checksum ([0359a78](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/0359a788e8295c5d581bfda0d8e7e024542e74e9))
+* remove sentieon from miarka config ([cc2dfe4](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/cc2dfe481383ead824762877659922a5ae843a70))
+* resources typo ([46034ff](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/46034ffbb52f10aa880688a0445c38066b069432))
+* separate yaml files for marvin ([2a3d30e](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/2a3d30e22823583e21c953e8d75b979d6bfa1e6b))
+* style ([798a830](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/798a8306c9d6d9df87c639ca8218c5626d859c85))
+* typo ([be7e499](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/be7e49933e038a4249d1e54acec2077169894e38))
+* workflow/Snakefile ([728751d](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/728751db8d8f4ee8772285919bb7166465238cfb))
+
 ## [1.3.2](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.3.1...v1.3.2) (2025-06-13)
 
 
