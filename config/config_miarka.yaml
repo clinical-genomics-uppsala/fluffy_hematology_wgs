@@ -18,6 +18,7 @@ modules:
   reports: "7c8b8c5"
   snv_indels: "v0.6.0"
   misc: "v0.1.0"
+  sentieon: "b002d39"
 
 default_container: "{{APPTAINER_CACHE}}/common_1.8.1.sif"
 
