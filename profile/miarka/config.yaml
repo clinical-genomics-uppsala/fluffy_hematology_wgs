@@ -7,7 +7,6 @@ max-jobs-per-second: 50
 resources: load=100
 max-status-checks-per-second: 100
 singularity-args: "-e --cleanenv -B /proj -B $HOME --nv"
-wrapper-prefix: "git+file://vulpes/proj/cgu/ngi2024001/nobackup/bin/wp2_iht/Nina_Miarka/snakemake-wrappers/"
 drmaa: " -A ngi2024001 -N 1-1 -t {resources.time} -n {resources.threads} --mem={resources.mem_mb} --mem-per-cpu={resources.mem_per_cpu} --mem-per-cpu={resources.mem_per_cpu} --partition={resources.partition} -J {rule} {resources.gres} -e slurm_out/{rule}_%j.err -o slurm_out/{rule}_%j.out"
 default-resources: [gres=""]
 drmaa-log-dir: "slurm_out"
