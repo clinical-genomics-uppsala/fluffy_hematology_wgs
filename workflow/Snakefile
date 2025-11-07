@@ -24,7 +24,6 @@ ruleorder: filtering_bcftools_filter_include_region_snv_t > bgzip_mutect
 ruleorder: cnv_sv_manta_run_workflow_t > tabix_cnv
 ruleorder: cnv_sv_manta_run_workflow_tn > tabix_cnv
 ruleorder: filtering_bcftools_filter_include_region_sv > bgzip_cnv
-ruleorder: parabricks_pbrun_fq2bam > alignment_samtools_index
 ruleorder: parabricks_pbrun_fq2bam_recal > alignment_samtools_index
 
 
