@@ -56,11 +56,11 @@ mosdepth_bed:
   threads: 4
 
 pbrun_fq2bam_recal:
-  gres: "--gres=gres:gpu:a100:2"
-  mem_mb: 240000
+  gres: "--gres=gres:gpu:a100:4"
+  mem_mb: 480000
   mem_per_cpu: 5000
   partition: "gpu"
-  threads: 48
+  threads: 96
   time: "6:00:00"
 
 pbrun_mutectcaller_t:
