@@ -2,7 +2,7 @@ default_resources:
   gres: ""
   mem_mb: 6144
   mem_per_cpu: 6144
-  partition: "low,low_bkup"
+  partition: "core,core_bkup"
   threads: 1
   time: "24:00:00"
   load: 1
