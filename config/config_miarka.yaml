@@ -18,6 +18,7 @@ modules:
   reports: "7c8b8c5"
   snv_indels: "v0.6.0"
   misc: "v0.1.0"
+  sentieon: "b002d39"
 
 default_container: "{{APPTAINER_CACHE}}/common_1.8.1.sif"
 
@@ -400,15 +401,12 @@ multiqc:
 pbrun_fq2bam_recal:
   container: "{{APPTAINER_CACHE}}/clara-parabricks_4.5.1-1.sif"
   extra: "--gpusort --gpuwrite --num-cpu-threads-per-stage 10 --bwa-nstreams 2"
-  tmp_dir: "/tmp/"
 
 pbrun_mutectcaller_t:
   container: "{{APPTAINER_CACHE}}/clara-parabricks_4.5.1-1.sif"
-  tmp_dir: "/tmp/"
 
 pbrun_mutectcaller_tn:
   container: "{{APPTAINER_CACHE}}/clara-parabricks_4.5.1-1.sif"
-  tmp_dir: "/tmp/"
 
 peddy:
   container: "{{APPTAINER_CACHE}}/peddy_0.4.8.sif"
