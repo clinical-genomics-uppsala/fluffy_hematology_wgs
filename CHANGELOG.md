@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.0.1](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.0.0...v2.0.1) (2025-12-08)
+
+
+### Bug Fixes
+
+* jobscript for GPU on miarka ([4008f2f](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/4008f2ff82490510c4a993c7e47ae7050ae8ac02))
+* Manta deprecated breakends ([b2e0443](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/b2e04438c2665f7728099f92b0e87762a572d14b))
+* partition resources_marvin.yaml ([05f2a6d](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/05f2a6db0e8c912ca356ece56a9ba04a719cb402))
+* profile container ([cab251c](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/cab251c0c4a2012bed21e95dba691bf6620936b9))
+* rule name ([510d8cc](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/510d8cc1656148c009345b6953f429b62adcf919))
+* tmpdir miarka config parabricks ([bbfeb3e](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/bbfeb3e62b86ee0b7b6252aa380664d0f313c22b))
+* Update resources_miarka.yaml ([4e2992e](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/4e2992e2af36a8fbf1e72157e76a57aac2e6735b))
+
 ## [1.3.2](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v1.3.1...v1.3.2) (2025-06-13)
 
 
