@@ -442,7 +442,7 @@ def create_manta_tables(
                     str(record.contig),
                     int(record.pos),
                     record_values["id"],
-                    str(record.alts[0])[1:-1],
+                    str(record.alts[0]),
                     record_values["genes"],
                     record_values["detail"],
                     record_values["depth"],
