@@ -633,8 +633,6 @@ module reports:
     config:
         config
 
-wildcard_constraints:
-    type="T|N|TN",
 
 use rule * from reports as reports_*
 
@@ -650,7 +648,7 @@ use rule merge_cnv_json from reports as reports_wgs_merge_cnv_json with:
         cnv_vcfs=get_unfiltered_cnv_vcfs_for_merge_json,
         filtered_cnv_vcfs_tbi=get_filtered_cnv_vcfs_tbi_for_merge_json,
         cnv_vcfs_tbi=get_unfiltered_cnv_vcfs_tbi_for_merge_json,
-        cytobands="config/cytoBand.hg38.txt",
+        cytobands="../../config/cytoBand.hg38.txt",
     output:
         json=temp("reports/cnv_html_report/{sample}_{type}.wgs.{tc_method}.merged.json"),
     log:
