@@ -649,7 +649,9 @@ use rule merge_cnv_json from reports as reports_merge_cnv_json with:
         filtered_cnv_vcfs_tbi=get_filtered_cnv_vcfs_tbi_for_merge_json,
         cnv_vcfs_tbi=get_unfiltered_cnv_vcfs_tbi_for_merge_json,
         cytobands=config.get("merge_cnv_json", {}).get("cytobands", ""),
-        ref_genes=config.get("merge_cnv_json", {}).get("ref_genes", "/projects/wp1/nobackup/ngs/utveckling/Twist_DNA_DATA/juli/refGene_hg38.txt"),
+        ref_genes=config.get("merge_cnv_json", {}).get(
+            "ref_genes", "/projects/wp1/nobackup/ngs/utveckling/Twist_DNA_DATA/juli/refGene_hg38.txt"
+        ),
 
 
 use rule cnv_html_report from reports as reports_cnv_html_report with:
