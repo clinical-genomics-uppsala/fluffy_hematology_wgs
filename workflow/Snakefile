@@ -638,7 +638,7 @@ use rule * from reports as reports_*
 
 
 # WGS variants
-use rule merge_cnv_json from reports as reports_wgs_merge_cnv_json with:
+use rule merge_cnv_json from reports as reports_merge_cnv_json with:
     input:
         json=get_json_for_merge_cnv_json,
         fai=config.get("reference", {}).get("fai", ""),
@@ -648,26 +648,20 @@ use rule merge_cnv_json from reports as reports_wgs_merge_cnv_json with:
         cnv_vcfs=get_unfiltered_cnv_vcfs_for_merge_json,
         filtered_cnv_vcfs_tbi=get_filtered_cnv_vcfs_tbi_for_merge_json,
         cnv_vcfs_tbi=get_unfiltered_cnv_vcfs_tbi_for_merge_json,
-        cytobands="../../config/cytoBand.hg38.txt",
-    output:
-        json=temp("reports/cnv_html_report/{sample}_{type}.wgs.{tc_method}.merged.json"),
-    log:
-        "reports/cnv_html_report/{sample}_{type}.wgs.{tc_method}.merged.json.log",
+        cytobands="fluffy_hematology_wgs/config/cytoBand.hg38.txt",
+        ref_genes="/projects/wp1/nobackup/ngs/utveckling/Twist_DNA_DATA/juli/refGene_hg38.txt",
 
 
-use rule cnv_html_report from reports as reports_wgs_cnv_html_report with:
-    input:
-        json="reports/cnv_html_report/{sample}_{type}.wgs.{tc_method}.merged.json",
-    output:
-        html="reports/cnv_html_report/{sample}_{type}.wgs.{tc_method}.cnv_report.html",
+use rule cnv_html_report from reports as reports_cnv_html_report with:
     params:
         include_table=config.get("cnv_html_report", {}).get("show_table", True),
+        extra_tables=config.get("cnv_html_report", {}).get("extra_tables", []),
         tc=get_tc,
         tc_method="pathology",
         include_cytobands=config.get("cnv_html_report", {}).get("cytobands", False),
-        wide_plot_width=config.get("cnv_html_report", {}).get("wide_plot_width", 2500),
+        wide_plot_width=config.get("cnv_html_report", {}).get("wide_plot_width", 2000),
     log:
-        "reports/cnv_html_report/{sample}_{type}.wgs.{tc_method}.cnv_report.html.log",
+        "reports/cnv_html_report/{sample}_{type}.{tc_method}.cnv_report.html.log",
 
 
 module snv_indels:

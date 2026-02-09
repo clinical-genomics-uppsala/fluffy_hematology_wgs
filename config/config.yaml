@@ -15,7 +15,7 @@ modules:
   parabricks: "v1.2.1"
   prealignment: "v1.1.0"
   qc: "v0.3.0"
-  reports: "9c1fc7a"
+  reports: "v0.11.0"
   snv_indels: "v0.6.0"
   misc: "v0.1.0"
   sentieon: "b002d39"
@@ -82,12 +82,8 @@ cnv_html_report:
   cnv_vcf:
     - annotation: cna_exons
       filter: cnv_hardfilter
-  cytobands: true
-
-cnv_json:
-  target_data_points: 1000000
-  roi_flank_size_bp: 1000
-  roi_budget_fraction: 0.1
+  cytobands: "{{FLUFFY_HOME}}/config/cytoBand.hg38.txt"
+  wide_plot_width: 2500
 
 cnvkit_scatter:
   container: "docker://hydragenetics/cnvkit:0.9.9"
