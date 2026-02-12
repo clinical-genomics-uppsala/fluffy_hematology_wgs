@@ -1,4 +1,4 @@
-resources: "{{FLUFFY_HOME}}/config/resources_miarka.yaml"
+d6e56edresources: "{{FLUFFY_HOME}}/config/resources_miarka.yaml"
 samples: "samples.tsv"
 units: "units.tsv"
 output: "{{FLUFFY_HOME}}/config/output_files.yaml"
@@ -15,12 +15,14 @@ modules:
   parabricks: "v1.2.1"
   prealignment: "v1.1.0"
   qc: "v0.3.0"
-  reports: "7c8b8c5"
+  reports: "d6e56ed"
   snv_indels: "v0.6.0"
   misc: "v0.1.0"
   sentieon: "b002d39"
 
 default_container: "{{APPTAINER_CACHE}}/common_1.8.1.sif"
+
+general_report: "{{FLUFFY_HOME}}/config/general_report_dummy.yaml"
 
 reference:
   design_bed: "{{REFERENCE_DATA}}/fluffy/homo_sapiens.hg38.wgs.bed"
@@ -254,6 +256,8 @@ cnv_html_report:
   cnv_vcf:
     - annotation: cna_exons
       filter: cnv_hardfilter
+  cytobands: True
+  wide_plot_width: 2500
 
 cnvkit_scatter:
   container: "{{APPTAINER_CACHE}}/cnvkit_0.9.9.sif"
@@ -333,6 +337,10 @@ manta_run_workflow_t:
 
 manta_run_workflow_tn:
   container: "{{APPTAINER_CACHE}}/manta_1.6.0.sif"
+
+merge_cnv_json:
+  cytobands: "{{FLUFFY_HOME}}/config/cytoBand.hg38.txt"
+  ref_genes: "{{REFERENCE_DATA}}/fluffy/cnv_report/refGene_hg38.txt"  
 
 mosdepth:
   by: "500"
