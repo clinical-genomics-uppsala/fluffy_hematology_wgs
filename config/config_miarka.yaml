@@ -1,4 +1,4 @@
-d6e56edresources: "{{FLUFFY_HOME}}/config/resources_miarka.yaml"
+resources: "{{FLUFFY_HOME}}/config/resources_miarka.yaml"
 samples: "samples.tsv"
 units: "units.tsv"
 output: "{{FLUFFY_HOME}}/config/output_files.yaml"
