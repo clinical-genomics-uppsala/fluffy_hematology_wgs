@@ -9,5 +9,5 @@ use-singularity: True
 drmaa: "-p {resources.partition} -t {resources.time} -n {resources.threads} --mem={resources.mem_mb} --mem-per-cpu={resources.mem_per_cpu} {resources.gres} -J {rule} -A wp2 -e slurm/{rule}_%j.err -o slurm/{rule}_%j.out --nodes=1-1"
 default-resources: [gres=""]
 drmaa-log-dir: "slurm"
-singularity-args: "--cleanenv --bind /beegfs-archive,/beegfs-scratch,/beegfs-storage,/home,/data,/projects,/tmp -B /beegfs-scratch/wp4/wp2_wgs_tmp:/tmp --nv --containall"
+singularity-args: "--cleanenv --bind /beegfs-archive,/beegfs-scratch,/beegfs-storage,/home,/data,/projects -B /beegfs-scratch/wp4/wp2_wgs_tmp:/tmp --nv --containall"
 singularity-prefix: "/beegfs-storage/projects/wp4/nobackup/singularity_cache/"

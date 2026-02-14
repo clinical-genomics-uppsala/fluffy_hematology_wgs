@@ -382,6 +382,13 @@ gatk_cnv_denoise_read_counts_by_sex:
     type: file
     url: file:/data/ref_genomes/GRCh38/gatk/gatk_cnv_panel_of_normal_male.20250926.hdf5
 
+merge_cnv_json:
+  ref_genes:
+    path: fluffy/cnv_report/refGene_hg38.txt
+    checksum: 8b92c5a4efbc8102a6498c61d2bfc63b
+    type: file
+    url: file:/beegfs-storage//data/ref_genomes/GRCh38/cnv_report/refGene_hg38.txt
+
 mosdepth_bed:
   design_bed: 
     path: fluffy/GRCh38_all_exon_sorted.bed

@@ -167,13 +167,6 @@ def get_cnv_callers(tc_method):
     raise ValueError(f"no cnv caller config available for tc_method {tc_method}")
 
 
-def get_json_for_merge_cnv_json_chr(wildcards):
-    callers = get_cnv_callers(wildcards.tc_method)
-    return [
-        "reports/cnv_html_report/{sample}_{type}.{caller}.{tc_method}.{locus}.json".format(caller=c, **wildcards) for c in callers
-    ]
-
-
 def get_tc(wildcards):
     if wildcards.tc_method == "pathology":
         try:

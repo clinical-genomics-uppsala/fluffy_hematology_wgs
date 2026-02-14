@@ -1,0 +1,6 @@
+files:
+ - name: Dummy variants
+   type: file_link
+   input: dummy_result
+   description: File link to vcf with SNVs and INDELs
+   nav_header: Dummy variants

@@ -115,9 +115,9 @@ files:
     output: "{sample}/CNV/{sample}_T_chr{chr}.png"
     types: ["T"]
     
-  - name: CNV report per chr
-    input: "reports/cnv_html_report/{sample}_T.pathology.chr{chr}.cnv_report.html"
-    output: "{sample}/CNV/cnv_html_report/{sample}_T.pathology.chr{chr}.cnv_report.html"
+  - name: CNV report WGS
+    input: "reports/cnv_html_report/{sample}_T.pathology.cnv_report.html"
+    output: "{sample}/CNV/cnv_html_report/{sample}_T.pathology.cnv_report.html"
     types: ["T"]
   
   - name: CNV svdb vcf

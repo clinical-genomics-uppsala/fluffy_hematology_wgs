@@ -548,6 +548,20 @@ properties:
     required:
       - container
 
+  merge_cnv_json:
+    type: object
+    description: parameters for merge_cnv_json
+    properties:
+      cytobands:
+        type: string
+        description: tab delimited bed file with cytobands
+      ref_genes:
+        type: string
+        description: gtf file with reference genes
+    required:
+      - cytobands
+      - ref_genes
+
   mosdepth:
     type: object
     description: parameters for mosdepth

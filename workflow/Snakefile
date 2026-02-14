@@ -12,7 +12,6 @@ include: "rules/dux4_rearrangements.smk"
 include: "rules/export.smk"
 include: "rules/fix_af.smk"
 include: "rules/gatk_cnv_denoise_read_counts_by_sex.smk"
-include: "rules/html_output.smk"
 include: "rules/peddy_create_ped.smk"
 include: "rules/somalier.smk"
 
@@ -638,44 +637,33 @@ module reports:
 use rule * from reports as reports_*
 
 
+# WGS variants
 use rule merge_cnv_json from reports as reports_merge_cnv_json with:
     input:
         json=get_json_for_merge_cnv_json,
         fai=config.get("reference", {}).get("fai", ""),
         annotation_bed=list(config.get("annotate_cnv", {}).values()),
-        germline_vcf=lambda wildcards: get_vcf_input(wildcards),
+        germline_vcf="parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.fix_af.vcf",
         filtered_cnv_vcfs=get_filtered_cnv_vcfs_for_merge_json,
         cnv_vcfs=get_unfiltered_cnv_vcfs_for_merge_json,
         filtered_cnv_vcfs_tbi=get_filtered_cnv_vcfs_tbi_for_merge_json,
         cnv_vcfs_tbi=get_unfiltered_cnv_vcfs_tbi_for_merge_json,
-
-
-use rule cnv_json from reports as reports_cnv_json_chr with:
-    output:
-        json=temp("reports/cnv_html_report/{sample}_{type}.{caller}.{tc_method}.{locus}.json"),
-    params:
-        skip_chromosomes=lambda wildcards: [
-            chromosome
-            for chromosome in [f"chr{i}" for i in range(1, 23)] + ["chrX", "chrY", "chrM"]
-            if chromosome != wildcards.locus
-        ],
-    log:
-        "reports/cnv_html_report/{sample}_{type}.{caller}.{tc_method}.{locus}.json.log",
-    benchmark:
-        repeat(
-            "reports/cnv_html_report/{sample}_{type}.{caller}.{tc_method}.{locus}.json.benchmark.tsv",
-            config.get("cnv_json", {}).get("benchmark_repeats", 1),
-        )
-    message:
-        "{rule}: Create JSON representation for CNV results per from {wildcards.caller} "
-        "for {wildcards.sample}_{wildcards.type} {wildcards.locus}"
+        cytobands=config.get("merge_cnv_json", {}).get("cytobands", ""),
+        ref_genes=config.get("merge_cnv_json", {}).get(
+            "ref_genes", "/projects/wp1/nobackup/ngs/utveckling/Twist_DNA_DATA/juli/refGene_hg38.txt"
+        ),
 
 
 use rule cnv_html_report from reports as reports_cnv_html_report with:
     params:
         include_table=config.get("cnv_html_report", {}).get("show_table", True),
+        extra_tables=config.get("cnv_html_report", {}).get("extra_tables", []),
         tc=get_tc,
         tc_method="pathology",
+        include_cytobands=config.get("cnv_html_report", {}).get("cytobands", False),
+        wide_plot_width=config.get("cnv_html_report", {}).get("wide_plot_width", 2000),
+    log:
+        "reports/cnv_html_report/{sample}_{type}.{tc_method}.cnv_report.html.log",
 
 
 module snv_indels:
