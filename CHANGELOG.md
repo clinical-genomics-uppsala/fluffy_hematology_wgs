@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.1.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.0.1...v2.1.0) (2026-02-14)
+
+
+### Features
+
+* miarka config ([f4a733c](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/f4a733c0221f809f007991d7c5ce4740da0cf675))
+* new cnv_html_report for wgs ([36bdc0f](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/36bdc0f1ce632847ef597cee84bdef93e579868d))
+* runs on marvin ([8461194](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/84611944ec52b820b9ae0927b3d2529c8f618e2a))
+
+
+### Bug Fixes
+
+* added cnvreport gtf file ([f9db903](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/f9db9034139ef3ef52cf04f17962b53e522a7c1a))
+* config adaptions to new report version ([e22c1f2](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/e22c1f263ae3b492118e126f6925cadb4f383b94))
+* put file path in config and update reports schemas ([dfd2e96](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/dfd2e962192533b98ee957eb5b16644124ff39fc))
+* rm tmp from profile ([173801f](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/173801fb93d8cac77290ed348b48d36465c07683))
+* rm wildcard constraint and fix cytobands file ([85ed918](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/85ed918e064121776a412aa17479edff5bc54ed9))
+* typo ([1dcb2bc](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/1dcb2bcbb784e50d2f518c755df2b7daa8f33872))
+
 ## [2.0.1](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.0.0...v2.0.1) (2025-12-08)
 
 
