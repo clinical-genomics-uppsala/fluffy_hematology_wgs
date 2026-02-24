@@ -1,0 +1,20 @@
+directory: ./Results
+
+files:
+  # RNA
+  - name: MultiQC RNA
+    input: "qc/multiqc/multiqc_RNA.html"
+    output: multiqc_R.html
+    types: ["R"]
+  
+    # Alignment
+  - name: RNA bam
+    input: "alignment/star/{sample}_R.bam"
+    output: "{sample}/Cram/{sample}_R.bam"
+    types: ["R"]
+
+  - name: RNA bai
+    input: "alignment/star/{sample}_R.bam.bai"
+    output: "{sample}/Cram/{sample}_R.bam.bai"
+    types: ["R"]
+
