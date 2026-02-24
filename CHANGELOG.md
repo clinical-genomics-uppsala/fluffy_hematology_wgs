@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.1.0...v2.2.0) (2026-02-24)
+
+
+### Features
+
+* IHT for WP3 ([ca37ceb](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/ca37cebf8d24db308f43c41e488bed1bf521dae4))
+
 ## [2.1.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.0.1...v2.1.0) (2026-02-14)
 
 
