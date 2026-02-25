@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.1](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.2.0...v2.2.1) (2026-02-25)
+
+
+### Bug Fixes
+
+* wp3 rename ([a1c20b2](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/a1c20b20f1e79e7d9943a51ebecd4a3453ba4c13))
+
 ## [2.2.0](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.1.0...v2.2.0) (2026-02-24)
 
 
