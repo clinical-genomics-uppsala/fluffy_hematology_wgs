@@ -44,6 +44,11 @@ parser.add_argument(
 parser.add_argument("-o", "--output", help="Output ending to be added to old samples and units files", default="_old")
 parser.add_argument("--samples", help="Input samples.tsv file created with hydra genetics", default="samples.tsv")
 parser.add_argument("--units", help="Input units.tsv file created with hydra genetics", default="units.tsv")
+parser.add_argument(
+    "--rename-samples", 
+    action="store_true",
+    help="Rename samples to pedigree IDs (default: keep original sample names)"
+)
 
 args = parser.parse_args()
 
@@ -89,11 +94,14 @@ if "samples_and_settings.json" in args.input:
         for lline in samples_tsv:
             line = lline.strip().upper().split("\t")
             if line[0] in data["samples"].keys():
-                ped_name = (
-                    line[0]
-                    if data["samples"][line[0]]["settings"]["ped"].upper() == "NA"
-                    else data["samples"][line[0]]["settings"]["ped"].upper()
-                )
+                if args.rename_samples:
+                    ped_name = (
+                        line[0]
+                        if data["samples"][line[0]]["settings"]["ped"].upper() == "NA"
+                        else data["samples"][line[0]]["settings"]["ped"].upper()
+                    )
+                else:
+                    ped_name = line[0]
                 tc = line[1]
                 if data["samples"][line[0]]["settings"]["sex"].upper() == "F":
                     data["samples"][line[0]]["settings"]["sex"] = "K"
@@ -123,11 +131,14 @@ if "samples_and_settings.json" in args.input:
         for lline in units_tsv:
             line = lline.strip().split("\t")
             if line[0] in data["samples"].keys():
-                ped_name = (
-                    line[0]
-                    if data["samples"][line[0]]["settings"]["ped"].upper() == "NA"
-                    else data["samples"][line[0]]["settings"]["ped"].upper()
-                )
+                if args.rename_samples:
+                    ped_name = (
+                        line[0]
+                        if data["samples"][line[0]]["settings"]["ped"].upper() == "NA"
+                        else data["samples"][line[0]]["settings"]["ped"].upper()
+                    )
+                else:
+                    ped_name = line[0]
                 if (
                     data["samples"][line[0]]["analysis"].upper() == "IHT"
                     and data["samples"][line[0]]["settings"]["fragestallning"].upper() != "R"
@@ -242,9 +253,12 @@ else:
             for lline in samples_tsv:
                 line = lline.strip().upper().split("\t")
                 if line[0] in samplesheet_dict.keys():
-                    ped_name = (
-                        line[0] if samplesheet_dict[line[0]]["ped"].upper() == "NA" else samplesheet_dict[line[0]]["ped"].upper()
-                    )
+                    if args.rename_samples:
+                        ped_name = (
+                            line[0] if samplesheet_dict[line[0]]["ped"].upper() == "NA" else samplesheet_dict[line[0]]["ped"].upper()
+                        )
+                    else:
+                        ped_name = line[0]
                     tc = line[1]
                     if samplesheet_dict[line[0]]["sex"].upper() == "F":
                         samplesheet_dict[line[0]]["sex"] = "K"
@@ -272,9 +286,12 @@ else:
         for lline in units_tsv:
             line = lline.strip().split("\t")
             if line[0] in samplesheet_dict.keys():
-                ped_name = (
-                    line[0] if samplesheet_dict[line[0]]["ped"].upper() == "NA" else samplesheet_dict[line[0]]["ped"].upper()
-                )
+                if args.rename_samples:
+                    ped_name = (
+                        line[0] if samplesheet_dict[line[0]]["ped"].upper() == "NA" else samplesheet_dict[line[0]]["ped"].upper()
+                    )
+                else:
+                    ped_name = line[0]
                 sample_type = samplesheet_dict[line[0]]["fragestallning"]
                 if sample_type.lower() == "heltranskriptom":
                     logging.warning(f"Fragestallning set to heltranskriptom for {ped_name}, sample_type set still set to R.")
