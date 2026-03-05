@@ -279,13 +279,13 @@ def generate_copy_rules(output_spec):
     code = ""
     output_directory = pathlib.Path(output_spec["directory"])
 
-    for f in output_spec["files"]:
-        if f["input"] is None:
+    for filedef in output_spec["files"]:
+        if filedef["input"] is None:
             continue
 
-        rule_name = "copy_{}".format("_".join(re.sub(r"[\"'-.,]", "", f["name"].strip().lower()).split()))
-        input_file = pathlib.Path(f["input"])
-        output_file = output_directory / pathlib.Path(f["output"])
+        rule_name = "copy_{}".format("_".join(re.sub(r"[\"'-.,]", "", filedef["name"].strip().lower()).split()))
+        input_file = pathlib.Path(filedef["input"])
+        output_file = output_directory / pathlib.Path(filedef["output"])
         result_file = os.path.basename(filedef["output"])
 
         mem_mb = config.get("_copy", {}).get("mem_mb", config["default_resources"]["mem_mb"])
