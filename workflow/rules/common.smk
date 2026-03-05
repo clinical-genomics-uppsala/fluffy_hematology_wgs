@@ -1,6 +1,6 @@
-__author__ = "Martin Rippin, Arielle R. Munters, Nina Hollfelder"
+__author__ = "Martin Rippin, Arielle R. Munters, Nina Hollfelder, Jonas Almlöf"
 __copyright__ = "Copyright 2022, Martin Rippin"
-__email__ = "arielle.munters@scilifelab.uu.se, nina.hollfelder@scilifelab.uu.se"
+__email__ = "arielle.munters@scilifelab.uu.se, nina.hollfelder@scilifelab.uu.se, jonas.almlof@scilifelab.uu.se"
 __license__ = "GPL-3"
 
 
