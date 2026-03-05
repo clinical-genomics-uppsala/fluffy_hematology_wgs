@@ -40,7 +40,7 @@ elif aligner == "bwa_gpu":
 
     wp = config.get("wp", None)
 
-    if aligner is None or (wp != "wp2" and wp != "wp3"):
+    if wp not in [ "wp2", "wp3"]:
         sys.exit("wp missing from config, valid options: wp2 or wp3")
 
     elif wp == "wp2":
