@@ -1,3 +1,4 @@
 output: "{{FLUFFY_HOME}}/config/output_files_wp3.yaml"
 
 wp: "wp3"
+
