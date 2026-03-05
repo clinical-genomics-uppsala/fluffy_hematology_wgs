@@ -276,8 +276,8 @@ def compile_output_file_list(wildcards):
 
 
 def generate_copy_rules(output_spec):
+    code = ""
     output_directory = pathlib.Path(output_spec["directory"])
-    rulestrings = []
 
     for f in output_spec["files"]:
         if f["input"] is None:
