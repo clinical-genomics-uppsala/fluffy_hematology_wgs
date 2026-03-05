@@ -44,6 +44,7 @@ elif aligner == "bwa_gpu":
         sys.exit("wp missing from config, valid options: wp2 or wp3")
 
     elif wp == "wp2":
+
         ruleorder: copy_crai_t_and_n > misc_samtools_index
 
 elif aligner == "bwa_sentieon":
