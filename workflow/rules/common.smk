@@ -311,7 +311,7 @@ def generate_copy_rules(output_spec):
             '\tshell ( "(cp --preserve=timestamps -r {input[0]} {output[0]}) &> {log}" , bench_record=bench_record, bench_iteration=bench_iteration)\n\n'
         )
 
-    exec(compile("\n".join(code), "copy_result_files", "exec"), workflow.globals)
+    exec(compile(code, "copy_result_files", "exec"), workflow.globals)
 
 
 generate_copy_rules(output_spec)
