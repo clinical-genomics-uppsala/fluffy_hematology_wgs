@@ -1,3 +1,5 @@
+wp: "wp2"
+
 reference:
   design_bed: "reference/homo_sapiens.wgs.bed"
   design_intervals: "reference/wgs.interval_list" #HSMetrics
