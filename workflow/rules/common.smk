@@ -296,19 +296,30 @@ def generate_copy_rules(output_spec):
         copy_container = config.get("_copy", {}).get("container", config["default_container"])
 
         rule_code = (
-            f'@workflow.rule(name="{rule_name}")\n'
-            f'@workflow.input("{input_file}")\n'
-            f'@workflow.output("{output_file}")\n'
-            f'@workflow.log("logs/{rule_name}_{result_file}.log")\n'
-            f'@workflow.container("{copy_container}")\n'
-            f'@workflow.resources(time = "{time}", threads = {threads}, mem_mb = {mem_mb}, mem_per_cpu = {mem_per_cpu}, partition = "{partition}")\n'
-            f'@workflow.shellcmd("cp --preserve=timestamps {{input}} {{output}}")\n\n'
-            f"@workflow.run\n"
-            f"def __rule_{rule_name}(input, output, params, wildcards, threads, resources, log, version, rule, "
+            "@workflow.rule(name=\"{rule_name}\")\n"
+            "@workflow.input(\"{input_file}\")\n"
+            "@workflow.output(\"{output_file}\")\n"
+            "@workflow.log(\"logs/{rule_name}_{result_file}.log\")\n"
+            "@workflow.container(\"{copy_container}\")\n"
+            "@workflow.resources(time = \"{time}\", threads = {threads}, mem_mb = {mem_mb}, mem_per_cpu = {mem_per_cpu}, partition = \"{partition}\")\n"
+            "@workflow.shellcmd(\"cp --preserve=timestamps {{input}} {{output}}\")\n\n"
+            "@workflow.run\n"
+            "def __rule_{rule_name}(input, output, params, wildcards, threads, resources, log, version, rule, "
             "conda_env, container_img, singularity_args, use_singularity, env_modules, bench_record, jobid, is_shell, "
             "bench_iteration, cleanup_scripts, shadow_dir, edit_notebook, conda_base_path, basedir, runtime_sourcecache_path, "
             "__is_snakemake_rule_func=True):\n"
-            '\tshell ( "(cp --preserve=timestamps -r {input[0]} {output[0]}) &> {log}" , bench_record=bench_record, bench_iteration=bench_iteration)\n\n'
+            "\tshell ( \"(cp --preserve=timestamps -r {{input[0]}} {{output[0]}}) &> {{log}}\" , bench_record=bench_record, bench_iteration=bench_iteration)\n\n"
+        ).format(
+            rule_name=rule_name,
+            input_file=input_file,
+            output_file=output_file,
+            result_file=result_file,
+            copy_container=copy_container,
+            time=time,
+            threads=threads,
+            mem_mb=mem_mb,
+            mem_per_cpu=mem_per_cpu,
+            partition=partition
         )
         rulestrings.append(rule_code)
 
