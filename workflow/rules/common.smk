@@ -7,6 +7,7 @@ __license__ = "GPL-3"
 import itertools
 import numpy as np
 import pandas as pd
+import os
 import pathlib
 import re
 from snakemake.utils import validate
@@ -276,16 +277,15 @@ def compile_output_file_list(wildcards):
 
 
 def generate_copy_rules(output_spec):
-    output_directory = pathlib.Path(output_spec["directory"])
     rulestrings = []
-
-    for f in output_spec["files"]:
-        if f["input"] is None:
+    for filedef in output_spec["files"]:
+        if filedef["input"] is None:
             continue
 
-        rule_name = "copy_{}".format("_".join(re.sub(r"[\"'-.,]", "", f["name"].strip().lower()).split()))
-        input_file = pathlib.Path(f["input"])
-        output_file = output_directory / pathlib.Path(f["output"])
+        rule_name = "copy_{}".format("_".join(re.sub(r"[\"'-.,]", "", filedef["name"].strip().lower()).split()))
+        input_file = pathlib.Path(filedef["input"])
+        output_file = output_directory / pathlib.Path(filedef["output"])
+        result_file = os.path.basename(filedef["output"])
 
         mem_mb = config.get("_copy", {}).get("mem_mb", config["default_resources"]["mem_mb"])
         mem_per_cpu = config.get("_copy", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"])
@@ -294,23 +294,31 @@ def generate_copy_rules(output_spec):
         time = config.get("_copy", {}).get("time", config["default_resources"]["time"])
         copy_container = config.get("_copy", {}).get("container", config["default_container"])
 
-        code += f'@workflow.rule(name="{rule_name}")\n'
-        code += f'@workflow.input("{input_file}")\n'
-        code += f'@workflow.output("{output_file}")\n'
-        code += f'@workflow.log("logs/{rule_name}_{result_file}.log")\n'
-        code += f'@workflow.container("{copy_container}")\n'
-        code += f'@workflow.resources(time = "{time}", threads = {threads}, mem_mb = {mem_mb}, mem_per_cpu = {mem_per_cpu}, partition = "{partition}")\n'
-        code += '@workflow.shellcmd("cp --preserve=timestamps {input} {output}")\n\n'
-        code += "@workflow.run\n"
-        code += (
+        rule_code = (
+            f'@workflow.rule(name="{rule_name}")\n'
+            f'@workflow.input("{input_file}")\n'
+            f'@workflow.output("{output_file}")\n'
+            f'@workflow.log("logs/{rule_name}_{result_file}.log")\n'
+            f'@workflow.container("{copy_container}")\n'
+            f'@workflow.resources(time = "{time}", threads = {threads}, mem_mb = {mem_mb}, mem_per_cpu = {mem_per_cpu}, partition = "{partition}")\n'
+            f'@workflow.shellcmd("cp --preserve=timestamps {{input}} {{output}}")\n\n'
+            f"@workflow.run\n"
             f"def __rule_{rule_name}(input, output, params, wildcards, threads, resources, log, version, rule, "
             "conda_env, container_img, singularity_args, use_singularity, env_modules, bench_record, jobid, is_shell, "
             "bench_iteration, cleanup_scripts, shadow_dir, edit_notebook, conda_base_path, basedir, runtime_sourcecache_path, "
             "__is_snakemake_rule_func=True):\n"
             '\tshell ( "(cp --preserve=timestamps -r {input[0]} {output[0]}) &> {log}" , bench_record=bench_record, bench_iteration=bench_iteration)\n\n'
         )
+        rulestrings.append(rule_code)
 
-    exec(compile("\n".join(code), "copy_result_files", "exec"), workflow.globals)
+    if rulestrings:
+        code = "\n".join(rulestrings).lstrip()
+        try:
+            exec(compile(code, "copy_result_files", "exec"), workflow.globals)
+        except IndentationError as e:
+            print(f"IndentationError in copy_result_files: {e}")
+            print(f"Generated code (repr):\n{repr(code)}")
+            raise e
 
 
 generate_copy_rules(output_spec)
