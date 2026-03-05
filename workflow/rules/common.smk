@@ -286,6 +286,7 @@ def generate_copy_rules(output_spec):
         rule_name = "copy_{}".format("_".join(re.sub(r"[\"'-.,]", "", f["name"].strip().lower()).split()))
         input_file = pathlib.Path(f["input"])
         output_file = output_directory / pathlib.Path(f["output"])
+        result_file = os.path.basename(filedef["output"])
 
         mem_mb = config.get("_copy", {}).get("mem_mb", config["default_resources"]["mem_mb"])
         mem_per_cpu = config.get("_copy", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"])
