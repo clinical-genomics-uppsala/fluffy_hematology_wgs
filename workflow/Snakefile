@@ -36,8 +36,16 @@ elif aligner == "bwa_gpu":
     include: "rules/sample_order_multiqc.smk"
 
     ruleorder: parabricks_pbrun_fq2bam > alignment_samtools_index
-    ruleorder: copy_crai_t_and_n > misc_samtools_index
     ruleorder: copy_rna_bai > alignment_samtools_index
+
+    wp = config.get("wp", None)
+
+    if wp not in ["wp2", "wp3"]:
+        sys.exit("wp missing from config, valid options: wp2 or wp3")
+
+    if wp == "wp2":
+
+        ruleorder: copy_crai_t_and_n > misc_samtools_index
 
 elif aligner == "bwa_sentieon":
 

@@ -211,6 +211,8 @@ trimmer_software: "fastp_pe"
 
 aligner: "bwa_gpu"
 
+wp: "wp2"
+
 annotate_cnv:
   cna_exons: "/data/ref_genomes/GRCh38/gene_lists/hg38_CNA.bed" 
 
