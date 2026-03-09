@@ -16,7 +16,7 @@ include: "rules/peddy_create_ped.smk"
 include: "rules/somalier.smk"
 
 
-ruleorder: fix_af > filtering_filter_vcf
+#ruleorder: fix_af > filtering_filter_vcf
 ruleorder: gatk_model_segments > cnv_sv_gatk_model_segments
 ruleorder: filtering_bcftools_filter_include_region_snv_tn > bgzip_mutect
 ruleorder: filtering_bcftools_filter_include_region_snv_t > bgzip_mutect
@@ -91,6 +91,21 @@ use rule vep from annotation as annotation_vep_snvs with:
     message:
         "{rule}: Annotate {input.vcf} with vep"
 
+############################################
+# CNV / SV MODULE
+############################################
+
+module cnv_sv:
+    snakefile:
+        get_module_snakefile(
+            config,
+            "hydra-genetics/cnv_sv",
+            path="workflow/Snakefile",
+            tag=config["modules"]["cnv_sv"],
+        )
+    config:
+        config
+
 
 use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation_tn with:
     input:
@@ -127,6 +142,93 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
     message:
         "{rule}: Annotate {input.vcf}"
 
+############################################
+# SVDB filtering (common SV database)
+############################################
+
+use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_tn/{sample}.ssa.vcf.gz",
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf"),
+    params:
+        db_string=config.get("svdb_query", {}).get("db_string", ""),
+        extra=config.get("svdb_query", {}).get("extra", ""),
+        #overlap=config.get("svdb_merge", {}).get("overlap", 0.6),
+        #priority=config.get("svdb_merge", {}).get("priority", ""),
+        prefix=lambda wildcards, output: os.path.splitext(output[0])[0][:-6],
+    log:
+        "cnv_sv/manta_run_workflow_tn/{sample}.svdb_query.vcf.log",
+    benchmark:
+        repeat(
+            "cnv_sv/manta_run_workflow_tn/{sample}.svdb_query.vcf.benchmark.tsv",
+            config.get("svdb_query", {}).get("benchmark_repeats", 1),
+        )
+    message:
+        "{rule}: Filter {input.vcf} against SV database"
+
+
+use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.gz",
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf"),
+    params:
+        db_string=config.get("svdb_query", {}).get("db_string", ""),
+        extra=config.get("svdb_query", {}).get("extra", ""),
+        #overlap=config.get("svdb_merge", {}).get("overlap", 0.6),
+        #priority=config.get("svdb_merge", {}).get("priority", ""),
+        prefix=lambda wildcards, output: os.path.splitext(output[0])[0][:-6],
+    log:
+        "cnv_sv/manta_run_workflow_t/{sample}.svdb_query.vcf.log",
+    benchmark:
+        repeat(
+            "cnv_sv/manta_run_workflow_t/{sample}.svdb_query.vcf.benchmark.tsv",
+            config.get("svdb_query", {}).get("benchmark_repeats", 1),
+        )
+    message:
+        "{rule}: Filter {input.vcf} against SV database"
+
+use rule vep from annotation as annotation_vep_svdb_manta_t with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_t/{sample}svdb_query.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_t/{sample}.svdb_query.vcf.gz.tbi",
+        cache=config["vep"]["vep_cache"],
+        fasta=config["reference"]["fasta"],
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.svdb_query.vep_annotated.vcf"),
+    log:
+        "cnv_sv/manta_run_workflow_t/{sample}.svdb_query.vep_annotated.vcf.log",
+    benchmark:
+        repeat(
+            "cnv_sv/manta_run_workflow_t{sample}.svdb_query.vep_annotated.vcf.benchmark.tsv",
+            config.get("vep", {}).get("benchmark_repeats", 1),
+        )
+    message:
+        "{rule}: Annotate {input.vcf} with VEP"
+
+
+############################################
+# VEP on SVDB-filtered SVs
+############################################
+
+use rule vep from annotation as annotation_vep_svdb_manta_tn with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_tn/{sample}.svdb_query.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_tn/{sample}.svdb_query.vcf.gz.tbi",
+        cache=config["vep"]["vep_cache"],
+        fasta=config["reference"]["fasta"],
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_tn/{sample}.svdb_query.vep_annotated.vcf"),
+    log:
+        "cnv_sv/manta_run_workflow_tn/{sample}.svdb_query.vep_annotated.vcf.log",
+    benchmark:
+        repeat(
+            "cnv_sv/manta_run_workflow_tn/{sample}.svdb_query.vep_annotated.vcf.benchmark.tsv",
+            config.get("vep", {}).get("benchmark_repeats", 1),
+        )
+    message:
+        "{rule}: Annotate {input.vcf} with VEP"
 
 module alignment:
     snakefile:
@@ -285,9 +387,9 @@ module filtering:
         config
 
 
-use rule filter_vcf from filtering as filtering_filter_vcf with:
-    wildcard_constraints:
-        tag="[^.]+",
+#use rule filter_vcf from filtering as filtering_filter_vcf with:
+#    wildcard_constraints:
+#        tag="[^.]+",
 
 
 use rule bcftools_filter_include_region from filtering as filtering_bcftools_filter_include_region_snv_t with:
@@ -332,18 +434,18 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
 
 use rule bcftools_filter_include_region from filtering as filtering_bcftools_filter_include_region_sv with:
     input:
-        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.vcf.gz",
-        tabix="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.vcf.gz.tbi",
+        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz.tbi",
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.gz"),
+        vcf=temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz"),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SV"][wildcards.bed],
         extra=config.get("bcftools_SV", {}).get("extra", ""),
     log:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.gz.log",
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz.log",
     benchmark:
         repeat(
-            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.gz.benchmark.tsv",
+            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz.benchmark.tsv",
             config.get("bcftools_SV", {}).get("benchmark_repeats", 1),
         )
     message:

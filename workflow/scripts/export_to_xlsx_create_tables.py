@@ -1,8 +1,8 @@
-#!/bin/python3
+# // src/export_to_xlsx_create_tables.py : v0.8 : 15:35
 
 import gzip
 from pysam import VariantFile
-
+import re
 
 # VEP fields in list to get index
 def index_vep(variantfile):
@@ -155,6 +155,19 @@ def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, 
         return_dict["depth"] = record.info["BND_DEPTH"]
     except KeyError:
         return_dict["depth"] = ""
+
+    # -- Add manta_AF and STR % columns --
+    try:
+        n_af_val = record.info["manta_N_AF"]
+        return_dict["manta_n_af"] = n_af_val[0] if isinstance(n_af_val, tuple) else n_af_val
+    except KeyError:
+        return_dict["manta_n_af"] = ""
+    try:
+        str_val = record.info["STR_PERCENT"]
+        return_dict["str_percent"] = round(str_val[0] if isinstance(str_val, tuple) else str_val, 2)
+    except KeyError:
+        return_dict["str_percent"] = ""
+    # ----------------------------------------------------
 
     try:
         pr_values = record.samples[sample_tumor]["PR"]
@@ -344,6 +357,7 @@ def create_manta_tables(
         "SampleFT",
         "HomRef",
     ],
+    target_genes=None,
 ):
     vcf_file = VariantFile(vcf_input)
     sample_tumor = [x for x in list(vcf_file.header.samples) if x.endswith("_T")][0]
@@ -364,6 +378,8 @@ def create_manta_tables(
         "dup": {"data": [], "headers": []},
         "ins": {"data": [], "headers": []},
     }
+    
+    # -- Lade till manta_N_AF som kolumn i alla tabeller här --
     manta_tables["bnd"]["headers"] = [
         {"header": "Chr"},
         {"header": "Pos"},
@@ -373,6 +389,8 @@ def create_manta_tables(
         {"header": "Details"},
         {"header": "Depth"},
         {"header": "Annotation"},
+        {"header": "manta_N_AF"},
+        {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
     ]
@@ -385,6 +403,8 @@ def create_manta_tables(
         {"header": "Genes"},
         {"header": "Details"},
         {"header": "Annotation"},
+        {"header": "manta_N_AF"},
+        {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
     ]
@@ -399,6 +419,8 @@ def create_manta_tables(
         {"header": "Hom Length"},
         {"header": "Hom Sequence"},
         {"header": "Annotation"},
+        {"header": "manta_N_AF"},
+        {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
     ]
@@ -414,29 +436,36 @@ def create_manta_tables(
         {"header": "Hom Length"},
         {"header": "Hom Sequence"},
         {"header": "Annotation"},
+        {"header": "manta_N_AF"},
+        {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
     ]
+
     if sample_normal:
-        manta_tables["bnd"]["headers"] = manta_tables["bnd"]["headers"] + [
-            {"header": "Paired-read Normal Freq"},
-            {"header": "Spanning-read Normal Freq"},
-        ]
-        manta_tables["del"]["headers"] = manta_tables["del"]["headers"] + [
-            {"header": "Paired-read Normal Freq"},
-            {"header": "Spanning-read Normal Freq"},
-        ]
-        manta_tables["dup"]["headers"] = manta_tables["dup"]["headers"] + [
-            {"header": "Paired-read Normal Freq"},
-            {"header": "Spanning-read Normal Freq"},
-        ]
-        manta_tables["ins"]["headers"] = manta_tables["ins"]["headers"] + [
-            {"header": "Paired-read Normal Freq"},
-            {"header": "Spanning-read Normal Freq"},
-        ]
+        for sv_type in ["bnd", "del", "dup", "ins"]:
+            manta_tables[sv_type]["headers"] += [
+                {"header": "Paired-read Normal Freq"},
+                {"header": "Spanning-read Normal Freq"},
+            ]
+
+    gene_pattern = None
+    if target_genes:
+        pattern_str = '|'.join([re.escape(g) for g in target_genes])
+        gene_pattern = re.compile(rf'\b({pattern_str})\b', re.IGNORECASE)
+        for sv_type in ["bnd", "del", "dup", "ins"]:
+            manta_tables[sv_type]["headers"].append({"header": "In Target Panel"})
+
     for record in vcf_file.fetch():
         record_values = extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, sample_normal)
         if not any(x in avoid_filterflags for x in record_values["filt_ann"].split(",")):
+            
+            in_target = []
+            if gene_pattern:
+                is_match = "Yes" if gene_pattern.search(record_values["genes"]) else "No"
+                in_target = [is_match]
+
+            # -- Lägger till record_values["manta_n_af"] i listorna nedan --
             if "MantaBND" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -447,12 +476,16 @@ def create_manta_tables(
                     record_values["detail"],
                     record_values["depth"],
                     record_values["filt_ann"],
+                    record_values["manta_n_af"], # Lades till här
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
+                
+                outline = outline + in_target
                 manta_tables["bnd"]["data"].append(outline)
+                
             elif "MantaDEL" in record_values["id"] and record_values["svlength"] <= -100:
                 outline = [
                     str(record.contig),
@@ -463,12 +496,16 @@ def create_manta_tables(
                     record_values["genes"],
                     record_values["detail"],
                     record_values["filt_ann"],
+                    record_values["manta_n_af"], # Lades till här
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
+                
+                outline = outline + in_target
                 manta_tables["del"]["data"].append(outline)
+                
             elif "MantaDUP" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -481,12 +518,16 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
+                    record_values["manta_n_af"], # Lades till här
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
+                
+                outline = outline + in_target
                 manta_tables["dup"]["data"].append(outline)
+                
             elif "MantaINS" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -500,10 +541,14 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
+                    record_values["manta_n_af"], # Lades till här
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
+                
+                outline = outline + in_target
                 manta_tables["ins"]["data"].append(outline)
+                
     return manta_tables

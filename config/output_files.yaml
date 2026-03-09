@@ -146,30 +146,42 @@ files:
     input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.gz"
     output: "{sample}/SV/{sample}_manta_T.ssa.vcf.gz"
     types: ["T"]
-      
+  
   - name: Manta T tbi
     input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.gz.tbi"
     output: "{sample}/SV/{sample}_manta_T.ssa.vcf.gz.tbi"
     types: ["T"]
+  
+  - name: Manta T vcf svdb
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.vcf"
+    types: ["T"]
+  
+  - name: Manta T svdb tbi
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.vcf.gz.tbi"
+    types: ["T"]
+
+ 
 
   - name: Manta T vcf ALL subsample
-    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.include.all.vcf.gz"
-    output: "{sample}/SV/{sample}_manta_T.ssa.all.vcf.gz"
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.include.all.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.all.vcf.gz"
     types: ["T"]
 
   - name: Manta T tbi ALL subsample
-    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.include.all.vcf.gz.tbi"
-    output: "{sample}/SV/{sample}_manta_T.ssa.all.vcf.gz.tbi"
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.include.all.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.all.vcf.gz.tbi"
     types: ["T"]
 
   - name: Manta T vcf AML subsample
-    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.include.aml.vcf.gz"
-    output: "{sample}/SV/{sample}_manta_T.ssa.aml.vcf.gz"
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.include.aml.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.aml.vcf.gz"
     types: ["T"]
 
   - name: Manta T tbi AML subsample
-    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.include.aml.vcf.gz"
-    output: "{sample}/SV/{sample}_manta_T.ssa.aml.vcf.gz.tbi"
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.include.aml.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.aml.vcf.gz.tbi"
     types: ["T"]
 
   - name: Manta T xlsx

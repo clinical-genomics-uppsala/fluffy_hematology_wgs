@@ -237,6 +237,7 @@ bcftools_SNV:
 bcftools_SV:
   all: "/data/ref_genomes/GRCh38/gene_lists/all_sv_38.bed"
   aml: "/data/ref_genomes/GRCh38/gene_lists/aml_sv_38.bed"
+  target_genes: "gene_list.txt"
 
 cnvkit_batch:
   container: "docker://hydragenetics/cnvkit:0.9.9"
@@ -328,9 +329,11 @@ gatk_cnv_denoise_read_counts_by_sex:
 
 manta_config_t:
   container: "docker://hydragenetics/manta:1.6.0"
+ # extra: "--callRegions /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz"
 
 manta_config_tn:
   container: "docker://hydragenetics/manta:1.6.0"
+  #extra: "--callRegions /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz"
 
 manta_run_workflow_t:
   container: "docker://hydragenetics/manta:1.6.0"
@@ -522,11 +525,16 @@ svdb_merge:
       cnv_caller:
         - cnvkit
         - gatk
-  container: "docker://hydragenetics/svdb:2.6.0"
+  container: "docker://hydragenetics/svdb:2.8.2"
+  overlap: 0.6
+  extra: "--pass_only --no_intra "
 
 svdb_query:
-  container: "docker://hydragenetics/svdb:2.6.0"
-  db_string: "--db /data/ref_data/wp2/fluffy/svdb/230601_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
+  container: "docker://hydragenetics/svdb:2.8.2"
+  #db_string: "--db /data/ref_data/wp2/fluffy/svdb/230601_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
+  db_string: "--db /beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz" #,/beegfs-storage/olwal516/manta_T_CGU_2021_5.sorted.vcf.gz"
+  #db_string: "--db /beegfs-storage/olwal516/manta_T_CGU_2021_5.sorted.vcf.gz"
+  extra: "--in_frq FRQ --in_occ OCC --out_frq manta_N_AF --out_occ manta_N_OCC" 
 
 vep:
   container: "docker://hydragenetics/vep:111.0"
