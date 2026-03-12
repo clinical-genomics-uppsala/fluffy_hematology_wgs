@@ -158,7 +158,7 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
     benchmark:
         "benchmarks/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.tsv"
     params:
-        db_string="--db /beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz", #,/beegfs-storage/olwal516/manta_T_CGU_2021_5.sorted.vcf.gz"
+        db_string=config.get("svdb_query", {}).get("db_manta", ""), 
         extra="--in_frq FRQ --in_occ OCC --out_frq manta_N_AF --out_occ manta_N_OCC", 
         prefix=lambda wildcards, output: output[0].replace("_query.vcf", "")
 
@@ -173,7 +173,7 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
     benchmark:
         "benchmarks/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.tsv"
     params:
-        db_string="--db /beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz", #,/beegfs-storage/olwal516/manta_T_CGU_2021_5.sorted.vcf.gz"
+        db_string=config.get("svdb_query", {}).get("db_manta", ""), 
         extra="--in_frq FRQ --in_occ OCC --out_frq manta_N_AF --out_occ manta_N_OCC", 
         prefix=lambda wildcards, output: output[0].replace("_query.vcf", "")
 
