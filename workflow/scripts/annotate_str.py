@@ -3,9 +3,7 @@
 import pysam
 import logging
 
-# Set up logging to appear elegantly in the Snakemake console/logs
 log_file = snakemake.log[0] if hasattr(snakemake, "log") and snakemake.log else None
-
 logging.basicConfig(
     format="{asctime} - {levelname} - {message}",
     style="{",
@@ -46,22 +44,10 @@ def main():
     # 1. Fetch paths directly from the Snakemake object
     vcf_in_path = snakemake.input.vcf
     vcf_out_path = snakemake.output.vcf
-    
-    # 2. Fetching the BED files. 
-    # Best practice is to pass them via 'input' in the Snakemake rule so the DAG tracks them:
-    # (e.g., in rule: bed=config["reference"]["simple_repeats"])
     bed_gz_path = snakemake.input.bed
-    
-    # If you prefer to pull them directly from the config without defining them in the rule's input:
-    # bed_gz_path = snakemake.config["reference"]["simple_repeats"]
-    
-    # Extracting target_genes (ready to be used if you expand the script logic later)
-    target_genes_path = snakemake.config["reference"].get("target_genes")
     
     logging.info(f"Input VCF: {vcf_in_path}")
     logging.info(f"Input BED (Simple Repeats): {bed_gz_path}")
-    if target_genes_path:
-        logging.info(f"Config target_genes found: {target_genes_path}")
     logging.info(f"Output VCF: {vcf_out_path}")
 
     # Open files using pysam

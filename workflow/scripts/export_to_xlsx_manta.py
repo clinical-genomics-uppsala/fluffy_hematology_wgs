@@ -45,8 +45,6 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 
     worksheet = workbook.add_worksheet(sheet_name)
     format_heading = workbook.add_format({"bold": True, "font_size": 18})
-    
-    # Sätt kolumnbredd om angivet
     if set_cols:
         for col_range, width in set_cols.items():
             worksheet.set_column(col_range, width)
@@ -82,12 +80,11 @@ sample_name = snakemake.output.xlsx.split("/")[-1].split(".manta.xlsx")[0]
 
 filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxDepth", "MaxMQ0Frac", "NoPairSupport", "SampleFT", "HomRef"]
 
-# Ladda in genlista om den finns
+# Load target genes for easy filtering in Excel
 target_genes = []
 if hasattr(snakemake.input, 'target_genes'):
     target_genes = load_target_genes(snakemake.input.target_genes)
 
-# Hämta tabellerna (nu hanteras In Target Panel internt av den funktionen om target_genes skickas in)
 manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
 
 # 2. Creating xlsx workbook
@@ -97,7 +94,6 @@ logging.info(f"Creating xlsx workbook {snakemake.output.xlsx}=")
 format_heading = workbook.add_format({"bold": True, "font_size": 18})
 format_bold = workbook.add_format({"bold": True, "text_wrap": True})
 
-# Skapa Overview först så den garanterat blir flik nr 1 i Excel
 worksheet_overview = workbook.add_worksheet("Overview")
 
 # 3. Create Data Sheets
@@ -110,10 +106,7 @@ create_sheet(workbook, "Translocations", "Translocations found by Manta", sample
 for vcf in snakemake.input.vcfs_bed:
     panel = vcf.split(".")[-3]
     logging.debug(f"Creating {panel} sheet")
-    
-    # Glöm inte att skicka in target_genes även hit om ni vill ha kolumnen i panel-flikarna
-    panel_tables = create_manta_tables(vcf, filter_flags, target_genes=target_genes)
-    
+    panel_tables = create_manta_tables(vcf, filter_flags, target_genes=target_genes)  
     sheet_title = "Translocations in " + panel.upper() + " genes"
     sheet_name = "Translocations " + panel.upper()
     create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"], {"B:B": 12, "C:D": 15})
@@ -128,7 +121,6 @@ worksheet_overview.write(5, 0, "Signed by: ")
 worksheet_overview.write(5, 4, "Document nr: ")
 worksheet_overview.write(7, 0, "Sheets:", format_bold)
 
-# Länkar till de statiska flikarna
 row_idx = 8
 link_map = [
     ("Deletions", "Manta Deletions"),
@@ -142,14 +134,12 @@ for sheet_name, desc in link_map:
         worksheet_overview.write_url(row_idx, 0, f"internal:'{sheet_name}'!A1", string=desc)
         row_idx += 1
 
-# Länkar till de dynamiska panel-flikarna
 for vcf in snakemake.input.vcfs_bed:
     panel = vcf.split(".")[-3]
     s_name = "Translocations " + panel.upper()
     worksheet_overview.write_url(row_idx, 0, f"internal:'{s_name}'!A1", string=f"Manta Translocations in {panel.upper()} genes")
     row_idx += 1
 
-# Metadata om körningen
 if hasattr(snakemake.input, 'all_bed'):
     worksheet_overview.write(row_idx + 4, 0, "ALL bedfile: " + snakemake.input.all_bed)
 if hasattr(snakemake.input, 'aml_bed'):
