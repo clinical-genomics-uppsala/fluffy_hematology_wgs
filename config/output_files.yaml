@@ -154,12 +154,12 @@ files:
   
   - name: Manta T vcf svdb
     input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz"
-    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.vcf"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.vcf.gz"
     types: ["T"]
   
-  - name: Manta T svdb tbi
-    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz.tbi"
-    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.vcf.gz.tbi"
+  - name: Manta T vcf svdb str
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.str_annotated.vcf"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.str_annotated.vcf"
     types: ["T"]
 
  

@@ -1,6 +1,6 @@
 rule fix_af:
     input:
-        vcf="parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.vcf",
+        vcf="parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.vcf.gz",
     output:
         vcf=temp("parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.fix_af.vcf"),
     log:

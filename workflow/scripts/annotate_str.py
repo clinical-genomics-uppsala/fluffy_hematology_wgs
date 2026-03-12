@@ -1,47 +1,85 @@
+# // scripts/annotate_str.py : v1.0 : 12:15
+
 import pysam
-import sys
-import os
+import logging
+
+# Set up logging to appear elegantly in the Snakemake console/logs
+log_file = snakemake.log[0] if hasattr(snakemake, "log") and snakemake.log else None
+
+logging.basicConfig(
+    format="{asctime} - {levelname} - {message}",
+    style="{",
+    datefmt="%Y-%m-%d %H:%M",
+    level=logging.INFO,
+)
 
 def get_indel_length(record):
-    """Beräknar längden på en indel från Manta."""
-    # För symboliska varianter (t.ex. <DEL>) använder Manta ofta INFO/SVLEN
+    """Calculates the length of an indel from Manta."""
+    # For symbolic variants (e.g., <DEL>), Manta often uses INFO/SVLEN
     if 'SVLEN' in record.info:
         val = record.info['SVLEN']
         return abs(val[0]) if isinstance(val, (list, tuple)) else abs(val)
-    # För explicita sekvenser (standard indels)
+    # For explicit sequences (standard indels)
     return max(len(record.ref), len(record.alts[0]))
 
 def calculate_overlap(chrom, start, end, bed_tabix):
-    """Hittar totalt antal överlappande baser i BED-filen."""
+    """Finds the total number of overlapping bases in the BED file."""
     overlap_bp = 0
     try:
         for region in bed_tabix.fetch(chrom, start, end):
-            # region format: "chrom\tstart\tend"
-            b_start = int(region.split('\t')[1])
-            b_end = int(region.split('\t')[2])
-            
-            # Beräkna skärningen mellan [start, end] och [b_start, b_end]
+            fields = region.split('\t')
+            b_start = int(fields[1])
+            b_end = int(fields[2])
+            # Calculate the intersection between [start, end] and [b_start, b_end]
             o_start = max(start, b_start)
             o_end = min(end, b_end)
-            
             if o_start < o_end:
                 overlap_bp += (o_end - o_start)
     except ValueError:
-        # Chromosome finns inte i BED-filen
+        # Chromosome is not present in the BED file
         pass
     return overlap_bp
 
-def main(vcf_in_path, bed_gz_path, vcf_out_path):
+def main():
+    logging.info("Starting STR annotation...")
+    
+    # 1. Fetch paths directly from the Snakemake object
+    vcf_in_path = snakemake.input.vcf
+    vcf_out_path = snakemake.output.vcf
+    
+    # 2. Fetching the BED files. 
+    # Best practice is to pass them via 'input' in the Snakemake rule so the DAG tracks them:
+    # (e.g., in rule: bed=config["reference"]["simple_repeats"])
+    bed_gz_path = snakemake.input.bed
+    
+    # If you prefer to pull them directly from the config without defining them in the rule's input:
+    # bed_gz_path = snakemake.config["reference"]["simple_repeats"]
+    
+    # Extracting target_genes (ready to be used if you expand the script logic later)
+    target_genes_path = snakemake.config["reference"].get("target_genes")
+    
+    logging.info(f"Input VCF: {vcf_in_path}")
+    logging.info(f"Input BED (Simple Repeats): {bed_gz_path}")
+    if target_genes_path:
+        logging.info(f"Config target_genes found: {target_genes_path}")
+    logging.info(f"Output VCF: {vcf_out_path}")
+
+    # Open files using pysam
     vcf_in = pysam.VariantFile(vcf_in_path)
     bed = pysam.TabixFile(bed_gz_path)
     
-    # Lägg till ny header för INFO-fältet
+    # Add a new header for the INFO field
     vcf_in.header.info.add('STR_PERCENT', '1', 'Float', 'Percentage of indel overlapping with STR (0-100)')
     
+    records_processed = 0
+    records_annotated = 0
+
     with pysam.VariantFile(vcf_out_path, 'w', header=vcf_in.header) as vcf_out:
         for record in vcf_in:
-            # Manta startar ofta vid POS, och slutar vid POS + längd
-            # Vi konverterar till 0-baserad start/end för sökning
+            records_processed += 1
+            
+            # Manta often starts at POS and ends at POS + length.
+            # We convert to 0-based start/end for the interval search.
             v_start = record.start
             v_len = get_indel_length(record)
             v_end = v_start + v_len
@@ -52,8 +90,11 @@ def main(vcf_in_path, bed_gz_path, vcf_out_path):
                 
                 if percent > 0:
                     record.info['STR_PERCENT'] = min(percent, 100.0)
+                    records_annotated += 1
             
             vcf_out.write(record)
 
+    logging.info(f"Finished! Processed {records_processed} variants. Annotated {records_annotated} with STR_PERCENT.")
+
 if __name__ == "__main__":
-    main(sys.argv[1], sys.argv[2], sys.argv[3])
+    main()

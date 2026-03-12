@@ -29,7 +29,6 @@ def convert_columns_to_letter(nr_columns):
     return letter
 
 def load_target_genes(filepath):
-    """Läs in genlista från fil om den finns."""
     genes = []
     if filepath and os.path.exists(filepath):
         try:
@@ -41,7 +40,6 @@ def load_target_genes(filepath):
     return genes
 
 def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, set_cols=None):
-    """Hjälpfunktion för att skapa en standardflik med tabell."""
     if not table_data or "headers" not in table_data:
         return None
 
@@ -79,7 +77,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 """ MAIN EXECUTION """
 
 # 1. Prepping data
-logging.info(f"Prepping data, such as loading {snakemake.input.vcf}=")
+logging.info(f"Prepping data, such as loading {snakemake.input.manta}=")
 sample_name = snakemake.output.xlsx.split("/")[-1].split(".manta.xlsx")[0]
 
 filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxDepth", "MaxMQ0Frac", "NoPairSupport", "SampleFT", "HomRef"]
@@ -90,7 +88,7 @@ if hasattr(snakemake.input, 'target_genes'):
     target_genes = load_target_genes(snakemake.input.target_genes)
 
 # Hämta tabellerna (nu hanteras In Target Panel internt av den funktionen om target_genes skickas in)
-manta_tables_full = create_manta_tables(snakemake.input.vcf, filter_flags, target_genes=target_genes)
+manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
 
 # 2. Creating xlsx workbook
 workbook = xlsxwriter.Workbook(snakemake.output.xlsx)

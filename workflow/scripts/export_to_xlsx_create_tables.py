@@ -1,4 +1,4 @@
-# // src/export_to_xlsx_create_tables.py : v0.8 : 15:35
+# // src/export_to_xlsx_create_tables.py : v1.0 : 16:11
 
 import gzip
 from pysam import VariantFile
@@ -17,30 +17,53 @@ def index_vep(variantfile):
 def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
     return_dict = {}
     return_dict["filter_flag"] = ",".join(record.filter.keys())
+    
+    # --- PINDEL AF FIX ---
+    return_dict["af"] = 0.0
     try:
         return_dict["af"] = float(record.samples[sample_tumor]["AF"][0])
-    except KeyError:
-        return_dict["af"] = int(record.samples[sample_tumor].get("AD")[1]) / sum(record.samples[sample_tumor].get("AD"))
-
+    except (KeyError, TypeError, IndexError):
+        ad = record.samples[sample_tumor].get("AD")
+        if ad and len(ad) >= 2 and sum(ad) > 0:
+            return_dict["af"] = float(ad[1]) / float(sum(ad))
+            
     if sample_normal != "":
-        return_dict["n_af"] = float(record.samples[sample_normal]["AF"][0])
+        try:
+            return_dict["n_af"] = float(record.samples[sample_normal]["AF"][0])
+        except (KeyError, TypeError, IndexError):
+            ad_n = record.samples[sample_normal].get("AD")
+            if ad_n and len(ad_n) >= 2 and sum(ad_n) > 0:
+                return_dict["n_af"] = float(ad_n[1]) / float(sum(ad_n))
+            else:
+                return_dict["n_af"] = ""
     else:
         return_dict["n_af"] = ""
 
     try:
         return_dict["dp"] = int(record.samples[sample_tumor]["DP"])
-    except KeyError:
-        return_dict["dp"] = sum(record.samples[sample_tumor].get("AD"))
+    except (KeyError, TypeError):
+        ad = record.samples[sample_tumor].get("AD")
+        if ad:
+            return_dict["dp"] = sum(ad)
+        else:
+            return_dict["dp"] = 0
 
     if sample_normal != "":
-        return_dict["n_dp"] = int(record.samples[sample_normal]["DP"])
+        try:
+            return_dict["n_dp"] = int(record.samples[sample_normal]["DP"])
+        except (KeyError, TypeError):
+            ad_n = record.samples[sample_normal].get("AD")
+            if ad_n:
+                return_dict["n_dp"] = sum(ad_n)
+            else:
+                return_dict["n_dp"] = ""
     else:
         return_dict["n_dp"] = ""
 
     try:
         return_dict["svlen"] = int(record.info["SVLEN"])
     except KeyError:
-        pass
+        return_dict["svlen"] = ""
 
     try:
         csq = record.info["CSQ"][0].split("|")
@@ -81,7 +104,8 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
         return_dict["max_pop_af"] = csq[csq_index.index("MAX_AF")]
         return_dict["max_pops"] = csq[csq_index.index("MAX_AF_POPS")]
     else:
-        return_dict = dict.fromkeys(
+        # --- UPDATE FIX FÖR ATT BEHÅLLA AF ---
+        return_dict.update(dict.fromkeys(
             [
                 "gene",
                 "transcript",
@@ -96,7 +120,7 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
                 "max_pops",
             ],
             "",
-        )
+        ))
 
     return return_dict
 
@@ -379,7 +403,6 @@ def create_manta_tables(
         "ins": {"data": [], "headers": []},
     }
     
-    # -- Lade till manta_N_AF som kolumn i alla tabeller här --
     manta_tables["bnd"]["headers"] = [
         {"header": "Chr"},
         {"header": "Pos"},
@@ -465,7 +488,7 @@ def create_manta_tables(
                 is_match = "Yes" if gene_pattern.search(record_values["genes"]) else "No"
                 in_target = [is_match]
 
-            # -- Lägger till record_values["manta_n_af"] i listorna nedan --
+            # --- KORRIGERADE DATARADER MED STR % FÖR ALLA TYPER ---
             if "MantaBND" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -476,7 +499,8 @@ def create_manta_tables(
                     record_values["detail"],
                     record_values["depth"],
                     record_values["filt_ann"],
-                    record_values["manta_n_af"], # Lades till här
+                    record_values["manta_n_af"],
+                    record_values["str_percent"], # <-- Lades in här
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
@@ -496,7 +520,8 @@ def create_manta_tables(
                     record_values["genes"],
                     record_values["detail"],
                     record_values["filt_ann"],
-                    record_values["manta_n_af"], # Lades till här
+                    record_values["manta_n_af"],
+                    record_values["str_percent"], # <-- Lades in här
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
@@ -518,7 +543,8 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
-                    record_values["manta_n_af"], # Lades till här
+                    record_values["manta_n_af"],
+                    record_values["str_percent"], # <-- Lades in här
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
@@ -541,7 +567,8 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
-                    record_values["manta_n_af"], # Lades till här
+                    record_values["manta_n_af"],
+                    record_values["str_percent"], # <-- Lades in här
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]

@@ -55,41 +55,25 @@ rule export_to_xlsx_snvs:
 
 rule annotate_manta_str:
     input:
-        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.vcf.gz",
-        bed=config["resources"]["simple_repeats_bed"], # Sökväg från din config
-        tbi=config["resources"]["simple_repeats_bed"] + ".tbi"
+        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz",
+        bed=config["reference"]["simple_repeats"], 
+        tbi=config["reference"]["simple_repeats"] + ".tbi"
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.str_annotated.vcf")
-    conda:
-        "../envs/annotation.yaml" # Miljö med pysam
-    shell:
-        "python scripts/annotate_str.py {input.vcf} {input.bed} {output.vcf}"
-
-
-rule filter_manta_noise:
-    input:
-        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.str_annotated.vcf"
-    output:
-        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.filtered_noise.vcf.gz"
-    conda:
-        "../envs/filtering.yaml" # Miljö med bcftools
+        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf"
     log:
-        "logs/filter_noise/{sample}_{analysis}.log"
-    shell:
-        """
-        # Vi använder -e (exclude) för att kasta bort de dåliga varianterna
-        # Vi behåller alltså allt som INTE har (STR > 80 OCH Normal AF > 0.2)
-        bcftools filter -e 'STR_PERCENT > 80 && manta_N_AF > 0.2' {input.vcf} \
-            -O z -o {output.vcf} 2> {log}
-        
-        # Indexera den filtrerade filen
-        tabix -p vcf {output.vcf}
-        """
-
+        "logs/annotate_str/manta_{analysis}_{sample}.log"
+    resources:
+        partition=config["default_resources"]["partition"],
+        time=config["default_resources"]["time"],
+        mem_mb=config["default_resources"]["mem_mb"],
+        mem_per_cpu=config["default_resources"]["mem_per_cpu"],
+        threads=config["default_resources"]["threads"]
+    script:
+        "../scripts/annotate_str.py"
 
 rule export_to_xlsx_manta:
     input:
-        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz",
+        manta="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf",
         vcfs_bed=expand("cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.include.{bed}.vcf.gz", bed=["all", "aml"]),  #ska tm med?
         tbi_vcfs_bed=expand("cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.include.{bed}.vcf.gz.tbi", bed=["all", "aml"]),
         all_bed=config["bcftools_SV"]["all"],
@@ -116,7 +100,7 @@ rule export_to_xlsx_manta:
     container:
         config.get("export_to_xlsx_manta", {}).get("container", config["default_container"])
     message:
-        "{rule}: merge {input.vcfs_bed} and {input.vcf} into {output.xlsx}"
+        "{rule}: merge {input.vcfs_bed} and {input.manta} into {output.xlsx}"
     script:
         "../scripts/export_to_xlsx_manta.py"
 
