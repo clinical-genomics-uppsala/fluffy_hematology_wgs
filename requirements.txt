@@ -10,3 +10,4 @@ pyfaidx>=0.5.3.1
 drmaa==0.7.9  # if using drmaa scheduler
 smart_open<7.0.0
 xlsxwriter>=3.0.6
+rich>=10.11.0

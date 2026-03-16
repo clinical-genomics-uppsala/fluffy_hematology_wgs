@@ -310,7 +310,7 @@ def generate_copy_rules(output_spec):
                 "env_modules, bench_record, jobid, is_shell, bench_iteration, cleanup_scripts, "
                 "shadow_dir, edit_notebook, conda_base_path, basedir, runtime_sourcecache_path, "
                 "__is_snakemake_rule_func=True):",
-                '\tshell("(cp --preserve=timestamps -r {input[0]} {output[0]}) &> {log}", bench_record=bench_record, '
+                '    shell("(cp --preserve=timestamps -r {input[0]} {output[0]}) &> {log}", bench_record=bench_record, '
                 "bench_iteration=bench_iteration)\n\n",
             ]
         )
