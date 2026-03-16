@@ -300,16 +300,16 @@ def generate_copy_rules(output_spec):
             f'@workflow.output("{output_file}")',
             f'@workflow.log("logs/{rule_name}_{output_file.name}.log")',
             f'@workflow.container("{copy_container}")',
-            f'@workflow.resources(time="{time}", threads={threads}, mem_mb="{mem_mb}", '
+            f'@workflow.resources(time="{time}", threads={threads}, mem_mb="{mem_mb}",'
             f'mem_per_cpu={mem_per_cpu}, partition="{partition}")',
             '@workflow.shellcmd("cp --preserve=timestamps -r {input} {output}")',
             "@workflow.run\n",
-            f"def __rule_{rule_name}(input, output, params, wildcards, threads, resources, "
-            "log, version, rule, conda_env, container_img, singularity_args, use_singularity, "
-            "env_modules, bench_record, jobid, is_shell, bench_iteration, cleanup_scripts, "
-            "shadow_dir, edit_notebook, conda_base_path, basedir, runtime_sourcecache_path, "
+            f"def __rule_{rule_name}(input, output, params, wildcards, threads, resources,"
+            "log, version, rule, conda_env, container_img, singularity_args, use_singularity,"
+            "env_modules, bench_record, jobid, is_shell, bench_iteration, cleanup_scripts,"
+            "shadow_dir, edit_notebook, conda_base_path, basedir, runtime_sourcecache_path,"
             "__is_snakemake_rule_func=True):",
-            '    shell("(cp --preserve=timestamps -r {input[0]} {output[0]}) &> {log}", bench_record=bench_record, '
+            '    shell("(cp --preserve=timestamps -r {input[0]} {output[0]}) &> {log}", bench_record=bench_record,'
             "bench_iteration=bench_iteration)\n\n",
         ])
         rulestrings.append(rule_code)
