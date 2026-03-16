@@ -177,6 +177,6 @@ if target_genes:
     worksheet_overview.write(row_idx + 6, 0, f"Target Genes filter added: {len(target_genes)} genes loaded - [{genes_string}]")
     
 worksheet_overview.write(row_idx + 9, 0, "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
-
+workbook.set_size(1600, 1200)
 workbook.close()
 logging.info("All done")
