@@ -98,7 +98,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
                     af_N = 0.0
                 if af_N > 0.2:
                     worksheet.set_row(excel_row_index, options={'hidden': True})
-       
+
     return worksheet
 
 

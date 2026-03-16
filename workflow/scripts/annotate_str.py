@@ -84,6 +84,5 @@ def main():
 
     logging.info(f"Finished! Processed {records_processed} variants. Annotated {records_annotated} with STR_PERCENT.")
 
-
 if __name__ == "__main__":
     main()
