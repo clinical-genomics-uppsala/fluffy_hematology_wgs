@@ -4,6 +4,7 @@ import gzip
 from pysam import VariantFile
 import re
 
+
 # VEP fields in list to get index
 def index_vep(variantfile):
     csq_index = []
@@ -17,7 +18,7 @@ def index_vep(variantfile):
 def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
     return_dict = {}
     return_dict["filter_flag"] = ",".join(record.filter.keys())
-    
+
     # --- PINDEL AF FIX ---
     return_dict["af"] = 0.0
     try:
@@ -402,7 +403,7 @@ def create_manta_tables(
         "dup": {"data": [], "headers": []},
         "ins": {"data": [], "headers": []},
     }
-    
+
     manta_tables["bnd"]["headers"] = [
         {"header": "Chr"},
         {"header": "Pos"},
@@ -482,7 +483,7 @@ def create_manta_tables(
     for record in vcf_file.fetch():
         record_values = extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, sample_normal)
         if not any(x in avoid_filterflags for x in record_values["filt_ann"].split(",")):
-            
+    
             in_target = []
             if gene_pattern:
                 is_match = "Yes" if gene_pattern.search(record_values["genes"]) else "No"
@@ -500,7 +501,7 @@ def create_manta_tables(
                     record_values["depth"],
                     record_values["filt_ann"],
                     record_values["manta_n_af"],
-                    record_values["str_percent"], # <-- Lades in här
+                    record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
@@ -521,7 +522,7 @@ def create_manta_tables(
                     record_values["detail"],
                     record_values["filt_ann"],
                     record_values["manta_n_af"],
-                    record_values["str_percent"], # <-- Lades in här
+                    record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
@@ -544,7 +545,7 @@ def create_manta_tables(
                     record_values["hom_seq"],
                     record_values["filt_ann"],
                     record_values["manta_n_af"],
-                    record_values["str_percent"], # <-- Lades in här
+                    record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
@@ -568,14 +569,14 @@ def create_manta_tables(
                     record_values["hom_seq"],
                     record_values["filt_ann"],
                     record_values["manta_n_af"],
-                    record_values["str_percent"], # <-- Lades in här
+                    record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
-                
+
                 outline = outline + in_target
                 manta_tables["ins"]["data"].append(outline)
-                
+    
     return manta_tables

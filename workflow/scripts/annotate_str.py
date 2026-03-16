@@ -11,6 +11,7 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+
 def get_indel_length(record):
     """Calculates the length of an indel from Manta."""
     # For symbolic variants (e.g., <DEL>), Manta often uses INFO/SVLEN
@@ -19,6 +20,7 @@ def get_indel_length(record):
         return abs(val[0]) if isinstance(val, (list, tuple)) else abs(val)
     # For explicit sequences (standard indels)
     return max(len(record.ref), len(record.alts[0]))
+
 
 def calculate_overlap(chrom, start, end, bed_tabix):
     """Finds the total number of overlapping bases in the BED file."""
@@ -38,14 +40,15 @@ def calculate_overlap(chrom, start, end, bed_tabix):
         pass
     return overlap_bp
 
+
 def main():
     logging.info("Starting STR annotation...")
-    
+
     # 1. Fetch paths directly from the Snakemake object
     vcf_in_path = snakemake.input.vcf
     vcf_out_path = snakemake.output.vcf
     bed_gz_path = snakemake.input.bed
-    
+
     logging.info(f"Input VCF: {vcf_in_path}")
     logging.info(f"Input BED (Simple Repeats): {bed_gz_path}")
     logging.info(f"Output VCF: {vcf_out_path}")
@@ -53,10 +56,10 @@ def main():
     # Open files using pysam
     vcf_in = pysam.VariantFile(vcf_in_path)
     bed = pysam.TabixFile(bed_gz_path)
-    
+
     # Add a new header for the INFO field
     vcf_in.header.info.add('STR_PERCENT', '1', 'Float', 'Percentage of indel overlapping with STR (1-100)')
-    
+
     records_processed = 0
     records_annotated = 0
 
@@ -69,11 +72,11 @@ def main():
             v_start = record.start
             v_len = get_indel_length(record)
             v_end = v_start + v_len
-            
+
             if v_len > 0:
                 overlap_bp = calculate_overlap(record.chrom, v_start, v_end, bed)
                 percent = round((overlap_bp / v_len) * 100, 2)
-                
+
                 if percent > 1.0: 
                     record.info['STR_PERCENT'] = min(percent, 100.0)
                     records_annotated += 1
@@ -81,6 +84,7 @@ def main():
             vcf_out.write(record)
 
     logging.info(f"Finished! Processed {records_processed} variants. Annotated {records_annotated} with STR_PERCENT.")
+
 
 if __name__ == "__main__":
     main()

@@ -55,8 +55,8 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     
     row_offset = 7
     if "Deletions" in sheet_name:
-         worksheet.write("A6", "Calls have to be longer than 100 bp to be included.")
-         row_offset = 8
+        worksheet.write("A6", "Calls have to be longer than 100 bp to be included.")
+        row_offset = 8
 
     headers = table_data["headers"]
     data = table_data["data"]
@@ -100,6 +100,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
                     
     return worksheet
 
+
 """ MAIN EXECUTION """
 
 # 1. Prepping data
@@ -125,10 +126,14 @@ format_bold = workbook.add_format({"bold": True, "text_wrap": True})
 worksheet_overview = workbook.add_worksheet("Overview")
 
 # 3. Create Data Sheets
-create_sheet(workbook, "Deletions", "Deletions found by Manta", sample_name, filter_flags, manta_tables_full["del"], {"B:C": 12, "E:E": 12})
-create_sheet(workbook, "Insertions", "Insertions found by Manta", sample_name, filter_flags, manta_tables_full["ins"], {"B:B": 12, "F:F": 12})
-create_sheet(workbook, "Duplications", "Duplications found by Manta", sample_name, filter_flags, manta_tables_full["dup"], {"B:C": 12, "E:E": 12})
-create_sheet(workbook, "Translocations", "Translocations found by Manta", sample_name, filter_flags, manta_tables_full["bnd"], {"B:B": 12, "C:D": 15})
+create_sheet(workbook, "Deletions", "Deletions found by Manta",
+             sample_name, filter_flags, manta_tables_full["del"],  {"B:C": 12, "E:E": 12})
+create_sheet(workbook, "Insertions", "Insertions found by Manta", 
+             sample_name, filter_flags, manta_tables_full["ins"], {"B:B": 12, "F:F": 12})
+create_sheet(workbook, "Duplications", "Duplications found by Manta", 
+             sample_name, filter_flags, manta_tables_full["dup"], {"B:C": 12, "E:E": 12})
+create_sheet(workbook, "Translocations", "Translocations found by Manta", 
+             sample_name, filter_flags, manta_tables_full["bnd"], {"B:B": 12, "C:D": 15})
 
 # Translocations (Panels from BED)
 for vcf in snakemake.input.vcfs_bed:
@@ -174,9 +179,11 @@ if hasattr(snakemake.input, 'aml_bed'):
     worksheet_overview.write(row_idx + 5, 0, "AML bedfile: " + snakemake.input.aml_bed)
 if target_genes:
     genes_string = ", ".join(target_genes)
-    worksheet_overview.write(row_idx + 6, 0, f"Target Genes filter added: {len(target_genes)} genes loaded - [{genes_string}]")
+    worksheet_overview.write(row_idx + 6, 0, 
+                             f"Target Genes filter added: {len(target_genes)} genes loaded - [{genes_string}]")
     
-worksheet_overview.write(row_idx + 9, 0, "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
+worksheet_overview.write(row_idx + 9, 0, 
+                         "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
 workbook.set_size(1600, 1200)
 workbook.close()
 logging.info("All done")
