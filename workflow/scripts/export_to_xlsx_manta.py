@@ -1,5 +1,5 @@
 #!/bin/python3
-# // src/export_to_xlsx_manta.py : v0.8 : 14:55
+# src/export_to_xlsx_manta.py : v0.8 : 14:55
 
 from export_to_xlsx_create_tables import *
 import xlsxwriter
@@ -61,6 +61,14 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     headers = table_data["headers"]
     data = table_data["data"]
     
+    target_col_idx = -1
+    svdb_col_idx = -1
+    for idx, header_dict in enumerate(headers):
+        if header_dict.get("header") == "In Target Panel":
+            target_col_idx = idx
+        elif header_dict.get("header") == "manta_N_AF":
+            svdb_col_idx = idx
+
     column_end = ":" + convert_columns_to_letter(len(headers))
     end_row = len(data) + row_offset if len(data) > 0 else row_offset + 1
     table_area = f"A{row_offset}{column_end}{end_row}"
@@ -69,8 +77,28 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
         table_area,
         {"columns": headers, "data": data, "style": "Table Style Light 1"},
     )
+    #worksheet.autofit(300)
+    if target_col_idx != -1 and svdb_col_idx != -1 and len(data) > 0:
+        try:
+            worksheet.filter_column(target_col_idx, 'x == Yes')
+            worksheet.filter_column(svdb_col_idx, 'x > 0,2')
+        except AttributeError:
+            logging.warning("xlsxwriter version too old for filter_column().")
+            
+        # Xlsxwriter requires us to manually hide the rows that don't match the criteria
+        for i, row_data in enumerate(data):
+            excel_row_index = row_offset + i
+            if row_data[target_col_idx] == "No":
+                worksheet.set_row(excel_row_index, options={'hidden': True})
+            else:
+                try:
+                    af_N = float(row_data[svdb_col_idx])
+                except (ValueError, TypeError):
+                    af_N = 0.0
+                if af_N > 0.2:
+                    worksheet.set_row(excel_row_index, options={'hidden': True})
+                    
     return worksheet
-
 
 """ MAIN EXECUTION """
 

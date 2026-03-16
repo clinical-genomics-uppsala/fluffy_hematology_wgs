@@ -34,7 +34,7 @@ reference:
   sites: "/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/Homo_sapiens_assembly38.known_indels.vcf.gz"
   simple_repeats: "/beegfs-storage/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz"
   wgs_intervals: "/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/homo_sapiens.hg38.wgs.interval_list"
-  target_genes: "/beegfs-storage/data/ref_genomes/GRCh38/target_genes.bed"
+  target_genes: "/beegfs-storage/data/ref_genomes/GRCh38/target_genes.txt"
   skip_chrs:
     - chrM
     - chr1_KI270706v1_random

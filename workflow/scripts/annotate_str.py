@@ -55,7 +55,7 @@ def main():
     bed = pysam.TabixFile(bed_gz_path)
     
     # Add a new header for the INFO field
-    vcf_in.header.info.add('STR_PERCENT', '1', 'Float', 'Percentage of indel overlapping with STR (0-100)')
+    vcf_in.header.info.add('STR_PERCENT', '1', 'Float', 'Percentage of indel overlapping with STR (1-100)')
     
     records_processed = 0
     records_annotated = 0
@@ -74,7 +74,7 @@ def main():
                 overlap_bp = calculate_overlap(record.chrom, v_start, v_end, bed)
                 percent = round((overlap_bp / v_len) * 100, 2)
                 
-                if percent > 0:
+                if percent > 1.0: 
                     record.info['STR_PERCENT'] = min(percent, 100.0)
                     records_annotated += 1
             

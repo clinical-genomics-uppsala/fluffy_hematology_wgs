@@ -78,7 +78,7 @@ rule export_to_xlsx_manta:
         tbi_vcfs_bed=expand("cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.include.{bed}.vcf.gz.tbi", bed=["all", "aml"]),
         all_bed=config["bcftools_SV"]["all"],
         aml_bed=config["bcftools_SV"]["aml"],
-        target_genes=config.get("bcftools_SV", {}).get("target_genes", ""),
+        target_genes=config.get("reference", {}).get("target_genes", ""),
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.manta.xlsx"),
     params:
