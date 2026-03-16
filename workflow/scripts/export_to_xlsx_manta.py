@@ -80,7 +80,6 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
         table_area,
         {"columns": headers, "data": data, "style": "Table Style Light 1"},
     )
-    #worksheet.autofit(300)
     if target_col_idx != -1 and svdb_col_idx != -1 and len(data) > 0:
         try:
             worksheet.filter_column(target_col_idx, 'x == Yes')
@@ -128,20 +127,28 @@ format_bold = workbook.add_format({"bold": True, "text_wrap": True})
 worksheet_overview = workbook.add_worksheet("Overview")
 
 # 3. Create Data Sheets
-create_sheet(workbook, "Deletions", "Deletions found by Manta",
-            sample_name, filter_flags, manta_tables_full["del"],  {"B:C": 12, "E:E": 12})
-create_sheet(workbook, "Insertions", "Insertions found by Manta", 
-            sample_name, filter_flags, manta_tables_full["ins"], {"B:B": 12, "F:F": 12})
-create_sheet(workbook, "Duplications", "Duplications found by Manta", 
-            sample_name, filter_flags, manta_tables_full["dup"], {"B:C": 12, "E:E": 12})
-create_sheet(workbook, "Translocations", "Translocations found by Manta", 
-            sample_name, filter_flags, manta_tables_full["bnd"], {"B:B": 12, "C:D": 15})
+create_sheet(
+    workbook, "Deletions", "Deletions found by Manta", 
+    sample_name, filter_flags, manta_tables_full["del"],  {"B:C": 12, "E:E": 12}
+)
+create_sheet(
+    workbook, "Insertions", "Insertions found by Manta", 
+    sample_name, filter_flags, manta_tables_full["ins"], {"B:B": 12, "F:F": 12}
+)
+create_sheet(
+    workbook, "Duplications", "Duplications found by Manta", 
+    sample_name, filter_flags, manta_tables_full["dup"], {"B:C": 12, "E:E": 12}
+)
+create_sheet(
+    workbook, "Translocations", "Translocations found by Manta", 
+    sample_name, filter_flags, manta_tables_full["bnd"], {"B:B": 12, "C:D": 15}
+)
 
 # Translocations (Panels from BED)
 for vcf in snakemake.input.vcfs_bed:
     panel = vcf.split(".")[-3]
     logging.debug(f"Creating {panel} sheet")
-    panel_tables = create_manta_tables(vcf, filter_flags, target_genes=target_genes)  
+    panel_tables = create_manta_tables(vcf, filter_flags, target_genes=target_genes)
     sheet_title = "Translocations in " + panel.upper() + " genes"
     sheet_name = "Translocations " + panel.upper()
     create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"], {"B:B": 12, "C:D": 15})

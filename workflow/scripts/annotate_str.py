@@ -30,7 +30,6 @@ def calculate_overlap(chrom, start, end, bed_tabix):
             fields = region.split('\t')
             b_start = int(fields[1])
             b_end = int(fields[2])
-            # Calculate the intersection between [start, end] and [b_start, b_end]
             o_start = max(start, b_start)
             o_end = min(end, b_end)
             if o_start < o_end:
@@ -79,7 +78,7 @@ def main():
                 if percent > 1.0: 
                     record.info['STR_PERCENT'] = min(percent, 100.0)
                     records_annotated += 1
-            
+ß
             vcf_out.write(record)
 
     logging.info(f"Finished! Processed {records_processed} variants. Annotated {records_annotated} with STR_PERCENT.")
