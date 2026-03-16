@@ -27,7 +27,7 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
         ad = record.samples[sample_tumor].get("AD")
         if ad and len(ad) >= 2 and sum(ad) > 0:
             return_dict["af"] = float(ad[1]) / float(sum(ad))
-            
+
     if sample_normal != "":
         try:
             return_dict["n_af"] = float(record.samples[sample_normal]["AF"][0])
@@ -483,13 +483,11 @@ def create_manta_tables(
     for record in vcf_file.fetch():
         record_values = extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, sample_normal)
         if not any(x in avoid_filterflags for x in record_values["filt_ann"].split(",")):
-    
             in_target = []
             if gene_pattern:
                 is_match = "Yes" if gene_pattern.search(record_values["genes"]) else "No"
                 in_target = [is_match]
 
-            # --- KORRIGERADE DATARADER MED STR % FÖR ALLA TYPER ---
             if "MantaBND" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -507,10 +505,10 @@ def create_manta_tables(
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
-                
+
                 outline = outline + in_target
                 manta_tables["bnd"]["data"].append(outline)
-                
+
             elif "MantaDEL" in record_values["id"] and record_values["svlength"] <= -100:
                 outline = [
                     str(record.contig),
@@ -528,10 +526,10 @@ def create_manta_tables(
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
-                
+
                 outline = outline + in_target
                 manta_tables["del"]["data"].append(outline)
-                
+
             elif "MantaDUP" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -551,10 +549,10 @@ def create_manta_tables(
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
-                
+
                 outline = outline + in_target
                 manta_tables["dup"]["data"].append(outline)
-                
+
             elif "MantaINS" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -578,5 +576,5 @@ def create_manta_tables(
 
                 outline = outline + in_target
                 manta_tables["ins"]["data"].append(outline)
-    
+
     return manta_tables

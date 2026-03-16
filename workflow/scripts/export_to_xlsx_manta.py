@@ -16,6 +16,7 @@ logging.basicConfig(
     level=logging.INFO,
 )
 
+
 def convert_columns_to_letter(nr_columns):
     # Function to convert number of columns to alphabetical coordinates for xlsx-sheets
     if nr_columns < 27:
@@ -28,6 +29,7 @@ def convert_columns_to_letter(nr_columns):
         sys.exit()
     return letter
 
+
 def load_target_genes(filepath):
     genes = []
     if filepath and os.path.exists(filepath):
@@ -39,6 +41,7 @@ def load_target_genes(filepath):
             logging.error(f"Could not load gene list: {e}")
     return genes
 
+
 def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, set_cols=None):
     if not table_data or "headers" not in table_data:
         return None
@@ -48,11 +51,11 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     if set_cols:
         for col_range, width in set_cols.items():
             worksheet.set_column(col_range, width)
-    
+
     worksheet.write("A1", title, format_heading)
     worksheet.write("A3", "Sample: " + str(sample_name))
     worksheet.write("A5", "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
-    
+
     row_offset = 7
     if "Deletions" in sheet_name:
         worksheet.write("A6", "Calls have to be longer than 100 bp to be included.")
@@ -60,7 +63,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 
     headers = table_data["headers"]
     data = table_data["data"]
-    
+
     target_col_idx = -1
     svdb_col_idx = -1
     for idx, header_dict in enumerate(headers):
@@ -84,8 +87,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
             worksheet.filter_column(svdb_col_idx, 'x > 0,2')
         except AttributeError:
             logging.warning("xlsxwriter version too old for filter_column().")
-            
-        # Xlsxwriter requires us to manually hide the rows that don't match the criteria
+
         for i, row_data in enumerate(data):
             excel_row_index = row_offset + i
             if row_data[target_col_idx] == "No":
@@ -127,13 +129,13 @@ worksheet_overview = workbook.add_worksheet("Overview")
 
 # 3. Create Data Sheets
 create_sheet(workbook, "Deletions", "Deletions found by Manta",
-             sample_name, filter_flags, manta_tables_full["del"],  {"B:C": 12, "E:E": 12})
+            sample_name, filter_flags, manta_tables_full["del"],  {"B:C": 12, "E:E": 12})
 create_sheet(workbook, "Insertions", "Insertions found by Manta", 
-             sample_name, filter_flags, manta_tables_full["ins"], {"B:B": 12, "F:F": 12})
+            sample_name, filter_flags, manta_tables_full["ins"], {"B:B": 12, "F:F": 12})
 create_sheet(workbook, "Duplications", "Duplications found by Manta", 
-             sample_name, filter_flags, manta_tables_full["dup"], {"B:C": 12, "E:E": 12})
+            sample_name, filter_flags, manta_tables_full["dup"], {"B:C": 12, "E:E": 12})
 create_sheet(workbook, "Translocations", "Translocations found by Manta", 
-             sample_name, filter_flags, manta_tables_full["bnd"], {"B:B": 12, "C:D": 15})
+            sample_name, filter_flags, manta_tables_full["bnd"], {"B:B": 12, "C:D": 15})
 
 # Translocations (Panels from BED)
 for vcf in snakemake.input.vcfs_bed:
@@ -181,7 +183,7 @@ if target_genes:
     genes_string = ", ".join(target_genes)
     worksheet_overview.write(row_idx + 6, 0, 
                              f"Target Genes filter added: {len(target_genes)} genes loaded - [{genes_string}]")
-    
+
 worksheet_overview.write(row_idx + 9, 0, 
                          "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
 workbook.set_size(1600, 1200)

@@ -66,7 +66,7 @@ def main():
     with pysam.VariantFile(vcf_out_path, 'w', header=vcf_in.header) as vcf_out:
         for record in vcf_in:
             records_processed += 1
-            
+
             # Manta often starts at POS and ends at POS + length.
             # We convert to 0-based start/end for the interval search.
             v_start = record.start
@@ -76,7 +76,6 @@ def main():
             if v_len > 0:
                 overlap_bp = calculate_overlap(record.chrom, v_start, v_end, bed)
                 percent = round((overlap_bp / v_len) * 100, 2)
-
                 if percent > 1.0: 
                     record.info['STR_PERCENT'] = min(percent, 100.0)
                     records_annotated += 1
