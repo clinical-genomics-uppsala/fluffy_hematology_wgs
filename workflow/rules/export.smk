@@ -68,6 +68,8 @@ rule annotate_manta_str:
         mem_mb=config["default_resources"]["mem_mb"],
         mem_per_cpu=config["default_resources"]["mem_per_cpu"],
         threads=config["default_resources"]["threads"]
+    container:
+        config.get("annotate_str", {}).get("container", config["default_container"])
     script:
         "../scripts/annotate_str.py"
 
