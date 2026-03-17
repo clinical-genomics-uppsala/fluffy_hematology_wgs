@@ -158,8 +158,8 @@ files:
     types: ["T"]
   
   - name: Manta T vcf svdb str
-    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.str_annotated.vcf"
-    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.str_annotated.vcf"
+    input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.str_annotated.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.str_annotated.vcf.gz"
     types: ["T"]
 
  

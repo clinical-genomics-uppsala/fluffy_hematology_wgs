@@ -34,7 +34,7 @@ reference:
   sites: "/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/Homo_sapiens_assembly38.known_indels.vcf.gz"
   simple_repeats: "/beegfs-storage/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz"
   wgs_intervals: "/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/homo_sapiens.hg38.wgs.interval_list"
-  target_genes: "/beegfs-storage/data/ref_genomes/GRCh38/target_genes.txt"
+  target_genes: "/beegfs-storage/data/ref_genomes/GRCh38/gene_lists/fluffy_genes.txt"
   skip_chrs:
     - chrM
     - chr1_KI270706v1_random
@@ -239,7 +239,6 @@ bcftools_SNV:
 bcftools_SV:
   all: "/data/ref_genomes/GRCh38/gene_lists/all_sv_38.bed"
   aml: "/data/ref_genomes/GRCh38/gene_lists/aml_sv_38.bed"
-  target_genes: "gene_list.txt"
 
 cnvkit_batch:
   container: "docker://hydragenetics/cnvkit:0.9.9"
@@ -528,8 +527,6 @@ svdb_merge:
         - cnvkit
         - gatk
   container: "docker://hydragenetics/svdb:2.6.0"
-  overlap: 0.6
-  extra: "--pass_only --no_intra "
 
 svdb_query:
   container: "docker://hydragenetics/svdb:2.6.0"
