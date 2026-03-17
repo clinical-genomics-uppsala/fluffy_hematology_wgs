@@ -1,4 +1,4 @@
-# // src/export_to_xlsx_create_tables.py : v1.0 : 16:11
+#!/usr/bin/env python
 
 import gzip
 from pysam import VariantFile

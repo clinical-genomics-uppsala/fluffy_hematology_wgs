@@ -1,5 +1,4 @@
-#!/bin/python3
-# src/export_to_xlsx_manta.py : v0.8 : 14:55
+#!/usr/bin/env python
 
 from export_to_xlsx_create_tables import *
 import xlsxwriter

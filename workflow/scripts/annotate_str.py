@@ -1,4 +1,4 @@
-# // scripts/annotate_str.py : v1.0 : 12:15
+#!/usr/bin/env python
 
 import pysam
 import logging
