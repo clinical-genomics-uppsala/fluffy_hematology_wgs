@@ -9,7 +9,6 @@ import numpy as np
 import pandas as pd
 import pathlib
 import re
-import textwrap
 from snakemake.utils import validate
 from snakemake.utils import min_version
 import yaml
