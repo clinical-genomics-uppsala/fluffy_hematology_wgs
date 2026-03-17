@@ -4,21 +4,6 @@ __email__ = "arielle.munters@scilifelab.uu.se"
 __license__ = "GPL-3"
 
 
-def get_vcfs(wildcards):
-    if wildcards.analysis == "tn":
-        vcfs = expand(
-            "parabricks/pbrun_mutectcaller_{{analysis}}/{{sample}}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz",
-            bed=["all", "aml", "tm"],
-        )
-    elif wildcards.analysis == "t":
-        vcfs = expand(
-            "parabricks/pbrun_mutectcaller_{{analysis}}/{{sample}}_T.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz",
-            bed=["all", "aml", "tm"],
-        )
-    print(vcfs)
-    return vcfs
-
-
 rule export_to_xlsx_snvs:
     input:
         vcfs=lambda wildcards: get_vcfs(wildcards),

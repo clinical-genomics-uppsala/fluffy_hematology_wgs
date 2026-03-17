@@ -105,6 +105,21 @@ wildcard_constraints:
     bed="aml|all|tm",
 
 
+def get_vcfs(wildcards):
+    if wildcards.analysis == "tn":
+        vcfs = expand(
+            "parabricks/pbrun_mutectcaller_{{analysis}}/{{sample}}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz",
+            bed=["all", "aml", "tm"],
+        )
+    elif wildcards.analysis == "t":
+        vcfs = expand(
+            "parabricks/pbrun_mutectcaller_{{analysis}}/{{sample}}_T.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz",
+            bed=["all", "aml", "tm"],
+        )
+    print(vcfs)
+    return vcfs
+
+    
 def type_generator(types):
     if "N" in types and "T" in types:
         types.add("TN")
