@@ -18,6 +18,7 @@ logging.basicConfig(
 
 logging.info(f"Using xlsxwriter version: {xlsxwriter.__version__} from {xlsxwriter.__file__}")
 
+
 def convert_columns_to_letter(nr_columns):
     # Function to convert number of columns to alphabetical coordinates for xlsx-sheets
     if nr_columns < 27:
@@ -51,13 +52,12 @@ def format_manta_table(table, sample_name, format_2dec):
     """
     if not table or "headers" not in table:
         return
-        
     # Check if we already formatted this table (prevents double-adding)
     if len(table["headers"]) > 0 and table["headers"][0].get("header") == "Sample Name":
         return
-        
+
     table["headers"] = [{"header": "Sample Name"}] + table["headers"]
-    
+
     # Identify which columns are frequencies
     freq_indices = []
     for i, h in enumerate(table["headers"]):
@@ -65,7 +65,7 @@ def format_manta_table(table, sample_name, format_2dec):
         if "freq" in header_str:
             h["format"] = format_2dec
             freq_indices.append(i)
-            
+
     # Process data rows
     for row_idx in range(len(table["data"])):
         row = table["data"][row_idx]
@@ -75,7 +75,7 @@ def format_manta_table(table, sample_name, format_2dec):
                 # Force to float and round. The Excel format_2dec ensures it displays as 0.XX
                 new_row[i] = round(float(new_row[i]), 2)
             except (ValueError, TypeError, IndexError):
-                pass # Keep original if it's "NA" or empty
+                pass  # Keep original if it's "NA" or empty
         table["data"][row_idx] = new_row
 
 
@@ -86,12 +86,12 @@ def apply_compact_formatting(worksheet, headers, data):
     for col_idx, h in enumerate(headers):
         header_str = str(h.get("header", ""))
         max_len = len(header_str)
-        
+
         # Sample the first 100 rows to find max content length
         for row in data[:100]:
             if col_idx < len(row) and row[col_idx] is not None:
                 max_len = max(max_len, len(str(row[col_idx])))
-        
+
         # Apply compact constraints based on column type
         lower_header = header_str.lower()
         if "freq" in lower_header or "af" in lower_header or "chr" in lower_header:
@@ -99,15 +99,15 @@ def apply_compact_formatting(worksheet, headers, data):
         elif "pos" in lower_header or "length" in lower_header or "sample" in lower_header:
             final_width = 12
         elif "mantaid" in lower_header:
-            final_width = 16    
+            final_width = 16
         elif "gene" in lower_header or "sample" in lower_header:
             final_width = 20
         else:
-            final_width = min(max_len + 2, 35) # Allow slightly longer text cols but cap at 35
-        
+            final_width = min(max_len + 2, 35)  # Allow slightly longer text cols but cap at 35
+
         worksheet.set_column(col_idx, col_idx, final_width)
 
-       
+
 def write_target_summary(worksheet, start_row, title, table_data, sample_name, format_heading):
     """
     Helper function to write a summary table on the Overview sheet
@@ -129,14 +129,14 @@ def write_target_summary(worksheet, start_row, title, table_data, sample_name, f
             svdb_col_idx = idx
 
     if target_col_idx == -1:
-        return start_row # Target column not found, skip
+        return start_row  # Target column not found, skip
 
     # 2. Extract target data
     target_data = []
     for row in data:
         if row[target_col_idx] == "Yes":
             keep_variant = True
-            
+
             if svdb_col_idx != -1:
                 af_val = row[svdb_col_idx]
                 if af_val is not None and str(af_val).strip() != "":
@@ -146,13 +146,13 @@ def write_target_summary(worksheet, start_row, title, table_data, sample_name, f
                             keep_variant = False
                     except (ValueError, TypeError):
                         pass
-            
+
             if keep_variant:
                 target_data.append(row)
 
     # Write the title
     worksheet.write(start_row, 0, title, format_heading)
-    table_start_idx = start_row + 2 # Skip a line after title
+    table_start_idx = start_row + 2  # Skip a line after title
 
     if not target_data:
         worksheet.write(table_start_idx, 0, "Inga target-varianter hittades för denna typ.")
@@ -160,7 +160,7 @@ def write_target_summary(worksheet, start_row, title, table_data, sample_name, f
 
     # Calculate Excel table coordinates
     column_end = convert_columns_to_letter(len(headers))
-    excel_start_row = table_start_idx + 1 
+    excel_start_row = table_start_idx + 1
     excel_end_row = excel_start_row + len(target_data)
     table_area = f"A{excel_start_row}:{column_end}{excel_end_row}"
 
@@ -182,24 +182,24 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 
     worksheet = workbook.add_worksheet(sheet_name)
     format_heading = workbook.add_format({"bold": True, "font_size": 18})
-    
+
     # Set column widths if specified
     if set_cols:
         for col_range, width in set_cols.items():
             worksheet.set_column(col_range, width)
-            
+
     worksheet.write("A1", title, format_heading)
     worksheet.write("A3", "Sample: " + str(sample_name))
     worksheet.write("A5", "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
     worksheet.write("A6", "MaxDepth calls for regions with depth > 3x median are only included if they have PR or SR support >= 5% and manta_N_OCC = 0")
     row_offset = 7
     if "Deletions" in sheet_name:
-         worksheet.write("A7", "Calls have to be longer than 100 bp to be included.")
-         row_offset = 8
+        worksheet.write("A7", "Calls have to be longer than 100 bp to be included.")
+        row_offset = 8
 
     headers = table_data["headers"]
     data = table_data["data"]
-    
+
     # 1. Find columns
     svdb_col_idx = -1
     for idx, header_dict in enumerate(headers):
@@ -216,7 +216,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
         table_area,
         {"columns": headers, "data": data, "style": "Table Style Light 1"},
     )
-    
+
     apply_compact_formatting(worksheet, headers, data)
 
     # 2. Hide rows with High manta_N_AF (but leave target genes visible)
@@ -229,7 +229,6 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
             except (ValueError, TypeError):
                 pass
 
-    
     return worksheet
 
 
@@ -290,7 +289,7 @@ def filter_maxdepth_by_support(tables_dict, min_support=0.05):
         table_data = tables_dict[sv_type]
         if not table_data["data"]:
             continue
-            
+
         headers = [h["header"] for h in table_data["headers"]]
         try:
             ann_idx = headers.index("Annotation")
@@ -303,20 +302,20 @@ def filter_maxdepth_by_support(tables_dict, min_support=0.05):
         filtered_data = []
         for row in table_data["data"]:
             annotation = str(row[ann_idx])
-            
+
             # Check if variant is flagged with MaxDepth
             if "MaxDepth" in annotation:
                 # Safely extract frequency floats (they might be "" if no PR/SR was found)
                 pr_freq = row[pr_idx] if isinstance(row[pr_idx], float) else 0.0
                 sr_freq = row[sr_idx] if isinstance(row[sr_idx], float) else 0.0
-        
+
                 # Keep it only if support meets our threshold
                 if (pr_freq >= min_support or sr_freq >= min_support) and row[occ_idx] == 0:
                     filtered_data.append(row)
             else:
                 # Keep all other non-MaxDepth rows normally
                 filtered_data.append(row)
-                
+
         tables_dict[sv_type]["data"] = filtered_data
     return tables_dict
 
@@ -432,7 +431,7 @@ worksheet_overview.write(row_idx + 9, 0,
 # -------------------------------------------------------------
 # 5. Add Summary Tables for Target Panel == "Yes" on Overview
 # -------------------------------------------------------------
-row_idx += 12 # Move down below the metadata
+row_idx += 12  # Move down below the metadata
 
 worksheet_overview.write(row_idx, 0, "Variants in gene list", format_overview_title)
 row_idx += 2
@@ -446,11 +445,11 @@ summaries = [
 
 for sv_key, sv_title in summaries:
     row_idx = write_target_summary(
-        worksheet_overview, 
-        row_idx, 
-        sv_title, 
-        manta_tables_full[sv_key], 
-        sample_name, 
+        worksheet_overview,
+        row_idx,
+        sv_title,
+        manta_tables_full[sv_key],
+        sample_name,
         format_bold
     )
 
