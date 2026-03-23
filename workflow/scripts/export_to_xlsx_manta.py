@@ -191,7 +191,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     worksheet.write("A1", title, format_heading)
     worksheet.write("A3", "Sample: " + str(sample_name))
     worksheet.write("A5", "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
-    worksheet.write("A6", "MaxDepth calls for regions with depth > 3x median are only included if they have PR or SR support >= 5% and manta_N_OCC = 0")
+    worksheet.write("A6", "MaxDepth calls are only included if they have PR or SR support >= 5% and manta_N_OCC = 0")
     row_offset = 7
     if "Deletions" in sheet_name:
         worksheet.write("A7", "Calls have to be longer than 100 bp to be included.")

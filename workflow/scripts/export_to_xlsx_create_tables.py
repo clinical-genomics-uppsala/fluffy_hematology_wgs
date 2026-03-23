@@ -39,7 +39,7 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
                 return_dict["n_af"] = ""
     else:
         return_dict["n_af"] = ""
-    
+
     try:
         return_dict["dp"] = int(record.samples[sample_tumor]["DP"])
     except (KeyError, TypeError):
