@@ -24,6 +24,7 @@ ruleorder: cnv_sv_manta_run_workflow_t > tabix_cnv
 ruleorder: cnv_sv_manta_run_workflow_tn > tabix_cnv
 ruleorder: filtering_bcftools_filter_include_region_sv > bgzip_cnv
 
+
 wp = config.get("wp", None)
 
 if wp not in ["wp2", "wp3"]:
