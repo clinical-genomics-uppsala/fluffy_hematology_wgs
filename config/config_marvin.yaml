@@ -330,11 +330,11 @@ gatk_cnv_denoise_read_counts_by_sex:
 
 manta_config_t:
   container: "docker://hydragenetics/manta:1.6.0"
- # extra: "--callRegions /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz"
+  extra: "--callRegions /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz"
 
 manta_config_tn:
   container: "docker://hydragenetics/manta:1.6.0"
-  #extra: "--callRegions /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz"
+  extra: "--callRegions /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz"
 
 manta_run_workflow_t:
   container: "docker://hydragenetics/manta:1.6.0"
@@ -531,7 +531,7 @@ svdb_merge:
 svdb_query:
   container: "docker://hydragenetics/svdb:2.6.0"
   db_string: "--db /data/ref_data/wp2/fluffy/svdb/230601_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
-  db_manta: "--db /beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz"
+  db_manta: "--db /beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz,/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz"
 
 vep:
   container: "docker://hydragenetics/vep:111.0"

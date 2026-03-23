@@ -159,7 +159,7 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
         "benchmarks/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.tsv"
     params:
         db_string=config.get("svdb_query", {}).get("db_manta", ""), 
-        extra="--in_frq FRQ --in_occ OCC --out_frq manta_N_AF --out_occ manta_N_OCC", 
+        extra="--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC", 
         prefix=lambda wildcards, output: output[0].replace("_query.vcf", "")
 
 
@@ -174,7 +174,7 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
         "benchmarks/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.tsv"
     params:
         db_string=config.get("svdb_query", {}).get("db_manta", ""), 
-        extra="--in_frq FRQ --in_occ OCC --out_frq manta_N_AF --out_occ manta_N_OCC", 
+        extra="--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC", 
         prefix=lambda wildcards, output: output[0].replace("_query.vcf", "")
 
 

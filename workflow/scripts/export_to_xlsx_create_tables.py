@@ -39,7 +39,7 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
                 return_dict["n_af"] = ""
     else:
         return_dict["n_af"] = ""
-
+    
     try:
         return_dict["dp"] = int(record.samples[sample_tumor]["DP"])
     except (KeyError, TypeError):
@@ -183,15 +183,30 @@ def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, 
 
     # -- Add manta_AF and STR % columns --
     try:
-        n_af_val = record.info["manta_N_AF"]
-        return_dict["manta_n_af"] = n_af_val[0] if isinstance(n_af_val, tuple) else n_af_val
-    except KeyError:
-        return_dict["manta_n_af"] = ""
+        n_occ_val = record.info.get("manta_N_OCC")
+        if n_occ_val is None:
+            return_dict["manta_n_occ"] = 0
+        else:
+            val = n_occ_val[0] if isinstance(n_occ_val, tuple) else n_occ_val
+            return_dict["manta_n_occ"] = int(val)
+    except (KeyError, ValueError, TypeError):
+        return_dict["manta_n_occ"] = 0
+
+    try:
+        t_occ_val = record.info.get("manta_T_OCC")
+        if t_occ_val is None:
+            return_dict["manta_t_occ"] = 0
+        else:
+            val = t_occ_val[0] if isinstance(t_occ_val, tuple) else t_occ_val
+            return_dict["manta_t_occ"] = int(val)
+    except (KeyError, ValueError, TypeError):
+        return_dict["manta_t_occ"] = 0
+
     try:
         str_val = record.info["STR_PERCENT"]
         return_dict["str_percent"] = round(str_val[0] if isinstance(str_val, tuple) else str_val, 2)
     except KeyError:
-        return_dict["str_percent"] = ""
+        return_dict["str_percent"] = 0
     # ----------------------------------------------------
 
     try:
@@ -413,7 +428,8 @@ def create_manta_tables(
         {"header": "Details"},
         {"header": "Depth"},
         {"header": "Annotation"},
-        {"header": "manta_N_AF"},
+        {"header": "manta_N_OCC"},
+        {"header": "manta_T_OCC"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
@@ -427,7 +443,8 @@ def create_manta_tables(
         {"header": "Genes"},
         {"header": "Details"},
         {"header": "Annotation"},
-        {"header": "manta_N_AF"},
+        {"header": "manta_N_OCC"},
+        {"header": "manta_T_OCC"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
@@ -443,7 +460,8 @@ def create_manta_tables(
         {"header": "Hom Length"},
         {"header": "Hom Sequence"},
         {"header": "Annotation"},
-        {"header": "manta_N_AF"},
+        {"header": "manta_N_OCC"},
+        {"header": "manta_T_OCC"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
@@ -460,7 +478,8 @@ def create_manta_tables(
         {"header": "Hom Length"},
         {"header": "Hom Sequence"},
         {"header": "Annotation"},
-        {"header": "manta_N_AF"},
+        {"header": "manta_N_OCC"},
+        {"header": "manta_T_OCC"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
@@ -498,7 +517,8 @@ def create_manta_tables(
                     record_values["detail"],
                     record_values["depth"],
                     record_values["filt_ann"],
-                    record_values["manta_n_af"],
+                    record_values["manta_n_occ"],
+                    record_values["manta_t_occ"],
                     record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
@@ -519,7 +539,8 @@ def create_manta_tables(
                     record_values["genes"],
                     record_values["detail"],
                     record_values["filt_ann"],
-                    record_values["manta_n_af"],
+                    record_values["manta_n_occ"],
+                    record_values["manta_t_occ"],
                     record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
@@ -542,7 +563,8 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
-                    record_values["manta_n_af"],
+                    record_values["manta_n_occ"],
+                    record_values["manta_t_occ"],
                     record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
@@ -566,7 +588,8 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
-                    record_values["manta_n_af"],
+                    record_values["manta_n_occ"],
+                    record_values["manta_t_occ"],
                     record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
