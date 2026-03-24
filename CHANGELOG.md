@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.2.3](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.2.2...v2.2.3) (2026-03-24)
+
+
+### Bug Fixes
+
+* ruleorder ([08c40e5](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/commit/08c40e52289a442d9839a1554712919a50befc03))
+
 ## [2.2.2](https://github.com/clinical-genomics-uppsala/fluffy_hematology_wgs/compare/v2.2.1...v2.2.2) (2026-03-06)
 
 
