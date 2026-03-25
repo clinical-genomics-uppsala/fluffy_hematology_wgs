@@ -67,7 +67,7 @@ version_files = touch_pipeline_version_file_name(
     pipeline_version, date_string=pipeline_name, directory="Results/versions/software"
 )
 if use_container(workflow):
-    version_files.append(touch_software_version_file(config, date_string=pipeline_name, directory="Results/versions/software")
+    version_files.append(touch_software_version_file(config, date_string=pipeline_name, directory="Results/versions/software"))
 add_version_files_to_multiqc(config, version_files)
 
 
