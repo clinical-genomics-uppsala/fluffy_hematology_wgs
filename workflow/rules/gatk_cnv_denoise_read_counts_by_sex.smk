@@ -64,7 +64,7 @@ rule gatk_cnv_denoise_read_counts_by_sex:
             "cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.denoisedCR.tsv.benchmark.tsv",
             config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("benchmark_repeats", 1),
         )
-        threads: config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("threads", config.get("default_resources", {}).get("threads"))
+    threads: config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("threads", config.get("default_resources", {}).get("threads"))
     resources:
         threads=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("threads", config.get("default_resources", {}).get("threads")),
         time=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("time", config.get("default_resources", {}).get("time")),
