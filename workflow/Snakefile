@@ -86,7 +86,9 @@ use rule vep from annotation as annotation_vep_snvs with:
         cache=config["vep"]["vep_cache"],
         fasta=config["reference"]["fasta"],
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vep.vcf"),
+        vcf=temp(
+            "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vep.vcf"
+        ),
     log:
         "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vep.vcf.log",
     benchmark:
@@ -97,9 +99,11 @@ use rule vep from annotation as annotation_vep_snvs with:
     message:
         "{rule}: Annotate {input.vcf} with vep"
 
+
 ############################################
 # CNV / SV MODULE
 ############################################
+
 
 module cnv_sv:
     snakefile:
@@ -148,53 +152,56 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
     message:
         "{rule}: Annotate {input.vcf}"
 
+
 ############################################
 # SVDB filtering (common SV database)
 ############################################
+
 
 use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
     input:
         vcf="cnv_sv/manta_run_workflow_tn/{sample}.ssa.vcf.gz",
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf"), 
+        vcf=temp("cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf"),
     log:
-        "logs/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.log"
+        "logs/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.log",
     benchmark:
         "benchmarks/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.tsv"
     params:
-        db_string=config.get("svdb_query", {}).get("db_manta", ""), 
-        extra="--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC", 
-        prefix=lambda wildcards, output: output[0].replace("_query.vcf", "")
+        db_string=config.get("svdb_query", {}).get("db_manta", ""),
+        extra="--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC",
+        prefix=lambda wildcards, output: output[0].replace("_query.vcf", ""),
 
 
 use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
     input:
         vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.gz",
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf"), 
+        vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf"),
     log:
-        "logs/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.log"
+        "logs/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.log",
     benchmark:
         "benchmarks/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.tsv"
     params:
-        db_string=config.get("svdb_query", {}).get("db_manta", ""), 
-        extra="--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC", 
-        prefix=lambda wildcards, output: output[0].replace("_query.vcf", "")
+        db_string=config.get("svdb_query", {}).get("db_manta", ""),
+        extra="--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC",
+        prefix=lambda wildcards, output: output[0].replace("_query.vcf", ""),
 
 
 use rule vep from annotation as annotation_vep_svdb_manta_tn with:
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf")
+        vcf=temp("cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf"),
     log:
-        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.log"
+        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.log",
     benchmark:
         "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.benchmark.tsv"
 
+
 use rule vep from annotation as annotation_vep_svdb_manta_t with:
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf")
+        vcf=temp("cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf"),
     log:
-        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.log"
+        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.log",
     benchmark:
         "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.benchmark.tsv"
 
@@ -327,8 +334,12 @@ use rule * from compression as compression_*
 
 use rule samtools_view from compression as compression_samtools_view with:
     input:
-        bam=lambda wildcards: get_bam_input(wildcards, t_n=None, use_sample_wildcard=False)[0],
-        bai=lambda wildcards: get_bam_input(wildcards, t_n=None, use_sample_wildcard=False)[1],
+        bam=lambda wildcards: get_bam_input(
+            wildcards, t_n=None, use_sample_wildcard=False
+        )[0],
+        bai=lambda wildcards: get_bam_input(
+            wildcards, t_n=None, use_sample_wildcard=False
+        )[1],
         ref=config.get("reference", {}).get("fasta", ""),
 
 
@@ -354,7 +365,9 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
         vcf="parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.ratio.filter.somatic.vcf.gz",
         tabix="parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.ratio.filter.somatic.vcf.gz.tbi",
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz"),
+        vcf=temp(
+            "parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz"
+        ),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SNV"][wildcards.bed],
         extra=config.get("bcftools_SNV", {}).get("extra", ""),
@@ -374,7 +387,9 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
         vcf="parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.vcf.gz",
         tabix="parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.vcf.gz.tbi",
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz"),
+        vcf=temp(
+            "parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz"
+        ),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SNV"][wildcards.bed],
         extra=config.get("bcftools_SNV", {}).get("extra", ""),
@@ -394,7 +409,9 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
         vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz",
         tabix="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz.tbi",
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz"),
+        vcf=temp(
+            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz"
+        ),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SV"][wildcards.bed],
         extra=config.get("bcftools_SV", {}).get("extra", ""),
@@ -500,7 +517,12 @@ use rule * from prealignment as prealignment_*
 
 module qc:
     snakefile:
-        get_module_snakefile(config, "hydra-genetics/qc", path="workflow/Snakefile", tag=config["modules"]["qc"])
+        get_module_snakefile(
+            config,
+            "hydra-genetics/qc",
+            path="workflow/Snakefile",
+            tag=config["modules"]["qc"],
+        )
     config:
         config
 
@@ -532,17 +554,32 @@ if aligner == "bwa_gpu":
             files=lambda wildcards: set(
                 [
                     file.format(
-                        sample=sample, type=u.type, lane=u.lane, flowcell=u.flowcell, barcode=u.barcode, read=read, ext=ext
+                        sample=sample,
+                        type=u.type,
+                        lane=u.lane,
+                        flowcell=u.flowcell,
+                        barcode=u.barcode,
+                        read=read,
+                        ext=ext,
                     )
-                    for file in config["multiqc"]["reports"][wildcards.report]["qc_files"]
+                    for file in config["multiqc"]["reports"][wildcards.report][
+                        "qc_files"
+                    ]
                     for sample in get_samples(samples)
                     for u in units.loc[sample].dropna().itertuples()
-                    if u.type in config["multiqc"]["reports"][wildcards.report]["included_unit_types"]
+                    if u.type
+                    in config["multiqc"]["reports"][wildcards.report][
+                        "included_unit_types"
+                    ]
                     for read in ["fastq1", "fastq2"]
-                    for ext in config.get("picard_collect_multiple_metrics", {}).get("output_ext", [""])
+                    for ext in config.get("picard_collect_multiple_metrics", {}).get(
+                        "output_ext", [""]
+                    )
                 ]
             ),
-            config=lambda wildcards: config["multiqc"]["reports"][wildcards.report]["config"],
+            config=lambda wildcards: config["multiqc"]["reports"][wildcards.report][
+                "config"
+            ],
             sample_replacement="qc/multiqc/sample_replacement_{report}.tsv",
             sample_order="qc/multiqc/sample_order_{report}.tsv",
         params:
@@ -552,7 +589,9 @@ if aligner == "bwa_gpu":
             + input.sample_order
             + " -c "
             + input.config,
-            use_input_files_only=config.get("multiqc", {}).get("use_input_files_only", True),
+            use_input_files_only=config.get("multiqc", {}).get(
+                "use_input_files_only", True
+            ),
 
 
 if aligner == "bwa_sentieon":
@@ -562,17 +601,32 @@ if aligner == "bwa_sentieon":
             files=lambda wildcards: set(
                 [
                     file.format(
-                        sample=sample, type=u.type, lane=u.lane, flowcell=u.flowcell, barcode=u.barcode, read=read, ext=ext
+                        sample=sample,
+                        type=u.type,
+                        lane=u.lane,
+                        flowcell=u.flowcell,
+                        barcode=u.barcode,
+                        read=read,
+                        ext=ext,
                     )
-                    for file in config["multiqc"]["reports"][wildcards.report]["qc_files"]
+                    for file in config["multiqc"]["reports"][wildcards.report][
+                        "qc_files"
+                    ]
                     for sample in get_samples(samples)
                     for u in units.loc[sample].dropna().itertuples()
-                    if u.type in config["multiqc"]["reports"][wildcards.report]["included_unit_types"]
+                    if u.type
+                    in config["multiqc"]["reports"][wildcards.report][
+                        "included_unit_types"
+                    ]
                     for read in ["fastq1", "fastq2"]
-                    for ext in config.get("picard_collect_multiple_metrics", {}).get("output_ext", [""])
+                    for ext in config.get("picard_collect_multiple_metrics", {}).get(
+                        "output_ext", [""]
+                    )
                 ]
             ),
-            config=lambda wildcards: config["multiqc"]["reports"][wildcards.report]["config"],
+            config=lambda wildcards: config["multiqc"]["reports"][wildcards.report][
+                "config"
+            ],
             sample_replacement="qc/multiqc/sample_replacement_{report}.tsv",
             sample_order="qc/multiqc/sample_order_{report}.tsv",
         params:
@@ -582,7 +636,9 @@ if aligner == "bwa_sentieon":
             + input.sample_order
             + " -c "
             + input.config,
-            use_input_files_only=config.get("multiqc", {}).get("use_input_files_only", True),
+            use_input_files_only=config.get("multiqc", {}).get(
+                "use_input_files_only", True
+            ),
 
 
 use rule peddy from qc as qc_peddy with:
@@ -716,9 +772,7 @@ use rule merge_cnv_json from reports as reports_merge_cnv_json with:
         filtered_cnv_vcfs_tbi=get_filtered_cnv_vcfs_tbi_for_merge_json,
         cnv_vcfs_tbi=get_unfiltered_cnv_vcfs_tbi_for_merge_json,
         cytobands=config.get("merge_cnv_json", {}).get("cytobands", ""),
-        ref_genes=config.get("merge_cnv_json", {}).get(
-            "ref_genes", ""
-        ),
+        ref_genes=config.get("merge_cnv_json", {}).get("ref_genes", ""),
 
 
 use rule cnv_html_report from reports as reports_cnv_html_report with:
@@ -750,7 +804,9 @@ use rule vt_decompose from snv_indels as snv_indels_vt_decompose with:
         vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.vcf.gz",
         tbi="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.vcf.gz.tbi",
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz"),
+        vcf=temp(
+            "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz"
+        ),
     log:
         "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz.log",
     benchmark:
@@ -777,7 +833,12 @@ use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
 
 module misc:
     snakefile:
-        get_module_snakefile(config, "hydra-genetics/misc", path="workflow/Snakefile", tag=config["modules"]["misc"])
+        get_module_snakefile(
+            config,
+            "hydra-genetics/misc",
+            path="workflow/Snakefile",
+            tag=config["modules"]["misc"],
+        )
     config:
         config
 

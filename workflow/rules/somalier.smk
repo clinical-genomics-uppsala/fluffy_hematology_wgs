@@ -5,6 +5,7 @@ __license__ = "GPL-3"
 
 import os
 
+
 rule somalier_create_ped_T:
     input:
         config["samples"],
@@ -17,17 +18,31 @@ rule somalier_create_ped_T:
             "qc/somalier/somalier_create_ped_T.fam.benchmark.tsv",
             config.get("somalier_create_ped_T", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("somalier_create_ped_T", {}).get("threads", config["default_resources"]["threads"])
+    threads: config.get("somalier_create_ped_T", {}).get(
+    "threads", config["default_resources"]["threads"]
+)
     params:
         sample_type="T",
     resources:
-        mem_mb=config.get("somalier_create_ped_T", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("somalier_create_ped_T", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("somalier_create_ped_T", {}).get("partition", config["default_resources"]["partition"]),
-        threads=config.get("somalier_create_ped_T", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("somalier_create_ped_T", {}).get("time", config["default_resources"]["time"]),
+        mem_mb=config.get("somalier_create_ped_T", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("somalier_create_ped_T", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("somalier_create_ped_T", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
+        threads=config.get("somalier_create_ped_T", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("somalier_create_ped_T", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
     container:
-        config.get("somalier_create_ped_T", {}).get("container", config["default_container"])
+        config.get("somalier_create_ped_T", {}).get(
+            "container", config["default_container"]
+        )
     message:
         "{rule}: Create fam file for all T samples for somalier input"
     script:
@@ -46,17 +61,31 @@ rule somalier_create_ped_N:
             "qc/somalier/somalier_create_ped_N.fam.benchmark.tsv",
             config.get("somalier_create_ped_N", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("somalier_create_ped_N", {}).get("threads", config["default_resources"]["threads"])
+    threads: config.get("somalier_create_ped_N", {}).get(
+    "threads", config["default_resources"]["threads"]
+)
     params:
         sample_type="N",
     resources:
-        mem_mb=config.get("somalier_create_ped_N", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("somalier_create_ped_N", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("somalier_create_ped_N", {}).get("partition", config["default_resources"]["partition"]),
-        threads=config.get("somalier_create_ped_N", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("somalier_create_ped_N", {}).get("time", config["default_resources"]["time"]),
+        mem_mb=config.get("somalier_create_ped_N", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("somalier_create_ped_N", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("somalier_create_ped_N", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
+        threads=config.get("somalier_create_ped_N", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("somalier_create_ped_N", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
     container:
-        config.get("somalier_create_ped_N", {}).get("container", config["default_container"])
+        config.get("somalier_create_ped_N", {}).get(
+            "container", config["default_container"]
+        )
     message:
         "{rule}: Create fam file for all T samples for somalier input"
     script:
@@ -81,13 +110,25 @@ rule somalier_combine_fam:
             config.get("somalier_combine_fam", {}).get("benchmark_repeats", 1),
         )
     resources:
-        mem_mb=config.get("somalier_combine_fam", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("somalier_combine_fam", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("somalier_combine_fam", {}).get("partition", config["default_resources"]["partition"]),
-        threads=config.get("somalier_combine_fam", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("somalier_combine_fam", {}).get("time", config["default_resources"]["time"]),
+        mem_mb=config.get("somalier_combine_fam", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("somalier_combine_fam", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("somalier_combine_fam", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
+        threads=config.get("somalier_combine_fam", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("somalier_combine_fam", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
     container:
-        config.get("somalier_combine_fam", {}).get("container", config["default_container"])
+        config.get("somalier_combine_fam", {}).get(
+            "container", config["default_container"]
+        )
     message:
         "{rule}: creates combined somalier_all.ped for sex check"
     shell:
@@ -109,15 +150,29 @@ rule somalier_create_groupfile:
             "qc/somalier/somalier.groups.benchmark.tsv",
             config.get("somalier_create_groupfile", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("somalier_create_groupfile", {}).get("threads", config["default_resources"]["threads"])
+    threads: config.get("somalier_create_groupfile", {}).get(
+    "threads", config["default_resources"]["threads"]
+)
     resources:
-        mem_mb=config.get("somalier_create_groupfile", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("somalier_create_groupfile", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("somalier_create_groupfile", {}).get("partition", config["default_resources"]["partition"]),
-        threads=config.get("somalier_create_groupfile", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("somalier_create_groupfile", {}).get("time", config["default_resources"]["time"]),
+        mem_mb=config.get("somalier_create_groupfile", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("somalier_create_groupfile", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("somalier_create_groupfile", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
+        threads=config.get("somalier_create_groupfile", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("somalier_create_groupfile", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
     container:
-        config.get("somalier_create_groupfile", {}).get("container", config["default_container"])
+        config.get("somalier_create_groupfile", {}).get(
+            "container", config["default_container"]
+        )
     message:
         "{rule}: Create group file for somalier input"
     shell:
@@ -147,15 +202,29 @@ rule somalier_custom_multiqc:
             "qc/somalier/somalier_custom_multiqc.becnhmark.tsv",
             config.get("somalier_custom_multiqc", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("somalier_custom_multiqc", {}).get("threads", config["default_resources"]["threads"])
+    threads: config.get("somalier_custom_multiqc", {}).get(
+    "threads", config["default_resources"]["threads"]
+)
     resources:
-        threads=config.get("somalier_custom_multiqc", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("somalier_custom_multiqc", {}).get("time", config["default_resources"]["time"]),
-        mem_mb=config.get("somalier_custom_multiqc", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("somalier_custom_multiqc", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("somalier_custom_multiqc", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("somalier_custom_multiqc", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("somalier_custom_multiqc", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
+        mem_mb=config.get("somalier_custom_multiqc", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("somalier_custom_multiqc", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("somalier_custom_multiqc", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
     container:
-        config.get("somalier_custom_multiqc", {}).get("container", config["default_container"])
+        config.get("somalier_custom_multiqc", {}).get(
+            "container", config["default_container"]
+        )
     message:
         "{rule}: creating custom input for somalier to MultiQC general stats"
     script:
@@ -180,15 +249,29 @@ if aligner == "bwa_gpu":
                 "qc/somalier/log/{sample}_{type}.cohort.benchmark.tsv",
                 config.get("somalier_extract", {}).get("benchmark_repeats", 1),
             )
-        threads: config.get("somalier_extract", {}).get("threads", config["default_resources"]["threads"])
+        threads: config.get("somalier_extract", {}).get(
+    "threads", config["default_resources"]["threads"]
+)
         resources:
-            threads=config.get("somalier_extract", {}).get("threads", config["default_resources"]["threads"]),
-            time=config.get("somalier_extract", {}).get("time", config["default_resources"]["time"]),
-            mem_mb=config.get("somalier_extract", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-            mem_per_cpu=config.get("somalier_extract", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-            partition=config.get("somalier_extract", {}).get("partition", config["default_resources"]["partition"]),
+            threads=config.get("somalier_extract", {}).get(
+                "threads", config["default_resources"]["threads"]
+            ),
+            time=config.get("somalier_extract", {}).get(
+                "time", config["default_resources"]["time"]
+            ),
+            mem_mb=config.get("somalier_extract", {}).get(
+                "mem_mb", config["default_resources"]["mem_mb"]
+            ),
+            mem_per_cpu=config.get("somalier_extract", {}).get(
+                "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+            ),
+            partition=config.get("somalier_extract", {}).get(
+                "partition", config["default_resources"]["partition"]
+            ),
         container:
-            config.get("somalier_extract", {}).get("container", config["default_container"])
+            config.get("somalier_extract", {}).get(
+                "container", config["default_container"]
+            )
         message:
             "{rule}: extracts sites for somalier in sample {wildcards.sample}_{wildcards.type}.bam"
         shell:
@@ -213,7 +296,7 @@ rule somalier_relate:
         "qc/somalier/somalier_relate.log",
     params:
         extra=config.get("somalier_relate", {}).get("extra", ""),
-        outname=lambda wildcards, output: output.html.replace(".html", "")
+        outname=lambda wildcards, output: output.html.replace(".html", ""),
     benchmark:
         repeat(
             "qc/somalier/somalier_relate.benchmark.tsv",
@@ -221,11 +304,21 @@ rule somalier_relate:
         )
     threads: config.get("somalier_relate", {}).get("threads", config["default_resources"]["threads"])
     resources:
-        threads=config.get("somalier_relate", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("somalier_relate", {}).get("time", config["default_resources"]["time"]),
-        mem_mb=config.get("somalier_relate", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("somalier_relate", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("somalier_relate", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("somalier_relate", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("somalier_relate", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
+        mem_mb=config.get("somalier_relate", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("somalier_relate", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("somalier_relate", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
     container:
         config.get("somalier_relate", {}).get("container", config["default_container"])
     message:
@@ -246,13 +339,25 @@ rule somalier_tn_test:
             "qc/somalier/somalier_tn_test.benchmark.tsv",
             config.get("somalier_tn_test", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("somalier_tn_test", {}).get("threads", config["default_resources"]["threads"])
+    threads: config.get("somalier_tn_test", {}).get(
+    "threads", config["default_resources"]["threads"]
+)
     resources:
-        threads=config.get("somalier_tn_test", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("somalier_tn_test", {}).get("time", config["default_resources"]["time"]),
-        mem_mb=config.get("somalier_tn_test", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("somalier_tn_test", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("somalier_tn_test", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("somalier_tn_test", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("somalier_tn_test", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
+        mem_mb=config.get("somalier_tn_test", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("somalier_tn_test", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("somalier_tn_test", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
     container:
         config.get("somalier_tn_test", {}).get("container", config["default_container"])
     message:

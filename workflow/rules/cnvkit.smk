@@ -19,11 +19,21 @@ rule cnvkit_call_no_custom_purity:
         )
     threads: config.get("cnvkit_call", {}).get("threads", config["default_resources"]["threads"])
     resources:
-        threads=config.get("cnvkit_call", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("cnvkit_call", {}).get("time", config["default_resources"]["time"]),
-        mem_mb=config.get("cnvkit_call", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("cnvkit_call", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("cnvkit_call", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("cnvkit_call", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("cnvkit_call", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
+        mem_mb=config.get("cnvkit_call", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("cnvkit_call", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("cnvkit_call", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
     container:
         config.get("cnvkit_call", {}).get("container", config["default_container"])
     message:
@@ -42,7 +52,9 @@ rule cnvkit_scatter:
     output:
         plot=temp("cnv_sv/cnvkit_scatter/{sample}_{type}_{locus}.png"),
     params:
-        gene=lambda wildcards: config.get("cnvkit_scatter", {}).get("cna", {}).get(wildcards.locus, ""),
+        gene=lambda wildcards: config.get("cnvkit_scatter", {})
+        .get("cna", {})
+        .get(wildcards.locus, ""),
         extra=config.get("cnvkit_scatter", {}).get("extra", ""),
     log:
         "cnv_sv/cnvkit_scatter/{sample}_{type}_{locus}.log",
@@ -53,11 +65,21 @@ rule cnvkit_scatter:
         )
     threads: config.get("cnvkit_scatter", {}).get("threads", config["default_resources"]["threads"])
     resources:
-        threads=config.get("cnvkit_scatter", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("cnvkit_scatter", {}).get("time", config["default_resources"]["time"]),
-        mem_mb=config.get("cnvkit_scatter", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("cnvkit_scatter", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("cnvkit_scatter", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("cnvkit_scatter", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("cnvkit_scatter", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
+        mem_mb=config.get("cnvkit_scatter", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("cnvkit_scatter", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("cnvkit_scatter", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
     container:
         config.get("cnvkit_scatter", {}).get("container", config["default_container"])
     message:

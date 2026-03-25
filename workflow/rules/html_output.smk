@@ -15,11 +15,14 @@ rule merge_cnv_json_chr:
         filtered_cnv_vcfs_tbi=get_filtered_cnv_vcfs_tbi_for_merge_json,
         cnv_vcfs_tbi=get_unfiltered_cnv_vcfs_tbi_for_merge_json,
     output:
-        json=temp("reports/cnv_html_report/{sample}_{type}.{tc_method}.{locus}.merged.json"),
+        json=temp(
+            "reports/cnv_html_report/{sample}_{type}.{tc_method}.{locus}.merged.json"
+        ),
     params:
         skip_chromosomes=lambda wildcards: [
             chromosome
-            for chromosome in [f"chr{i}" for i in range(1, 23)] + ["chrX", "chrY", "chrM"]
+            for chromosome in [f"chr{i}" for i in range(1, 23)]
+            + ["chrX", "chrY", "chrM"]
             if chromosome != wildcards.locus
         ],
     log:
@@ -31,11 +34,21 @@ rule merge_cnv_json_chr:
         )
     threads: config.get("merge_cnv_json", {}).get("threads", config["default_resources"]["threads"])
     resources:
-        mem_mb=config.get("merge_cnv_json", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("merge_cnv_json", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("merge_cnv_json", {}).get("partition", config["default_resources"]["partition"]),
-        threads=config.get("merge_cnv_json", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("merge_cnv_json", {}).get("time", config["default_resources"]["time"]),
+        mem_mb=config.get("merge_cnv_json", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("merge_cnv_json", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("merge_cnv_json", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
+        threads=config.get("merge_cnv_json", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("merge_cnv_json", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
     container:
         config.get("merge_cnv_json", {}).get("container", config["default_container"])
     message:

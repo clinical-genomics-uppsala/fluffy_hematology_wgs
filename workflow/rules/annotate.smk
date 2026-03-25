@@ -16,15 +16,29 @@ rule annotate_normal_ratio:
             "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vep.ratio.vcf.benchmark.tsv",
             config.get("annotate_normal_ratio", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("annotate_normal_ratio", {}).get("threads", config["default_resources"]["threads"])
+    threads: config.get("annotate_normal_ratio", {}).get(
+    "threads", config["default_resources"]["threads"]
+)
     resources:
-        mem_mb=config.get("annotate_normal_ratio", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
-        mem_per_cpu=config.get("annotate_normal_ratio", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
-        partition=config.get("annotate_normal_ratio", {}).get("partition", config["default_resources"]["partition"]),
-        threads=config.get("annotate_normal_ratio", {}).get("threads", config["default_resources"]["threads"]),
-        time=config.get("annotate_normal_ratio", {}).get("time", config["default_resources"]["time"]),
+        mem_mb=config.get("annotate_normal_ratio", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        ),
+        mem_per_cpu=config.get("annotate_normal_ratio", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        ),
+        partition=config.get("annotate_normal_ratio", {}).get(
+            "partition", config["default_resources"]["partition"]
+        ),
+        threads=config.get("annotate_normal_ratio", {}).get(
+            "threads", config["default_resources"]["threads"]
+        ),
+        time=config.get("annotate_normal_ratio", {}).get(
+            "time", config["default_resources"]["time"]
+        ),
     container:
-        config.get("annotate_normal_ratio", {}).get("container", config["default_container"])
+        config.get("annotate_normal_ratio", {}).get(
+            "container", config["default_container"]
+        )
     message:
         "{rule}: Add normal ratio annotation to {input.vcf}"
     script:

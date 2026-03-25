@@ -67,17 +67,33 @@ version_files = touch_pipeline_version_file_name(
     pipeline_version, date_string=pipeline_name, directory="Results/versions/software"
 )
 if use_container(workflow):
-    version_files.append(touch_software_version_file(config, date_string=pipeline_name, directory="Results/versions/software"))
+    version_files.append(
+        touch_software_version_file(
+            config, date_string=pipeline_name, directory="Results/versions/software"
+        )
+    )
 add_version_files_to_multiqc(config, version_files)
 
 
 onstart:
-    export_pipeline_version_as_file(pipeline_version, date_string=pipeline_name, directory="Results/versions/software")
+    export_pipeline_version_as_file(
+        pipeline_version,
+        date_string=pipeline_name,
+        directory="Results/versions/software",
+    )
     if use_container(workflow):
-        update_config, software_info = add_software_version_to_config(config, workflow, False)
-        export_software_version_as_file(software_info, date_string=pipeline_name, directory="Results/versions/software")
+        update_config, software_info = add_software_version_to_config(
+            config, workflow, False
+        )
+        export_software_version_as_file(
+            software_info,
+            date_string=pipeline_name,
+            directory="Results/versions/software",
+        )
     date_string = datetime.now().strftime("%Y%m%d")
-    export_config_as_file(update_config, date_string=date_string, directory="Results/versions")
+    export_config_as_file(
+        update_config, date_string=date_string, directory="Results/versions"
+    )
 
 
 ### Read and validate samples file
@@ -119,7 +135,7 @@ def get_vcfs(wildcards):
     print(vcfs)
     return vcfs
 
-    
+
 def type_generator(types):
     if "N" in types and "T" in types:
         types.add("TN")
@@ -152,7 +168,9 @@ def get_bam_input(wildcards, t_n=None, use_sample_wildcard=True):
 
 
 def get_num_gpus(rule, wildcards):
-    gres = config.get(rule, {"gres": "--gres=gres:gpu:1"}).get("gres", "--gres=gres:gpu:1")[len("--gres=") :]
+    gres = config.get(rule, {"gres": "--gres=gres:gpu:1"}).get(
+        "gres", "--gres=gres:gpu:1"
+    )[len("--gres=") :]
     gres_dict = dict()
     for item in gres.split(","):
         items = item.split(":")
@@ -237,7 +255,12 @@ def get_filtered_cnv_vcfs_tbi_for_merge_json(wildcards):
 
 def get_json_for_merge_cnv_json(wildcards):
     callers = get_cnv_callers(wildcards.tc_method)
-    return ["reports/cnv_html_report/{sample}_{type}.{caller}.{tc_method}.json".format(caller=c, **wildcards) for c in callers]
+    return [
+        "reports/cnv_html_report/{sample}_{type}.{caller}.{tc_method}.json".format(
+            caller=c, **wildcards
+        )
+        for c in callers
+    ]
 
 
 def compile_output_file_list(wildcards):
@@ -263,9 +286,24 @@ def compile_output_file_list(wildcards):
                 for sample in get_samples(samples)
                 for unit_type in get_unit_types(units, sample)
                 if unit_type in set(filedef["types"])
-                for flowcell in set([u.flowcell for u in units.loc[(sample, unit_type)].dropna().itertuples()])
-                for barcode in set([u.barcode for u in units.loc[(sample, unit_type)].dropna().itertuples()])
-                for lane in set([u.lane for u in units.loc[(sample, unit_type)].dropna().itertuples()])
+                for flowcell in set(
+                    [
+                        u.flowcell
+                        for u in units.loc[(sample, unit_type)].dropna().itertuples()
+                    ]
+                )
+                for barcode in set(
+                    [
+                        u.barcode
+                        for u in units.loc[(sample, unit_type)].dropna().itertuples()
+                    ]
+                )
+                for lane in set(
+                    [
+                        u.lane
+                        for u in units.loc[(sample, unit_type)].dropna().itertuples()
+                    ]
+                )
             ]
         )
 
@@ -299,19 +337,32 @@ def generate_copy_rules(output_spec):
         if f["input"] is None:
             continue
 
-        rule_name = "copy_{}".format("_".join(re.sub(r"[\"'-.,]", "", f["name"].strip().lower()).split()))
+        rule_name = "copy_{}".format(
+            "_".join(re.sub(r"[\"'-.,]", "", f["name"].strip().lower()).split())
+        )
         input_file = pathlib.Path(f["input"])
         output_file = output_directory / pathlib.Path(f["output"])
 
-        mem_mb = config.get("_copy", {}).get("mem_mb", config["default_resources"]["mem_mb"])
-        mem_per_cpu = config.get("_copy", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"])
-        partition = config.get("_copy", {}).get("partition", config["default_resources"]["partition"])
-        threads = config.get("_copy", {}).get("threads", config["default_resources"]["threads"])
+        mem_mb = config.get("_copy", {}).get(
+            "mem_mb", config["default_resources"]["mem_mb"]
+        )
+        mem_per_cpu = config.get("_copy", {}).get(
+            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
+        )
+        partition = config.get("_copy", {}).get(
+            "partition", config["default_resources"]["partition"]
+        )
+        threads = config.get("_copy", {}).get(
+            "threads", config["default_resources"]["threads"]
+        )
         time = config.get("_copy", {}).get("time", config["default_resources"]["time"])
-        copy_container = config.get("_copy", {}).get("container", config["default_container"])
+        copy_container = config.get("_copy", {}).get(
+            "container", config["default_container"]
+        )
 
-        #rule_code = "\n".join([
-        rule_code_template = textwrap.dedent("""
+        # rule_code = "\n".join([
+        rule_code_template = textwrap.dedent(
+            """
             @workflow.rule(name="{rule_name}")
             @workflow.input("{input_file}")
             @workflow.output("{output_file}")
@@ -334,9 +385,8 @@ def generate_copy_rules(output_spec):
                     "(cp --preserve=timestamps -r {{input[0]}} {{output[0]}}) &> {{log}}",
                     bench_record=bench_record, bench_iteration=bench_iteration
                 )
-        """).strip()
-
-       
+        """
+        ).strip()
 
         rule_code = rule_code_template.format(
             rule_name=rule_name,
@@ -348,7 +398,7 @@ def generate_copy_rules(output_spec):
             threads=threads,
             mem_mb=mem_mb,
             mem_per_cpu=mem_per_cpu,
-            partition=partition
+            partition=partition,
         )
 
         rulestrings.append(rule_code)
