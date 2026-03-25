@@ -39,7 +39,6 @@ multiqc_cgs:
     bbtools-stats_Percent_filtered_bbmstheader:
       title: "rRNA [%]"
       description: "Contamination estimate from BBduk"
-      scale: "RdYlGn-rev"
       format: "{:.2f}"
 
 mosdepth_config:
