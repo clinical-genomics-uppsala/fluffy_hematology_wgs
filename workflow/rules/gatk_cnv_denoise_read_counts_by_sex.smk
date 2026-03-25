@@ -72,7 +72,7 @@ rule gatk_cnv_denoise_read_counts_by_sex:
         mem_per_cpu=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
         partition=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("partition", config.get("default_resources", {}).get("partition")),
     container:
-                config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("container", config.get("default_container", ""))
+        config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("container", config.get("default_container", ""))
     message:
         "{rule}: Use gatk_cnv to obtain cnv_sv/gatk_cnv_denoise_read_counts/{wildcards.sample}_{wildcards.type}.clean.denoisedCR.tsv"
     shell:
