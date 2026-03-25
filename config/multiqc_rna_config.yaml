@@ -34,7 +34,14 @@ custom_data:
           description: "RNA number based on SampleSheet"
           placement: 300
 
-# mosdepth custom thresholds
+multiqc_cgs:
+  "BBTools":
+    bbtools-stats_Percent_filtered_bbmstheader:
+      title: "rRNA [%]"
+      description: "Contamination estimate from BBduk"
+      scale: "RdYlGn-rev"
+      format: "{:.2f}"
+
 mosdepth_config:
   general_stats_coverage:
     - 1

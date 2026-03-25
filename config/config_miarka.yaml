@@ -15,7 +15,7 @@ modules:
   parabricks: "v1.2.1"
   prealignment: "v1.1.0"
   qc: "v0.3.0"
-  reports: "d6e56ed"
+  reports: "v1.0.3"
   snv_indels: "v0.6.0"
   misc: "v0.1.0"
   sentieon: "b002d39"
