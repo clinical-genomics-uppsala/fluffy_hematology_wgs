@@ -330,7 +330,6 @@ def generate_copy_rules(output_spec):
         time = config.get("_copy", {}).get("time", config["default_resources"]["time"])
         copy_container = config.get("_copy", {}).get("container", config["default_container"])
 
-        # rule_code = "\n".join([
         rule_code_template = textwrap.dedent(
             """
             @workflow.rule(name="{rule_name}")
