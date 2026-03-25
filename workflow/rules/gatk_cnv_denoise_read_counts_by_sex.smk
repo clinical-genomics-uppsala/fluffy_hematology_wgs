@@ -27,12 +27,12 @@ if aligner == "bwa_gpu":
                 config.get("gatk_cnv_collect_allelic_counts", {}).get("benchmark_repeats", 1),
             )
         threads: config.get("gatk_cnv_collect_allelic_counts", {}).get("threads", config.get("default_resources", {}).get("threads"))
-    resources:
-        threads=config.get("gatk_cnv_collect_allelic_counts", {}).get("threads", config.get("default_resources", {}).get("threads")),
-        time=config.get("gatk_cnv_collect_allelic_counts", {}).get("time", config.get("default_resources", {}).get("time")),
-        mem_mb=config.get("gatk_cnv_collect_allelic_counts", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
-        mem_per_cpu=config.get("gatk_cnv_collect_allelic_counts", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
-        partition=config.get("gatk_cnv_collect_allelic_counts", {}).get("partition", config.get("default_resources", {}).get("partition")),
+        resources:
+            threads=config.get("gatk_cnv_collect_allelic_counts", {}).get("threads", config.get("default_resources", {}).get("threads")),
+            time=config.get("gatk_cnv_collect_allelic_counts", {}).get("time", config.get("default_resources", {}).get("time")),
+            mem_mb=config.get("gatk_cnv_collect_allelic_counts", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
+            mem_per_cpu=config.get("gatk_cnv_collect_allelic_counts", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
+            partition=config.get("gatk_cnv_collect_allelic_counts", {}).get("partition", config.get("default_resources", {}).get("partition")),
         container:
             config.get("gatk_cnv_collect_allelic_counts", {}).get("container", config.get("default_container", ""))
         message:
