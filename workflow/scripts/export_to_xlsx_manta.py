@@ -427,7 +427,7 @@ if target_genes:
     genes_string = ", ".join(target_genes)
     worksheet_overview.write(row_idx + 6, 0,
                              f"Target Genes filter added: {len(target_genes)} genes loaded - [{genes_string}]")
-worksheet_overview.write(row_idx + 8, 0, 
+worksheet_overview.write(row_idx + 8, 0,
                          f"Number of samples in manta_N: {manta_N_total} and manta_T: {manta_T_total}")
 worksheet_overview.write(row_idx + 9, 0,
                          "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
