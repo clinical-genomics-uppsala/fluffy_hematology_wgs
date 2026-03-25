@@ -237,12 +237,7 @@ def get_filtered_cnv_vcfs_tbi_for_merge_json(wildcards):
 
 def get_json_for_merge_cnv_json(wildcards):
     callers = get_cnv_callers(wildcards.tc_method)
-    return [
-        "reports/cnv_html_report/{sample}_{type}.{caller}.{tc_method}.json".format(
-            caller=c, **wildcards
-        )
-        for c in callers
-    ]
+    return ["reports/cnv_html_report/{sample}_{type}.{caller}.{tc_method}.json".format(caller=c, **wildcards) for c in callers]
 
 
 def compile_output_file_list(wildcards):
@@ -268,24 +263,9 @@ def compile_output_file_list(wildcards):
                 for sample in get_samples(samples)
                 for unit_type in get_unit_types(units, sample)
                 if unit_type in set(filedef["types"])
-                for flowcell in set(
-                    [
-                        u.flowcell
-                        for u in units.loc[(sample, unit_type)].dropna().itertuples()
-                    ]
-                )
-                for barcode in set(
-                    [
-                        u.barcode
-                        for u in units.loc[(sample, unit_type)].dropna().itertuples()
-                    ]
-                )
-                for lane in set(
-                    [
-                        u.lane
-                        for u in units.loc[(sample, unit_type)].dropna().itertuples()
-                    ]
-                )
+                for flowcell in set([u.flowcell for u in units.loc[(sample, unit_type)].dropna().itertuples()])
+                for barcode in set([u.barcode for u in units.loc[(sample, unit_type)].dropna().itertuples()])
+                for lane in set([u.lane for u in units.loc[(sample, unit_type)].dropna().itertuples()])
             ]
         )
 

@@ -17,9 +17,7 @@ rule cnvkit_table:
     output:
         temp("cnv_sv/cnvkit_table/{sample}_{type}.CNV.xlsx"),
     params:
-        cnvkit_scatter_folder=lambda wildcards, input: os.path.dirname(
-            input.cnvkit_scatter_whole
-        ),
+        cnvkit_scatter_folder=lambda wildcards, input: os.path.dirname(input.cnvkit_scatter_whole),
         log=config.get("cnvkit_table", {}).get("log_thresholds", "-0.25,0.2"),
         ploidy=config.get("cnvkit_table", {}).get("ploidy", "2"),
         tc=lambda wildcards: get_sample(samples, wildcards)["tumor_content"],

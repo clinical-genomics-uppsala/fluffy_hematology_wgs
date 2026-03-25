@@ -19,8 +19,7 @@ rule merge_cnv_json_chr:
     params:
         skip_chromosomes=lambda wildcards: [
             chromosome
-            for chromosome in [f"chr{i}" for i in range(1, 23)]
-            + ["chrX", "chrY", "chrM"]
+            for chromosome in [f"chr{i}" for i in range(1, 23)] + ["chrX", "chrY", "chrM"]
             if chromosome != wildcards.locus
         ],
     log:

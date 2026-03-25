@@ -35,23 +35,10 @@ rule combine_peddy_results:
     input:
         sex=lambda wildcards: [
             "qc/peddy/%s/peddy.sex_check.csv" % (s)
-            for s in set(
-                [
-                    row["sample"]
-                    for index, row in units.iterrows()
-                    if row["type"] == "T"
-                ]
-            )
+            for s in set([row["sample"] for index, row in units.iterrows() if row["type"] == "T"])
         ],
         fam=lambda wildcards: [
-            "qc/peddy/%s.peddy.fam" % (s)
-            for s in set(
-                [
-                    row["sample"]
-                    for index, row in units.iterrows()
-                    if row["type"] == "T"
-                ]
-            )
+            "qc/peddy/%s.peddy.fam" % (s) for s in set([row["sample"] for index, row in units.iterrows() if row["type"] == "T"])
         ],
     output:
         peddy_sex_check="qc/peddy/peddy.sex_check.csv",
