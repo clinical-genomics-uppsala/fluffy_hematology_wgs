@@ -13,14 +13,10 @@ if aligner == "bwa_gpu":
         input:
             bam="parabricks/pbrun_fq2bam_recal/{sample}_T.bam",
             bai="parabricks/pbrun_fq2bam_recal/{sample}_T.bam.bai",
-            interval=config.get("gatk_cnv_collect_allelic_counts", {}).get(
-                "SNP_interval", ""
-            ),
-            ref=config["reference"]["fasta"],
+            interval=config.get("gatk_cnv_collect_allelic_counts", {}).get("SNP_interval", ""),
+            ref=config.get("reference", {}).get("fasta", ""),
         output:
-            temp(
-                "cnv_sv/gatk_collect_allelic_counts/{sample}_{type}.clean.allelicCounts.tsv"
-            ),
+            temp("cnv_sv/gatk_collect_allelic_counts/{sample}_{type}.clean.allelicCounts.tsv"),
         params:
             extra=config.get("gatk_cnv_collect_allelic_counts", {}).get("extra", ""),
         log:
@@ -28,33 +24,17 @@ if aligner == "bwa_gpu":
         benchmark:
             repeat(
                 "cnv_sv/gatk_collect_allelic_counts/{sample}_{type}.clean.allelicCounts.tsv.benchmark.tsv",
-                config.get("gatk_cnv_collect_allelic_counts", {}).get(
-                    "benchmark_repeats", 1
-                ),
+                config.get("gatk_cnv_collect_allelic_counts", {}).get("benchmark_repeats", 1),
             )
-        threads: config.get("gatk_cnv_collect_allelic_counts", {}).get(
-    "threads", config["default_resources"]["threads"]
-)
-        resources:
-            threads=config.get("gatk_cnv_collect_allelic_counts", {}).get(
-                "threads", config["default_resources"]["threads"]
-            ),
-            time=config.get("gatk_cnv_collect_allelic_counts", {}).get(
-                "time", config["default_resources"]["time"]
-            ),
-            mem_mb=config.get("gatk_cnv_collect_allelic_counts", {}).get(
-                "mem_mb", config["default_resources"]["mem_mb"]
-            ),
-            mem_per_cpu=config.get("gatk_cnv_collect_allelic_counts", {}).get(
-                "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
-            ),
-            partition=config.get("gatk_cnv_collect_allelic_counts", {}).get(
-                "partition", config["default_resources"]["partition"]
-            ),
+        threads: config.get("gatk_cnv_collect_allelic_counts", {}).get("threads", config.get("default_resources", {}).get("threads"))
+    resources:
+        threads=config.get("gatk_cnv_collect_allelic_counts", {}).get("threads", config.get("default_resources", {}).get("threads")),
+        time=config.get("gatk_cnv_collect_allelic_counts", {}).get("time", config.get("default_resources", {}).get("time")),
+        mem_mb=config.get("gatk_cnv_collect_allelic_counts", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
+        mem_per_cpu=config.get("gatk_cnv_collect_allelic_counts", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
+        partition=config.get("gatk_cnv_collect_allelic_counts", {}).get("partition", config.get("default_resources", {}).get("partition")),
         container:
-            config.get("gatk_cnv_collect_allelic_counts", {}).get(
-                "container", config["default_container"]
-            )
+            config.get("gatk_cnv_collect_allelic_counts", {}).get("container", config.get("default_container", ""))
         message:
             "{rule}: Use gatk_cnv to obtain cnv_sv/gatk_collect_allelic_counts/{wildcards.sample}_{wildcards.type}.clean.allelicCounts.tsv"
         shell:
@@ -68,21 +48,13 @@ if aligner == "bwa_gpu":
 
 rule gatk_cnv_denoise_read_counts_by_sex:
     input:
-        hdf5PoN_f=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-            "pon_female", ""
-        ),
-        hdf5PoN_m=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-            "pon_male", ""
-        ),
+        hdf5PoN_f=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("pon_female", ""),
+        hdf5PoN_m=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("pon_male", ""),
         hdf5Tumor="cnv_sv/gatk_collect_read_counts/{sample}_{type}.counts.hdf5",
         sex="qc/somalier/somalier_relate.samples.tsv",
     output:
-        denoisedCopyRatio=temp(
-            "cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.denoisedCR.tsv"
-        ),
-        stdCopyRatio=temp(
-            "cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.standardizedCR.tsv"
-        ),
+        denoisedCopyRatio=temp("cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.denoisedCR.tsv"),
+        stdCopyRatio=temp("cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.standardizedCR.tsv"),
     params:
         extra=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("extra", ""),
     log:
@@ -90,33 +62,17 @@ rule gatk_cnv_denoise_read_counts_by_sex:
     benchmark:
         repeat(
             "cnv_sv/gatk_denoise_read_counts/{sample}_{type}.clean.denoisedCR.tsv.benchmark.tsv",
-            config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-                "benchmark_repeats", 1
-            ),
+            config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-    "threads", config["default_resources"]["threads"]
-)
+        threads: config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("threads", config.get("default_resources", {}).get("threads"))
     resources:
-        threads=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-            "threads", config["default_resources"]["threads"]
-        ),
-        time=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-            "time", config["default_resources"]["time"]
-        ),
-        mem_mb=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-            "mem_mb", config["default_resources"]["mem_mb"]
-        ),
-        mem_per_cpu=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
-        ),
-        partition=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-            "partition", config["default_resources"]["partition"]
-        ),
+        threads=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("threads", config.get("default_resources", {}).get("threads")),
+        time=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("time", config.get("default_resources", {}).get("time")),
+        mem_mb=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
+        mem_per_cpu=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
+        partition=config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("partition", config.get("default_resources", {}).get("partition")),
     container:
-        config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get(
-            "container", config["default_container"]
-        )
+                config.get("gatk_cnv_denoise_read_counts_by_sex", {}).get("container", config.get("default_container", ""))
     message:
         "{rule}: Use gatk_cnv to obtain cnv_sv/gatk_cnv_denoise_read_counts/{wildcards.sample}_{wildcards.type}.clean.denoisedCR.tsv"
     shell:
@@ -184,29 +140,15 @@ rule gatk_model_segments:
             "cnv_sv/gatk_model_segments/{sample}_{type}.clean.modelFinal.seg.benchmark.tsv",
             config.get("gatk_model_segments", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("gatk_model_segments", {}).get(
-    "threads", config["default_resources"]["threads"]
-)
+    threads: config.get("gatk_model_segments", {}).get("threads", config.get("default_resources", {}).get("threads"))
     resources:
-        threads=config.get("gatk_model_segments", {}).get(
-            "threads", config["default_resources"]["threads"]
-        ),
-        time=config.get("gatk_model_segments", {}).get(
-            "time", config["default_resources"]["time"]
-        ),
-        mem_mb=config.get("gatk_model_segments", {}).get(
-            "mem_mb", config["default_resources"]["mem_mb"]
-        ),
-        mem_per_cpu=config.get("gatk_model_segments", {}).get(
-            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
-        ),
-        partition=config.get("gatk_model_segments", {}).get(
-            "partition", config["default_resources"]["partition"]
-        ),
+        threads=config.get("gatk_model_segments", {}).get("threads", config.get("default_resources", {}).get("threads")),
+        time=config.get("gatk_model_segments", {}).get("time", config.get("default_resources", {}).get("time")),
+        mem_mb=config.get("gatk_model_segments", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
+        mem_per_cpu=config.get("gatk_model_segments", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
+        partition=config.get("gatk_model_segments", {}).get("partition", config.get("default_resources", {}).get("partition")),
     container:
-        config.get("gatk_model_segments", {}).get(
-            "container", config["default_container"]
-        )
+        config.get("gatk_model_segments", {}).get("container", config.get("default_container", ""))
     message:
         "{rule}: Use gatk_cnv to obtain cnv_sv/gatk_model_segments/{wildcards.sample}_{wildcards.type}.clean.modelFinal.seg"
     shell:

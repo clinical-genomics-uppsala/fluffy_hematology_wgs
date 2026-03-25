@@ -67,33 +67,17 @@ version_files = touch_pipeline_version_file_name(
     pipeline_version, date_string=pipeline_name, directory="Results/versions/software"
 )
 if use_container(workflow):
-    version_files.append(
-        touch_software_version_file(
-            config, date_string=pipeline_name, directory="Results/versions/software"
-        )
-    )
+    version_files.append(touch_software_version_file(config, date_string=pipeline_name, directory="Results/versions/software")
 add_version_files_to_multiqc(config, version_files)
 
 
 onstart:
-    export_pipeline_version_as_file(
-        pipeline_version,
-        date_string=pipeline_name,
-        directory="Results/versions/software",
-    )
+    export_pipeline_version_as_file(pipeline_version, date_string=pipeline_name, directory="Results/versions/software")
     if use_container(workflow):
-        update_config, software_info = add_software_version_to_config(
-            config, workflow, False
-        )
-        export_software_version_as_file(
-            software_info,
-            date_string=pipeline_name,
-            directory="Results/versions/software",
-        )
+        update_config, software_info = add_software_version_to_config(config, workflow, False)
+        export_software_version_as_file(software_info, date_string=pipeline_name, directory="Results/versions/software")
     date_string = datetime.now().strftime("%Y%m%d")
-    export_config_as_file(
-        update_config, date_string=date_string, directory="Results/versions"
-    )
+    export_config_as_file(update_config, date_string=date_string, directory="Results/versions")
 
 
 ### Read and validate samples file
@@ -168,9 +152,7 @@ def get_bam_input(wildcards, t_n=None, use_sample_wildcard=True):
 
 
 def get_num_gpus(rule, wildcards):
-    gres = config.get(rule, {"gres": "--gres=gres:gpu:1"}).get(
-        "gres", "--gres=gres:gpu:1"
-    )[len("--gres=") :]
+    gres = config.get(rule, {"gres": "--gres=gres:gpu:1"}).get("gres", "--gres=gres:gpu:1")[len("--gres=") :]
     gres_dict = dict()
     for item in gres.split(","):
         items = item.split(":")
@@ -337,28 +319,16 @@ def generate_copy_rules(output_spec):
         if f["input"] is None:
             continue
 
-        rule_name = "copy_{}".format(
-            "_".join(re.sub(r"[\"'-.,]", "", f["name"].strip().lower()).split())
-        )
+        rule_name = "copy_{}".format("_".join(re.sub(r"[\"'-.,]", "", f["name"].strip().lower()).split()))
         input_file = pathlib.Path(f["input"])
         output_file = output_directory / pathlib.Path(f["output"])
 
-        mem_mb = config.get("_copy", {}).get(
-            "mem_mb", config["default_resources"]["mem_mb"]
-        )
-        mem_per_cpu = config.get("_copy", {}).get(
-            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
-        )
-        partition = config.get("_copy", {}).get(
-            "partition", config["default_resources"]["partition"]
-        )
-        threads = config.get("_copy", {}).get(
-            "threads", config["default_resources"]["threads"]
-        )
+        mem_mb = config.get("_copy", {}).get("mem_mb", config["default_resources"]["mem_mb"])
+        mem_per_cpu = config.get("_copy", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"])
+        partition = config.get("_copy", {}).get("partition", config["default_resources"]["partition"])
+        threads = config.get("_copy", {}).get("threads", config["default_resources"]["threads"])
         time = config.get("_copy", {}).get("time", config["default_resources"]["time"])
-        copy_container = config.get("_copy", {}).get(
-            "container", config["default_container"]
-        )
+        copy_container = config.get("_copy", {}).get("container", config["default_container"])
 
         # rule_code = "\n".join([
         rule_code_template = textwrap.dedent(

@@ -8,14 +8,14 @@ rule export_to_xlsx_snvs:
     input:
         vcfs=lambda wildcards: get_vcfs(wildcards),
         vcf_pindel="cnv_sv/pindel_vcf/{sample}_T.no_tc.vep_annotated.vcf",
-        all_bed=config["bcftools_SNV"]["all"],
-        aml_bed=config["bcftools_SNV"]["aml"],
-        tm_bed=config["bcftools_SNV"]["tm"],
-        pindel_bed=config["pindel_call"]["include_bed"],
+        all_bed=config.get("bcftools_SNV", {}).get("all", ""),
+        aml_bed=config.get("bcftools_SNV", {}).get("aml", ""),
+        tm_bed=config.get("bcftools_SNV", {}).get("tm", ""),
+        pindel_bed=config.get("pindel_call", {}).get("include_bed", ""),
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.snvs.xlsx"),
     params:
-        filterfile=config["filter_vcf"]["somatic"],
+        filterfile=config.get("filter_vcf", {}).get("somatic", ""),
         extra=config.get("export_to_xlsx_snvs", {}).get("extra", ""),
     log:
         "export_to_xlsx/{analysis}/{sample}.snvs.xslx.log",

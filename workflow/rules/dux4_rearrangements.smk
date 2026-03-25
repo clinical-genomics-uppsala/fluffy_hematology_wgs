@@ -26,21 +26,11 @@ if aligner == "bwa_gpu":
             region=config.get("dux4_igh", {}).get("region", ""),
         threads: config.get("dux4_igh", {}).get("threads", config["default_resources"]["threads"])
         resources:
-            mem_mb=config.get("fdux4_igh", {}).get(
-                "mem_mb", config["default_resources"]["mem_mb"]
-            ),
-            mem_per_cpu=config.get("dux4_igh", {}).get(
-                "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
-            ),
-            partition=config.get("dux4_igh", {}).get(
-                "partition", config["default_resources"]["partition"]
-            ),
-            threads=config.get("dux4_igh", {}).get(
-                "threads", config["default_resources"]["threads"]
-            ),
-            time=config.get("dux4_igh", {}).get(
-                "time", config["default_resources"]["time"]
-            ),
+            mem_mb=config.get("fdux4_igh", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+            mem_per_cpu=config.get("dux4_igh", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+            partition=config.get("dux4_igh", {}).get("partition", config["default_resources"]["partition"]),
+            threads=config.get("dux4_igh", {}).get("threads", config["default_resources"]["threads"]),
+            time=config.get("dux4_igh", {}).get("time", config["default_resources"]["time"]),
         container:
             config.get("dux4_igh", {}).get("container", config["default_container"])
         message:
@@ -72,21 +62,11 @@ if aligner == "bwa_gpu":
             region=config.get("dux4_erg", {}).get("region", ""),
         threads: config.get("dux4_erg", {}).get("threads", config["default_resources"]["threads"])
         resources:
-            mem_mb=config.get("fdux4_erg", {}).get(
-                "mem_mb", config["default_resources"]["mem_mb"]
-            ),
-            mem_per_cpu=config.get("dux4_erg", {}).get(
-                "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
-            ),
-            partition=config.get("dux4_erg", {}).get(
-                "partition", config["default_resources"]["partition"]
-            ),
-            threads=config.get("dux4_erg", {}).get(
-                "threads", config["default_resources"]["threads"]
-            ),
-            time=config.get("dux4_erg", {}).get(
-                "time", config["default_resources"]["time"]
-            ),
+            mem_mb=config.get("dux4_erg", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+            mem_per_cpu=config.get("dux4_erg", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+            partition=config.get("dux4_erg", {}).get("partition", config["default_resources"]["partition"]),
+            threads=config.get("dux4_erg", {}).get("threads", config["default_resources"]["threads"]),
+            time=config.get("dux4_erg", {}).get("time", config["default_resources"]["time"]),
         container:
             config.get("dux4_erg", {}).get("container", config["default_container"])
         message:
@@ -115,29 +95,15 @@ rule dux4_igh_fusioncatcher_count:
     params:
         extra=config.get("dux4-igh_fusioncatcher", {}).get("extra", ""),
         region=config.get("dux4-igh_fusioncatcher", {}).get("region", ""),
-    threads: config.get("dux4-igh_fusioncatcher", {}).get(
-    "threads", config["default_resources"]["threads"]
-)
+    threads: config.get("dux4-igh_fusioncatcher", {}).get("threads", config["default_resources"]["threads"])
     resources:
-        mem_mb=config.get("dux4-igh_fusioncatcher", {}).get(
-            "mem_mb", config["default_resources"]["mem_mb"]
-        ),
-        mem_per_cpu=config.get("dux4-igh_fusioncatcher", {}).get(
-            "mem_per_cpu", config["default_resources"]["mem_per_cpu"]
-        ),
-        partition=config.get("dux4-igh_fusioncatcher", {}).get(
-            "partition", config["default_resources"]["partition"]
-        ),
-        threads=config.get("dux4-igh_fusioncatcher", {}).get(
-            "threads", config["default_resources"]["threads"]
-        ),
-        time=config.get("dux4-igh_fusioncatcher", {}).get(
-            "time", config["default_resources"]["time"]
-        ),
+        mem_mb=config.get("dux4-igh_fusioncatcher", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("dux4-igh_fusioncatcher", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("dux4-igh_fusioncatcher", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("dux4-igh_fusioncatcher", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("dux4-igh_fusioncatcher", {}).get("time", config["default_resources"]["time"]),
     container:
-        config.get("dux4-igh_fusioncatcher", {}).get(
-            "container", config["default_container"]
-        )
+        config.get("dux4-igh_fusioncatcher", {}).get("container", config["default_container"])
     message:
         "{rule}: get count and results of fusioncatcher translocations in DUX4 with IGH in {input.fq}"
     shell:
