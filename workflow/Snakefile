@@ -831,7 +831,7 @@ use rule tabix from misc as tabix_cnv with:
 
 use rule bgzip from misc as decompress_manta with:
     input:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_queryinclude.{bed}.vcf.gz",
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz",
     output:
         "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf",
     params:
