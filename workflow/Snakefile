@@ -440,6 +440,9 @@ use rule fusioncatcher from fusions as fusions_fusioncatcher with:
     output:
         fusions="fusions/fusioncatcher/{sample}_{type}/final-list_candidate-fusion-genes.txt",
         fusions_summary="fusions/fusioncatcher/{sample}_{type}/summary_candidate_fusions.txt",
+    params:
+        output_dir=lambda wildcards, output: os.path.dirname(output.fusions),
+        extra=config.get("fusioncatcher", {}).get("extra", "")
 
 
 use rule star_fusion from fusions as fusions_star_fusion with:
