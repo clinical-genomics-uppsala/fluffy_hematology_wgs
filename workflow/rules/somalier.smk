@@ -212,7 +212,7 @@ rule somalier_relate:
         "qc/somalier/somalier_relate.log",
     params:
         extra=config.get("somalier_relate", {}).get("extra", ""),
-        outname="qc/somalier/somalier_relate",
+        outname=lambda wildcards, output: output.html.replace(".html", "")
     benchmark:
         repeat(
             "qc/somalier/somalier_relate.benchmark.tsv",
