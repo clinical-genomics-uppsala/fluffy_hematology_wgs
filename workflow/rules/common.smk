@@ -103,6 +103,7 @@ wildcard_constraints:
     sample="|".join(samples.index),
     unit="N|T|R",
     bed="aml|all|tm",
+    analysis="t|tn",
 
 
 def get_vcfs(wildcards):
