@@ -399,7 +399,7 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
         vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz",
         tabix="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz.tbi",
     output:
-        vcf=temp("parabricks/pbrun_mutectcaller_tn/{sample}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz"),
+        vcf=temp("parabricks/pbrun_mutectcaller_{analysis}/{sample}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz"),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SV"][wildcards.bed],
         extra=config.get("bcftools_SV", {}).get("extra", ""),

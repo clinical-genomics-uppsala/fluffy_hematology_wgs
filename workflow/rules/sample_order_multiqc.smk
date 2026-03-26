@@ -17,19 +17,16 @@ rule sample_order_multiqc:
     log:
         "qc/multiqc/sample_order.tsv.log",
     benchmark:
-        repeat(
-            "qc/multiqc/sample_order.tsv.benchmark.tsv",
-            config.get("sample_order_multiqc", {}).get("benchmark_repeats", 1),
-        )
-    threads: config.get("sample_order_multiqc", {}).get("threads", config.get("default_resources", {}).get("threads"))
+        repeat("qc/multiqc/sample_order.tsv.benchmark.tsv", config.get("sample_order_multiqc", {}).get("benchmark_repeats", 1))
+    threads: config.get("sample_order_multiqc", {}).get("threads", config["default_resources"]["threads"])
     resources:
-        mem_mb=config.get("sample_order_multiqc", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
-        mem_per_cpu=config.get("sample_order_multiqc", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
-        partition=config.get("sample_order_multiqc", {}).get("partition", config.get("default_resources", {}).get("partition")),
-        threads=config.get("sample_order_multiqc", {}).get("threads", config.get("default_resources", {}).get("threads")),
-        time=config.get("sample_order_multiqc", {}).get("time", config.get("default_resources", {}).get("time")),
+        mem_mb=config.get("sample_order_multiqc", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("sample_order_multiqc", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("sample_order_multiqc", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("sample_order_multiqc", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("sample_order_multiqc", {}).get("time", config["default_resources"]["time"]),
     container:
-        config.get("sample_order_multiqc", {}).get("container", config.get("default_container", ""))
+        config.get("sample_order_multiqc", {}).get("container", config["default_container"])
     message:
         "{rule}: Create a sample order tsv based on units.tsv."
     script:

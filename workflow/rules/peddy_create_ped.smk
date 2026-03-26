@@ -6,7 +6,7 @@ __license__ = "GPL-3"
 
 rule peddy_create_ped:
     input:
-        config.get("samples", ""),
+        config["samples"],
     output:
         [f"qc/peddy/{sample}.peddy.fam" for sample in get_samples(samples)],
     log:
@@ -16,15 +16,15 @@ rule peddy_create_ped:
             "qc/peddy/peddy_create_ped.fam.benchmark.tsv",
             config.get("peddy_create_ped", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("peddy_create_ped", {}).get("threads", config.get("default_resources", {}).get("threads"))
+    threads: config.get("peddy_create_ped", {}).get("threads", config["default_resources"]["threads"])
     resources:
-        mem_mb=config.get("peddy_create_ped", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
-        mem_per_cpu=config.get("peddy_create_ped", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
-        partition=config.get("peddy_create_ped", {}).get("partition", config.get("default_resources", {}).get("partition")),
-        threads=config.get("peddy_create_ped", {}).get("threads", config.get("default_resources", {}).get("threads")),
-        time=config.get("peddy_create_ped", {}).get("time", config.get("default_resources", {}).get("time")),
+        mem_mb=config.get("peddy_create_ped", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("peddy_create_ped", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("peddy_create_ped", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("peddy_create_ped", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("peddy_create_ped", {}).get("time", config["default_resources"]["time"]),
     container:
-        config.get("peddy_create_ped", {}).get("container", config.get("default_container", ""))
+        config.get("peddy_create_ped", {}).get("container", config["default_container"])
     message:
         "{rule}: Create fam file for all samples for peddy input"
     script:
@@ -51,13 +51,13 @@ rule combine_peddy_results:
             config.get("combine_peddy_results", {}).get("benchmark_repeats", 1),
         )
     resources:
-        mem_mb=config.get("combine_peddy_results", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
-        mem_per_cpu=config.get("combine_peddy_results", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
-        partition=config.get("combine_peddy_results", {}).get("partition", config.get("default_resources", {}).get("partition")),
-        threads=config.get("combine_peddy_results", {}).get("threads", config.get("default_resources", {}).get("threads")),
-        time=config.get("combine_peddy_results", {}).get("time", config.get("default_resources", {}).get("time")),
+        mem_mb=config.get("combine_peddy_results", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("combine_peddy_results", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("combine_peddy_results", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("combine_peddy_results", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("combine_peddy_results", {}).get("time", config["default_resources"]["time"]),
     container:
-        config.get("combine_peddy_results", {}).get("container", config.get("default_container", ""))
+        config.get("combine_peddy_results", {}).get("container", config["default_container"])
     message:
         "{rule}: creates combined all.ped and qc/peddy/peddy.sex_check.csv for T samples for sex check"
     shell:
@@ -82,13 +82,13 @@ rule create_peddy_mqc_tsv:
             config.get("create_peddy_mqc_tsv", {}).get("benchmark_repeats", 1),
         )
     resources:
-        mem_mb=config.get("create_peddy_mqc_tsv", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
-        mem_per_cpu=config.get("create_peddy_mqc_tsv", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
-        partition=config.get("create_peddy_mqc_tsv", {}).get("partition", config.get("default_resources", {}).get("partition")),
-        threads=config.get("create_peddy_mqc_tsv", {}).get("threads", config.get("default_resources", {}).get("threads")),
-        time=config.get("create_peddy_mqc_tsv", {}).get("time", config.get("default_resources", {}).get("time")),
+        mem_mb=config.get("create_peddy_mqc_tsv", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+        mem_per_cpu=config.get("create_peddy_mqc_tsv", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
+        partition=config.get("create_peddy_mqc_tsv", {}).get("partition", config["default_resources"]["partition"]),
+        threads=config.get("create_peddy_mqc_tsv", {}).get("threads", config["default_resources"]["threads"]),
+        time=config.get("create_peddy_mqc_tsv", {}).get("time", config["default_resources"]["time"]),
     container:
-        config.get("create_peddy_mqc_tsv", {}).get("container", config.get("default_container", ""))
+        config.get("create_peddy_mqc_tsv", {}).get("container", config["default_container"])
     message:
         "{rule}: Create multiqc custom content embedded config tsv files from peddy sex_check and ped_check files"
     script:
