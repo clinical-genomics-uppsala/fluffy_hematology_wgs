@@ -39,7 +39,7 @@ multiqc_cgs:
     bbtools-stats_Percent_filtered_bbmstheader:
       title: "rRNA [%]"
       description: "Contamination estimate from BBduk"
-      format: "{:.2f}"
+      format: "{:.1f}"
 
 mosdepth_config:
   general_stats_coverage:
@@ -85,9 +85,9 @@ custom_table_header_config:
     multimapped:
       suffix: ""
       title: "Multimapped [M]"
-    rRNA_pct:
-      suffix: ""
-      title: "rRNA [%]"
+#   rRNA_pct:
+      #suffix: ""
+      #title: "rRNA [%]"
 
 # General stats column visibility
 table_columns_visible:
@@ -121,8 +121,8 @@ table_columns_visible:
     star-uniquely_mapped: False
     star-uniquely_mapped_percent: True
     star-multimapped: True
-  SortMeRNA:
-    rRNA_pct: True
+# SortMeRNA:
+    # rRNA_pct: True
   # Picard:
   #   PCT_PF_READS_ALIGNED: True
   "Picard: Mark Duplicates":
