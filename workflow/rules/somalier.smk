@@ -173,7 +173,7 @@ if aligner == "bwa_gpu":
         log:
             "qc/somalier/log/{sample}_{type}.cohort.log",
         params:
-            extract_folder=config.get("somalier_extract", {}).get("extract_folder", "qc/somalier/cohort/"),
+            extract_folder=lambda wildcards, output: os.path.dirname(output[0])
         benchmark:
             repeat(
                 "qc/somalier/log/{sample}_{type}.cohort.benchmark.tsv",
