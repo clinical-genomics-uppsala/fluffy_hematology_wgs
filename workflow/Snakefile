@@ -46,6 +46,7 @@ elif aligner == "bwa_gpu":
         ruleorder: copy_crai_t_and_n > misc_samtools_index
         ruleorder: parabricks_pbrun_fq2bam_recal > alignment_samtools_index
 
+
 elif aligner == "bwa_sentieon":
 
     ruleorder: sentieon_dedup > alignment_samtools_index
