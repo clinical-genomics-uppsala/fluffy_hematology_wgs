@@ -333,9 +333,10 @@ filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "
 
 # Load target genes for easy filtering in Excel
 target_genes = []
-if hasattr(snakemake.input, 'target_genes'):
-    target_genes = load_target_genes(snakemake.input.target_genes)
-
+target_genes_path = getattr(snakemake.params, "target_genes", "") or getattr(snakemake.input, "target_genes", "")
+if target_genes_path:
+    target_genes = load_target_genes(target_genes_path)
+    
 manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
 manta_tables_full = filter_maxdepth_by_support(manta_tables_full, 0.05)
 manta_tables_full["bnd"] = filter_complex_and_junk_bnd(manta_tables_full["bnd"], max_sites=4)

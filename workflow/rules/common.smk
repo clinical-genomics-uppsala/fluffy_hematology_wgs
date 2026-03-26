@@ -319,7 +319,7 @@ def generate_copy_rules(output_spec):
             @workflow.log("logs/{rule_name}_{output_file_name}.log")
             @workflow.container("{copy_container}")
             @workflow.resources(
-                time="{time}", threads={threads}, mem_mb="{mem_mb}",
+                time="{time}", threads={threads}, mem_mb={mem_mb},
                 mem_per_cpu={mem_per_cpu}, partition="{partition}"
             )
             @workflow.shellcmd("cp --preserve=timestamps -r {{input}} {{output}}")
@@ -355,7 +355,7 @@ def generate_copy_rules(output_spec):
 
     final_code_string = "\n\n".join(rulestrings).strip()
 
-    exec(compile(final_code_string, "copy_result_files", "exec"), workflow.globals)
+    exec(compile(final_code_string, generate_copy_rules.__code__.co_filename, "exec"), workflow.globals)
 
 
 generate_copy_rules(output_spec)

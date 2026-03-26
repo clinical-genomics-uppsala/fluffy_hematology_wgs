@@ -73,10 +73,10 @@ rule export_to_xlsx_manta:
         ),
         all_bed=config.get("bcftools_SV", {}).get("all", ""),
         aml_bed=config.get("bcftools_SV", {}).get("aml", ""),
-        target_genes=config.get("reference", {}).get("target_genes", ""),
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.manta.xlsx"),
     params:
+        target_genes=config.get("reference", {}).get("target_genes", ""),
         extra=config.get("export_to_xlsx_manta", {}).get("extra", ""),
     log:
         "export_to_xlsx/{analysis}/{sample}.manta.xlsx.log",
