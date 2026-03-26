@@ -229,6 +229,18 @@ arriba_draw_fusion:
   gtf: "/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.93.chr.gtf"
   protein_domains: "/data/ref_data/arriba/arriba_v2.3.0/database/protein_domains_hg38_GRCh38_v2.3.0.gff3"
 
+bbduk:
+  container: "docker://kincekara/bbduk:38.98"
+  fasta:
+    - "/data/ref_genomes/GRCh38/sortmerna/rfam-5.8s-database-id98.fasta"
+    - "/data/ref_genomes/GRCh38/sortmerna/rfam-5s-database-id98.fasta"
+    - "/data/ref_genomes/GRCh38/sortmerna/silva-bac-16s-id90.fasta"
+    - "/data/ref_genomes/GRCh38/sortmerna/silva-bac-23s-id98.fasta"
+    - "/data/ref_genomes/GRCh38/sortmerna/silva-euk-18s-id95.fasta"
+    - "/data/ref_genomes/GRCh38/sortmerna/silva-euk-28s-id98.fasta"
+  kmer: "31"
+  extra: "overwrite=t"
+
 bcftools_SNV:
   all: "/data/ref_genomes/GRCh38/gene_lists/all_snv_38.bed"
   aml: "/data/ref_genomes/GRCh38/gene_lists/aml_snv_38_2022-02-25.bed"
@@ -400,11 +412,11 @@ multiqc:
         - "qc/rseqc_inner_distance/{sample}_{type}.inner_distance.txt"
         - "qc/rseqc_inner_distance/{sample}_{type}.inner_distance_freq.txt"
         - "prealignment/fastp_pe/{sample}_{type}_{flowcell}_{lane}_{barcode}_fastp.json"
-        - "prealignment/sortmerna/{sample}_{type}.rrna.log"
         - "qc/multiqc/RNA_number.table.tsv"
         - "qc/picard_collect_alignment_summary_metrics/{sample}_{type}.alignment_summary_metrics.txt"
         - "fusions/star_fusion/{sample}_{type}/Log.final.out"
         - "fusions/star_fusion/{sample}_{type}/ReadsPerGene.out.tab"
+        - "prealignment/bbduk/{sample}_{type}.rrna.log"
 
 pbrun_fq2bam_recal:
   container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1"
