@@ -25,6 +25,11 @@ arriba_draw_fusion:
   gtf: "reference/assembly.gtf"
   protein_domains: "reference/proteindomain.gff3"
 
+bbduk:
+  fasta:
+    - "reference/id.fasta"
+  kmer: "31"
+
 bcftools_SNV:
   all: "reference/all.bed"
   aml: "reference/aml.bed"
