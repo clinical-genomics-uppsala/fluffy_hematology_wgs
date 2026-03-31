@@ -155,7 +155,7 @@ for sheet in subsections:
     cond_formula = "=LEFT($A" + str(i + 1) + ', 4)<>"PASS"'
     worksheet.conditional_format(table_area_data, {"type": "formula", "criteria": cond_formula, "format": format_orange})
 
-    worksheet.autofilter(table_area)
+    #worksheet.autofilter(table_area)
     worksheet.filter_column("A", "Filter != PASS")
     # worksheet.filter_column("I", "AF >= 0.05")
     for row_data in data_table["data"]:
@@ -207,7 +207,7 @@ worksheet.add_table(table_area, {"columns": pindel_table["headers"], "style": "T
 cond_formula = "=LEFT($A" + str(i + 1) + ', 4)<>"PASS"'
 worksheet.conditional_format(table_area_data, {"type": "formula", "criteria": cond_formula, "format": format_orange})
 
-worksheet.autofilter(table_area)
+#worksheet.autofilter(table_area)
 worksheet.filter_column("A", "Filter != PASS")
 for row_data in pindel_table["data"]:
     if row_data[0] == "PASS":
