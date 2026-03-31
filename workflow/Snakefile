@@ -64,6 +64,29 @@ rule all:
         unpack(compile_output_file_list),
 
 
+module alignment:
+    snakefile:
+        get_module_snakefile(
+            config,
+            "hydra-genetics/alignment",
+            path="workflow/Snakefile",
+            tag=config["modules"]["alignment"],
+        )
+    config:
+        config
+
+
+use rule star from alignment as alignment_star with:
+    output:
+        bam=temp("alignment/star/{sample}_{type}.bam"),
+        sj=temp("alignment/star/{sample}_{type}.SJ.out.tab"),
+        reads_per_gene=temp("alignment/star/{sample}_{type}.ReadsPerGene.out.tab"),
+        log_final=temp("alignment/star/{sample}_{type}.Log.final.out"),
+
+
+use rule samtools_index from alignment as alignment_samtools_index
+
+
 module annotation:
     snakefile:
         get_module_snakefile(
@@ -96,23 +119,6 @@ use rule vep from annotation as annotation_vep_snvs with:
         )
     message:
         "{rule}: Annotate {input.vcf} with vep"
-
-
-############################################
-# CNV / SV MODULE
-############################################
-
-
-module cnv_sv:
-    snakefile:
-        get_module_snakefile(
-            config,
-            "hydra-genetics/cnv_sv",
-            path="workflow/Snakefile",
-            tag=config["modules"]["cnv_sv"],
-        )
-    config:
-        config
 
 
 use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation_tn with:
@@ -151,9 +157,47 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
         "{rule}: Annotate {input.vcf}"
 
 
-############################################
-# SVDB filtering (common SV database)
-############################################
+use rule vep from annotation as annotation_vep_svdb_manta_tn with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz.tbi",
+        cache=config["vep"]["vep_cache"],
+        fasta=config["reference"]["fasta"],
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf"),
+    log:
+        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.log",
+    benchmark:
+        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.benchmark.tsv"
+
+
+use rule vep from annotation as annotation_vep_svdb_manta_t with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz.tbi",
+        cache=config["vep"]["vep_cache"],
+        fasta=config["reference"]["fasta"],
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf"),
+    log:
+        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.log",
+    benchmark:
+        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.benchmark.tsv"
+
+
+module cnv_sv:
+    snakefile:
+        get_module_snakefile(
+            config,
+            "hydra-genetics/cnv_sv",
+            path="workflow/Snakefile",
+            tag=config["modules"]["cnv_sv"],
+        )
+    config:
+        config
+
+
+use rule * from cnv_sv exclude cnvkit_call, cnvkit_scatter, gatk_denoise_read_counts, gatk_collect_allelic_counts as cnv_sv_*
 
 
 use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
@@ -184,60 +228,6 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
         db_string=config.get("svdb_query", {}).get("db_manta", ""),
         extra=config.get("svdb_query", {}).get("extra_manta", ""),
         prefix=lambda wildcards, output: output[0].replace("_query.vcf", ""),
-
-
-use rule vep from annotation as annotation_vep_svdb_manta_tn with:
-    input:
-        vcf="cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz",
-        tabix="cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz.tbi",
-        cache=config["vep"]["vep_cache"],
-        fasta=config["reference"]["fasta"],
-    output:
-        vcf=temp("cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf"),
-    log:
-        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.log",
-    benchmark:
-        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.benchmark.tsv"
-
-
-use rule vep from annotation as annotation_vep_svdb_manta_t with:
-    input:
-        vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz",
-        tabix="cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz.tbi",
-        cache=config["vep"]["vep_cache"],
-        fasta=config["reference"]["fasta"],
-    output:
-        vcf=temp("cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf"),
-    log:
-        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.log",
-    benchmark:
-        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.benchmark.tsv"
-
-
-module alignment:
-    snakefile:
-        get_module_snakefile(
-            config,
-            "hydra-genetics/alignment",
-            path="workflow/Snakefile",
-            tag=config["modules"]["alignment"],
-        )
-    config:
-        config
-
-
-use rule star from alignment as alignment_star with:
-    output:
-        bam=temp("alignment/star/{sample}_{type}.bam"),
-        sj=temp("alignment/star/{sample}_{type}.SJ.out.tab"),
-        reads_per_gene=temp("alignment/star/{sample}_{type}.ReadsPerGene.out.tab"),
-        log_final=temp("alignment/star/{sample}_{type}.Log.final.out"),
-
-
-use rule samtools_index from alignment as alignment_samtools_index
-
-
-use rule * from cnv_sv exclude cnvkit_call, cnvkit_scatter, gatk_denoise_read_counts, gatk_collect_allelic_counts as cnv_sv_*
 
 
 use rule cnvkit_batch from cnv_sv as cnv_sv_cnvkit_batch with:
@@ -467,6 +457,74 @@ use rule star_fusion from fusions as fusions_star_fusion with:
         rpg=temp("fusions/star_fusion/{sample}_{type}/ReadsPerGene.out.tab"),
 
 
+module misc:
+    snakefile:
+        get_module_snakefile(
+            config,
+            "hydra-genetics/misc",
+            path="workflow/Snakefile",
+            tag=config["modules"]["misc"],
+        )
+    config:
+        config
+
+
+use rule bgzip from misc as bgzip_mutect with:
+    wildcard_constraints:
+        file="parabricks/pbrun_mutectcaller_[A-Za-z0-9-_./]+.vcf",
+
+
+use rule bgzip from misc as bgzip_cnv with:
+    wildcard_constraints:
+        file=r"cnv_sv/(?!.*\.include\.(?:all|aml|tm)\.vcf$)[A-Za-z0-9-_./]+\.vcf",
+
+
+use rule tabix from misc as tabix_mutect with:
+    wildcard_constraints:
+        file="parabricks/pbrun_mutectcaller_[A-Za-z0-9-_./]+.vcf",
+
+
+use rule tabix from misc as tabix_cnv with:
+    wildcard_constraints:
+        file="cnv_sv/[A-Za-z0-9-_./]+.vcf",
+
+
+use rule bgzip from misc as decompress_manta with:
+    input:
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz",
+    output:
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf",
+    params:
+        extra="-d",
+    log:
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.log",
+    benchmark:
+        repeat(
+            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.benchmark.tsv",
+            config.get("bgzip", {}).get("benchmark_repeats", 1),
+        )
+    message:
+        "{rule}: decompress {input}"
+
+
+use rule samtools_index from misc as misc_samtools_index with:
+    input:
+        cram="{file}.crumble.cram",
+    output:
+        crai=temp("{file}.crumble.cram.crai"),
+    params:
+        extra=config.get("extra", {}).get("extra", ""),
+    log:
+        "{file}.crumble.cram.crai.log",
+    benchmark:
+        repeat(
+            "{file}.crumble.cram.crai.benchmark.tsv",
+            config.get("samtools_index", {}).get("benchmark_repeats", 1),
+        )
+    message:
+        "{rule}: Index {wildcards.file}.crumble.cram file"
+
+
 module parabricks:
     snakefile:
         get_module_snakefile(
@@ -484,21 +542,6 @@ use rule * from parabricks as parabricks_*
 
 use rule pbrun_fq2bam_recal from parabricks as parabricks_pbrun_fq2bam_recal with:
     priority: 5
-
-
-module sentieon:
-    snakefile:
-        get_module_snakefile(
-            config,
-            "hydra-genetics/sentieon",
-            path="workflow/Snakefile",
-            tag=config["modules"]["sentieon"],
-        )
-    config:
-        config
-
-
-use rule * from sentieon as sentieon_*
 
 
 module prealignment:
@@ -766,6 +809,21 @@ use rule cnv_html_report from reports as reports_cnv_html_report with:
         "reports/cnv_html_report/{sample}_{type}.{tc_method}.cnv_report.html.log",
 
 
+module sentieon:
+    snakefile:
+        get_module_snakefile(
+            config,
+            "hydra-genetics/sentieon",
+            path="workflow/Snakefile",
+            tag=config["modules"]["sentieon"],
+        )
+    config:
+        config
+
+
+use rule * from sentieon as sentieon_*
+
+
 module snv_indels:
     snakefile:
         get_module_snakefile(
@@ -806,71 +864,3 @@ use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
             "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.benchmark.tsv",
             config.get("vt_normalize", {}).get("benchmark_repeats", 1),
         )
-
-
-module misc:
-    snakefile:
-        get_module_snakefile(
-            config,
-            "hydra-genetics/misc",
-            path="workflow/Snakefile",
-            tag=config["modules"]["misc"],
-        )
-    config:
-        config
-
-
-use rule bgzip from misc as bgzip_mutect with:
-    wildcard_constraints:
-        file="parabricks/pbrun_mutectcaller_[A-Za-z0-9-_./]+.vcf",
-
-
-use rule bgzip from misc as bgzip_cnv with:
-    wildcard_constraints:
-        file=r"cnv_sv/(?!.*\.include\.(?:all|aml|tm)\.vcf$)[A-Za-z0-9-_./]+\.vcf",
-
-
-use rule tabix from misc as tabix_mutect with:
-    wildcard_constraints:
-        file="parabricks/pbrun_mutectcaller_[A-Za-z0-9-_./]+.vcf",
-
-
-use rule tabix from misc as tabix_cnv with:
-    wildcard_constraints:
-        file="cnv_sv/[A-Za-z0-9-_./]+.vcf",
-
-
-use rule bgzip from misc as decompress_manta with:
-    input:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz",
-    output:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf",
-    params:
-        extra="-d",
-    log:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.log",
-    benchmark:
-        repeat(
-            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.benchmark.tsv",
-            config.get("bgzip", {}).get("benchmark_repeats", 1),
-        )
-    message:
-        "{rule}: decompress {input}"
-
-
-use rule samtools_index from misc as misc_samtools_index with:
-    input:
-        cram="{file}.crumble.cram",
-    output:
-        crai=temp("{file}.crumble.cram.crai"),
-    params:
-        extra=config.get("extra", {}).get("extra", ""),
-    log:
-        "{file}.crumble.cram.crai.log",
-    benchmark:
-        repeat(
-            "{file}.crumble.cram.crai.benchmark.tsv",
-            config.get("samtools_index", {}).get("benchmark_repeats", 1),
-        )
-    message:
-        "{rule}: Index {wildcards.file}.crumble.cram file"
