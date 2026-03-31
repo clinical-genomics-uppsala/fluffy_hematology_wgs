@@ -167,7 +167,7 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
         "benchmarks/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.tsv"
     params:
         db_string=config.get("svdb_query", {}).get("db_manta", ""),
-        extra="--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC",
+        extra=config.get("svdb_query", {}).get("extra_manta", ""),
         prefix=lambda wildcards, output: output[0].replace("_query.vcf", ""),
 
 
@@ -182,7 +182,7 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
         "benchmarks/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.tsv"
     params:
         db_string=config.get("svdb_query", {}).get("db_manta", ""),
-        extra="--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC",
+        extra=config.get("svdb_query", {}).get("extra_manta", ""),
         prefix=lambda wildcards, output: output[0].replace("_query.vcf", ""),
 
 
@@ -287,7 +287,7 @@ if aligner == "bwa_gpu":
         input:
             bam="parabricks/pbrun_fq2bam_recal/{sample}_T.bam",
             bai="parabricks/pbrun_fq2bam_recal/{sample}_T.bam.bai",
-            interval=config.get("reference", {}).get("design_intervals_gatk_cnv", ""),
+            interval=config["reference"]["design_intervals_gatk_cnv"],
 
 
 use rule pindel_generate_config from cnv_sv as cnv_sv_pindel_generate_config with:
@@ -322,7 +322,7 @@ use rule pindel_call from cnv_sv as cnv_sv_pindel_call with:
         bai=lambda wildcards: get_bam_input(wildcards, t_n="T")[1],
         config="cnv_sv/pindel/{sample}_T.cfg",
         ref=config["reference"]["fasta"],
-        include_bed=config.get("pindel_call", {}).get("include_bed", []),
+        include_bed=config["pindel_call"]["include_bed"],
 
 
 module compression:
@@ -344,7 +344,7 @@ use rule samtools_view from compression as compression_samtools_view with:
     input:
         bam=lambda wildcards: get_bam_input(wildcards, t_n=None, use_sample_wildcard=False)[0],
         bai=lambda wildcards: get_bam_input(wildcards, t_n=None, use_sample_wildcard=False)[1],
-        ref=config.get("reference", {}).get("fasta", ""),
+        ref=config["reference"]["fasta"],
 
 
 module filtering:
@@ -543,7 +543,7 @@ use rule mosdepth from qc as qc_mosdepth with:
         region=temp("qc/mosdepth/{sample}_{type,T|N}.mosdepth.region.dist.txt"),
         summary=temp("qc/mosdepth/{sample}_{type,T|N}.mosdepth.summary.txt"),
     params:
-        by=config.get("mosdepth", {}).get("by", ""),
+        by=config["mosdepth"]["by"],
         extra=config.get("mosdepth", {}).get("extra", ""),
         thresholds=config.get("mosdepth", {}).get("thresholds", ""),
 
@@ -642,7 +642,7 @@ use rule peddy from qc as qc_peddy with:
         )
     params:
         prefix="qc/peddy/{sample}/",
-        extra=config.get("peddy", {}).get("extra", ""),
+        extra=config["peddy"]["extra"],
 
 
 use rule picard_collect_alignment_summary_metrics from qc as qc_picard_alignment_summary_metrics with:
@@ -706,7 +706,7 @@ use rule mosdepth_bed from qc as qc_mosdepth_bed_rna with:
     input:
         bam="alignment/star/{sample}_R.bam",
         bai="alignment/star/{sample}_R.bam.bai",
-        bed=config.get("mosdepth_bed", {}).get("design_bed", ""),
+        bed=config["mosdepth_bed"]["design_bed"],
 
 
 use rule rseqc_gene_body_coverage from qc as qc_rseqc_gene_body_coverage with:

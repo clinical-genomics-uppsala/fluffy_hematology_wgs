@@ -532,7 +532,7 @@ svdb_query:
   container: "docker://hydragenetics/svdb:2.6.0"
   db_string: "--db /data/ref_data/wp2/fluffy/svdb/230601_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
   db_manta: "--db /beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz,/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz"
-
+  extra_manta: "--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC"
 vep:
   container: "docker://hydragenetics/vep:111.0"
   vep_cache: "/data/ref_genomes/VEP/"

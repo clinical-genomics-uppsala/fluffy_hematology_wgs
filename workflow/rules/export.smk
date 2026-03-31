@@ -8,10 +8,10 @@ rule export_to_xlsx_snvs:
     input:
         vcfs=lambda wildcards: get_vcfs(wildcards),
         vcf_pindel="cnv_sv/pindel_vcf/{sample}_T.no_tc.vep_annotated.vcf",
-        all_bed=config.get("bcftools_SNV", {}).get("all", ""),
-        aml_bed=config.get("bcftools_SNV", {}).get("aml", ""),
+        all_bed=config["bcftools_SNV"]["all"],
+        aml_bed=config["bcftools_SNV"]["aml"],
+        pindel_bed=config["pindel_call"]["include_bed"],
         tm_bed=config.get("bcftools_SNV", {}).get("tm", ""),
-        pindel_bed=config.get("pindel_call", {}).get("include_bed", ""),
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.snvs.xlsx"),
     params:

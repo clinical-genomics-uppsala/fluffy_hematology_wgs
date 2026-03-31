@@ -178,7 +178,7 @@ def get_vcf_input(wildcards):
 
 
 def get_cnv_callers(tc_method):
-    for tcm in config.get("svdb_merge", {}).get("tc_method", []):
+    for tcm in config["svdb_merge"]["tc_method"]:
         if tcm["name"] == tc_method:
             return tcm["cnv_caller"]
     raise ValueError(f"no cnv caller config available for tc_method {tc_method}")
@@ -194,7 +194,7 @@ def get_tc(wildcards):
 
 def get_unfiltered_cnv_vcfs_for_merge_json(wildcards):
     cnv_vcfs = []
-    tags = config.get("cnv_html_report", {}).get("cnv_vcf", [])
+    tags = config["cnv_html_report"]["cnv_vcf"]
     for t in tags:
         cnv_vcfs.append(
             f"cnv_sv/svdb_query/{wildcards.sample}_{wildcards.type}.{wildcards.tc_method}.svdb_query."
