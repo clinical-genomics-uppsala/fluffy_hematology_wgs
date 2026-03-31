@@ -333,7 +333,7 @@ manta_N_total, manta_T_total = 0, 0
 with VariantFile(snakemake.input.manta) as vcf:
     for rec in vcf:
         if "manta_N_OCC" in rec.info and rec.info.get("manta_N_AF") > 0:
-            manta_N_total = int(round(rec.info["manta_N_OCC"] / rec.info["manta_N_AF"))
+            manta_N_total = int(round(rec.info["manta_N_OCC"] / rec.info["manta_N_AF"]))
             manta_T_total = int(round(rec.info["manta_T_OCC"] / rec.info["manta_T_AF"]))
             break
 
