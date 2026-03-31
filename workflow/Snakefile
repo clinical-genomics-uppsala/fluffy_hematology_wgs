@@ -16,6 +16,17 @@ include: "rules/peddy_create_ped.smk"
 include: "rules/somalier.smk"
 
 
+ruleorder: fix_af > filtering_filter_vcf
+ruleorder: gatk_model_segments > cnv_sv_gatk_model_segments
+ruleorder: filtering_bcftools_filter_include_region_snv_tn > bgzip_mutect
+ruleorder: filtering_bcftools_filter_include_region_snv_t > bgzip_mutect
+ruleorder: cnv_sv_manta_run_workflow_t > tabix_cnv
+ruleorder: cnv_sv_manta_run_workflow_tn > tabix_cnv
+ruleorder: filtering_bcftools_filter_include_region_sv > bgzip_cnv
+ruleorder: cnv_sv_svdb_query_manta_t > bgzip_cnv
+ruleorder: cnv_sv_svdb_query_manta_tn > bgzip_cnv
+
+
 wp = config.get("wp", None)
 
 if wp not in ["wp2", "wp3"]:
@@ -863,30 +874,3 @@ use rule samtools_index from misc as misc_samtools_index with:
         )
     message:
         "{rule}: Index {wildcards.file}.crumble.cram file"
-
-
-ruleorder: fix_af > filtering_filter_vcf
-
-
-ruleorder: gatk_model_segments > cnv_sv_gatk_model_segments
-
-
-ruleorder: filtering_bcftools_filter_include_region_snv_tn > bgzip_mutect
-
-
-ruleorder: filtering_bcftools_filter_include_region_snv_t > bgzip_mutect
-
-
-ruleorder: cnv_sv_manta_run_workflow_t > tabix_cnv
-
-
-ruleorder: cnv_sv_manta_run_workflow_tn > tabix_cnv
-
-
-ruleorder: filtering_bcftools_filter_include_region_sv > bgzip_cnv
-
-
-ruleorder: cnv_sv_svdb_query_manta_t > bgzip_cnv
-
-
-ruleorder: cnv_sv_svdb_query_manta_tn > bgzip_cnv
