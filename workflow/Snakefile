@@ -145,7 +145,7 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
         panel=config["simple_sv_annotation"]["panel"],
         fusion_pairs=config["simple_sv_annotation"]["fusion_pairs"],
     output:
-        vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf",
+        vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf"),
     log:
         "cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.log",
     benchmark:
@@ -431,15 +431,15 @@ use rule * from fusions as fusions_*
 
 use rule arriba from fusions as fusions_arriba with:
     output:
-        fusions="fusions/arriba/{sample}_{type}.fusions.tsv",
-        fusions_dis="fusions/arriba/{sample}_{type}.fusions.discarded.tsv",
+        fusions=temp("fusions/arriba/{sample}_{type}.fusions.tsv"),
+        fusions_dis=temp("fusions/arriba/{sample}_{type}.fusions.discarded.tsv"),
 
 
 use rule fusioncatcher from fusions as fusions_fusioncatcher with:
     priority: 4
     output:
-        fusions="fusions/fusioncatcher/{sample}_{type}/final-list_candidate-fusion-genes.txt",
-        fusions_summary="fusions/fusioncatcher/{sample}_{type}/summary_candidate_fusions.txt",
+        fusions=temp("fusions/fusioncatcher/{sample}_{type}/final-list_candidate-fusion-genes.txt"),
+        fusions_summary=temp("fusions/fusioncatcher/{sample}_{type}/summary_candidate_fusions.txt"),
     params:
         output_dir=lambda wildcards, output: os.path.dirname(output.fusions),
         extra=config.get("fusioncatcher", {}).get("extra", ""),
@@ -448,8 +448,8 @@ use rule fusioncatcher from fusions as fusions_fusioncatcher with:
 use rule star_fusion from fusions as fusions_star_fusion with:
     output:
         bam="fusions/star_fusion/{sample}_{type}/Aligned.out.bam",
-        fusions="fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.tsv",
-        fusions_abridged="fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.abridged.tsv",
+        fusions=temp("fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.tsv"),
+        fusions_abridged=temp("fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.abridged.tsv"),
         sj="fusions/star_fusion/{sample}_{type}/SJ.out.tab",
         log1=temp("fusions/star_fusion/{sample}_{type}/Log.final.out"),
         log2=temp("fusions/star_fusion/{sample}_{type}/Log.out"),
@@ -493,7 +493,7 @@ use rule bgzip from misc as decompress_manta with:
     input:
         "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz",
     output:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf",
+        temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf"),
     params:
         extra="-d",
     log:
@@ -671,7 +671,7 @@ use rule peddy from qc as qc_peddy with:
     output:
         ped=temp("qc/peddy/{sample}/peddy.peddy.ped"),
         ped_check=temp("qc/peddy/{sample}/peddy.ped_check.csv"),
-        sex_check="qc/peddy/{sample}/peddy.sex_check.csv",
+        sex_check=temp("qc/peddy/{sample}/peddy.sex_check.csv"),
         het_check=temp("qc/peddy/{sample}/peddy.het_check.csv"),
         ped_html=temp("qc/peddy/{sample}/peddy.html"),
         ped_vs_html=temp("qc/peddy/{sample}/peddy.vs.html"),
@@ -754,7 +754,7 @@ use rule mosdepth_bed from qc as qc_mosdepth_bed_rna with:
 
 use rule rseqc_gene_body_coverage from qc as qc_rseqc_gene_body_coverage with:
     output:
-        pdf="qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.curves.pdf",
+        pdf=temp("qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.curves.pdf"),
         rscrpt=temp("qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.r"),
         txt=temp("qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.txt"),
 
@@ -762,7 +762,7 @@ use rule rseqc_gene_body_coverage from qc as qc_rseqc_gene_body_coverage with:
 use rule rseqc_inner_distance from qc as qc_rseqc_inner_distance with:
     output:
         freq=temp("qc/rseqc_inner_distance/{sample}_{type}.inner_distance_freq.txt"),
-        plot="qc/rseqc_inner_distance/{sample}_{type}.inner_distance_plot.pdf",
+        plot=temp("qc/rseqc_inner_distance/{sample}_{type}.inner_distance_plot.pdf"),
         rscrpt=temp("qc/rseqc_inner_distance/{sample}_{type}.inner_distance_plot.r"),
         txt=temp("qc/rseqc_inner_distance/{sample}_{type}.inner_distance.txt"),
 
@@ -856,7 +856,7 @@ use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
         vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz",
         ref=config["reference"]["fasta"],
     output:
-        vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz",
+        vcf=temp("parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz"),
     log:
         "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.log",
     benchmark:
