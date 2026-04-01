@@ -8,7 +8,9 @@ reference:
   fai: "reference/reference.fasta.fai"
   fasta_rna: "reference/reference.fasta"
   genome_dir: "reference"
+  simple_repeats: "reference/simple.bed.gz"
   sites: "reference/sites.vcf.gz"
+  target_genes: "reference/target_genes.txt"
   wgs_intervals: "reference/wgs.interval_list"
 
 annotate_cnv:

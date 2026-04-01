@@ -7,7 +7,7 @@ __license__ = "GPL-3"
 rule merge_cnv_json_chr:
     input:
         json=get_json_for_merge_cnv_json_chr,
-        fai=config.get("reference", {}).get("fai", ""),
+        fai=config["reference"]["fai"],
         annotation_bed=list(config.get("annotate_cnv", {}).values()),
         germline_vcf="parabricks/pbrun_mutectcaller_t/{sample}_{type}.normalized.vep.filter.germline.fix_af.vcf",
         cnv_vcfs=get_unfiltered_cnv_vcfs_for_merge_json,
@@ -29,7 +29,7 @@ rule merge_cnv_json_chr:
             "reports/cnv_html_report/{sample}_{type}.{tc_method}.{locus}.merged.json.benchmark.tsv",
             config.get("merge_cnv_json", {}).get("benchmark_repeats", 1),
         )
-    threads: config.get("merge_cnv_json", {}).get("threads", config["default_resources"]["threads"])
+    threads: config.get("merge_cnv_json", {}).get("threads", config.get("default_resources", {}).get("threads"))
     resources:
         mem_mb=config.get("merge_cnv_json", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
         mem_per_cpu=config.get("merge_cnv_json", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),

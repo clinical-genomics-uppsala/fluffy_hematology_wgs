@@ -25,7 +25,7 @@ rule cnvkit_call_no_custom_purity:
         mem_per_cpu=config.get("cnvkit_call", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
         partition=config.get("cnvkit_call", {}).get("partition", config["default_resources"]["partition"]),
     container:
-        config.get("cnvkit_call", {}).get("container", config["default_container"])
+        config["cnvkit_call"]["container"]
     message:
         "{rule}: Call cnvs with loh info into cnv_sv/cnvkit_call/{wildcards.sample}_{wildcards.type}.loh.cns"
     shell:
@@ -59,7 +59,7 @@ rule cnvkit_scatter:
         mem_per_cpu=config.get("cnvkit_scatter", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
         partition=config.get("cnvkit_scatter", {}).get("partition", config["default_resources"]["partition"]),
     container:
-        config.get("cnvkit_scatter", {}).get("container", config["default_container"])
+        config["cnvkit_scatter"]["container"]
     message:
         "{rule}: Plot cnvs into cnv_sv/cnvkit_scatter/{wildcards.sample}_{wildcards.type}_{wildcards.locus}.png"
     shell:

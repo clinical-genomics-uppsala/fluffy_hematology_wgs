@@ -33,6 +33,7 @@ reference:
   fasta_rna: ""
   genome_dir: "" # req by align not used
   sites: ""
+  simple_repeats: ""
   wgs_intervals: ""
   skip_chrs:
     - chrM

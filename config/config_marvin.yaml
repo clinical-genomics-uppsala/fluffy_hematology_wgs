@@ -32,7 +32,9 @@ reference:
   dict: "/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.dict"
   genome_dir: "/data/ref_genomes/GRCh38/reference_grasnatter/homo_sapiens_star/" # req by align not used
   sites: "/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/Homo_sapiens_assembly38.known_indels.vcf.gz"
+  simple_repeats: "/beegfs-storage/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz"
   wgs_intervals: "/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/homo_sapiens.hg38.wgs.interval_list"
+  target_genes: "/beegfs-storage/data/ref_genomes/GRCh38/gene_lists/fluffy_genes.txt"
   skip_chrs:
     - chrM
     - chr1_KI270706v1_random
@@ -328,9 +330,11 @@ gatk_cnv_denoise_read_counts_by_sex:
 
 manta_config_t:
   container: "docker://hydragenetics/manta:1.6.0"
+  extra: "--callRegions /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz"
 
 manta_config_tn:
   container: "docker://hydragenetics/manta:1.6.0"
+  extra: "--callRegions /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz"
 
 manta_run_workflow_t:
   container: "docker://hydragenetics/manta:1.6.0"
@@ -527,7 +531,8 @@ svdb_merge:
 svdb_query:
   container: "docker://hydragenetics/svdb:2.6.0"
   db_string: "--db /data/ref_data/wp2/fluffy/svdb/230601_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
-
+  db_manta: "--db /beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz,/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz"
+  extra_manta: "--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC"
 vep:
   container: "docker://hydragenetics/vep:111.0"
   vep_cache: "/data/ref_genomes/VEP/"

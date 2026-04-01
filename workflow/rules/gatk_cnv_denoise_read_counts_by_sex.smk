@@ -13,7 +13,7 @@ if aligner == "bwa_gpu":
         input:
             bam="parabricks/pbrun_fq2bam_recal/{sample}_T.bam",
             bai="parabricks/pbrun_fq2bam_recal/{sample}_T.bam.bai",
-            interval=config.get("gatk_cnv_collect_allelic_counts", {}).get("SNP_interval", ""),
+            interval=config["gatk_cnv_collect_allelic_counts"]["SNP_interval"],
             ref=config["reference"]["fasta"],
         output:
             temp("cnv_sv/gatk_collect_allelic_counts/{sample}_{type}.clean.allelicCounts.tsv"),
@@ -36,7 +36,7 @@ if aligner == "bwa_gpu":
             ),
             partition=config.get("gatk_cnv_collect_allelic_counts", {}).get("partition", config["default_resources"]["partition"]),
         container:
-            config.get("gatk_cnv_collect_allelic_counts", {}).get("container", config["default_container"])
+            config["gatk_cnv_collect_allelic_counts"]["container"]
         message:
             "{rule}: Use gatk_cnv to obtain cnv_sv/gatk_collect_allelic_counts/{wildcards.sample}_{wildcards.type}.clean.allelicCounts.tsv"
         shell:
@@ -152,7 +152,7 @@ rule gatk_model_segments:
         mem_per_cpu=config.get("gatk_model_segments", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
         partition=config.get("gatk_model_segments", {}).get("partition", config["default_resources"]["partition"]),
     container:
-        config.get("gatk_model_segments", {}).get("container", config["default_container"])
+        config["gatk_model_segments"]["container"]
     message:
         "{rule}: Use gatk_cnv to obtain cnv_sv/gatk_model_segments/{wildcards.sample}_{wildcards.type}.clean.modelFinal.seg"
     shell:

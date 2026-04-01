@@ -104,7 +104,7 @@ worksheet_overview.write(7, 0, "Sheets:", format_bold)
 worksheet_overview.write_url(8, 0, "internal:'ALL'!A1", string="Variants in ALL genes")
 worksheet_overview.write_url(9, 0, "internal:'AML'!A1", string="Variants in AML genes")
 worksheet_overview.write_url(10, 0, "internal:'TM'!A1", string="Variants in TM exons")
-worksheet_overview.write_url(11, 0, "internal: 'Pindel'!A1", string="Variants found by pindel in FLT3 or UBTF")
+worksheet_overview.write_url(11, 0, "internal:'Pindel'!A1", string="Variants found by pindel in FLT3 or UBTF")
 worksheet_overview.write_url(12, 0, "internal:'ALL bedfile'!A1", string="Gene regions included in ALL bedfile")
 worksheet_overview.write_url(13, 0, "internal:'AML bedfile'!A1", string="Gene regions included in AML bedfile")
 worksheet_overview.write_url(14, 0, "internal:'TM bedfile'!A1", string="Gene regions included in TM bedfile")
@@ -155,7 +155,6 @@ for sheet in subsections:
     cond_formula = "=LEFT($A" + str(i + 1) + ', 4)<>"PASS"'
     worksheet.conditional_format(table_area_data, {"type": "formula", "criteria": cond_formula, "format": format_orange})
 
-    worksheet.autofilter(table_area)
     worksheet.filter_column("A", "Filter != PASS")
     # worksheet.filter_column("I", "AF >= 0.05")
     for row_data in data_table["data"]:
@@ -207,7 +206,6 @@ worksheet.add_table(table_area, {"columns": pindel_table["headers"], "style": "T
 cond_formula = "=LEFT($A" + str(i + 1) + ', 4)<>"PASS"'
 worksheet.conditional_format(table_area_data, {"type": "formula", "criteria": cond_formula, "format": format_orange})
 
-worksheet.autofilter(table_area)
 worksheet.filter_column("A", "Filter != PASS")
 for row_data in pindel_table["data"]:
     if row_data[0] == "PASS":
