@@ -141,7 +141,7 @@ files:
     output: "{sample}/DNA_fusions/{sample}_T.dux4_erg_read_count.txt"
     types: ["T"]
 
-    # SVs
+  # SVs
   
   - name: Manta T vcf svdb str
     input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.str_annotated.vcf.gz"
@@ -172,7 +172,7 @@ files:
     input: "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.str_annotated.include.aml.vcf.gz.tbi"
     output: "{sample}/SV/{sample}_manta_T.ssa.svdb_query.str_annotated.aml.vcf.gz.tbi"
     types: ["T"]
-  
+
   - name: Manta T xlsx
     input: "export_to_xlsx/t/{sample}.manta.xlsx"
     output: "{sample}/SV/{sample}_T.manta.xlsx"
