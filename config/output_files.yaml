@@ -226,44 +226,35 @@ files:
     types: ["TN"]
 
     # SVs
-  - name: Manta TN vcf
-    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.vcf.gz"
-    output: "{sample}/SV/{sample}_manta_TN.ssa.vcf.gz" 
-    types: ["TN"]
-
-  - name: Manta TN tbi
-    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.vcf.gz.tbi"
-    output: "{sample}/SV/{sample}_manta_TN.ssa.vcf.gz.tbi"
-    types: ["TN"]
 
   - name: Manta TN vcf svdb
-    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz"
-    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.vcf.gz"
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.str_annotated.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.str_annotated.vcf.gz"
     types: ["TN"]
 
   - name: Manta TN svdb tbi
-    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz.tbi"
-    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.vcf.gz.tbi"
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.str_annotated.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.str_annotated.vcf.gz.tbi"
     types: ["TN"]
 
   - name: Manta TN vcf ALL subsample
-    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.include.all.vcf.gz"
-    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.all.vcf.gz"
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.str_annotated.include.all.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.str_annotated.all.vcf.gz"
     types: ["TN"]
 
   - name: Manta TN tbi ALL subsample
-    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.include.all.vcf.gz.tbi"
-    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.all.vcf.gz.tbi"
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.str_annotated.include.all.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.str_annotated.all.vcf.gz.tbi"
     types: ["TN"]
 
   - name: Manta TN vcf AML subsample
-    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.include.aml.vcf.gz"
-    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.aml.vcf.gz"
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.str_annotated.include.aml.vcf.gz"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.str_annotated.aml.vcf.gz"
     types: ["TN"]
 
   - name: Manta TN tbi AML subsample
-    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.include.aml.vcf.gz.tbi"
-    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.aml.vcf.gz.tbi"
+    input: "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.str_annotated.include.aml.vcf.gz.tbi"
+    output: "{sample}/SV/{sample}_manta_TN.ssa.svdb_query.str_annotated.aml.vcf.gz.tbi"
     types: ["TN"]
 
   - name: Manta TN xlsx
