@@ -15,6 +15,10 @@ arriba:
   threads: 5
   time: "72:00:00"
 
+bbduk:
+  threads: 8
+  time: "1:00:00"
+
 crumble:
   mem_mb: 24576
   threads: 4

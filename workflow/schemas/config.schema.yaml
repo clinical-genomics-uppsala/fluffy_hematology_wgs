@@ -193,6 +193,26 @@ properties:
       - gtf
       - protein_domains
 
+  bbduk:
+    type: object
+    description: parameters for bbduk
+    properties:
+      container:
+        type: string
+        description: name or path to docker/singularity container
+      fasta:
+        type: array
+        description: list of paths to fasta files containing ribosomal rna sequences
+      kmer:
+        type: string
+        description: length of kmer for kmer matching
+      extra:
+        type: string
+        description: extra parameters to be forwarded
+    required:
+      - container
+      - fasta
+
   bcftools_SNV: 
     type: object
     description: parameters for bcftools_SNV

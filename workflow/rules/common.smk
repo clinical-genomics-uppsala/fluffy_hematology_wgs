@@ -152,6 +152,10 @@ def get_bam_input(wildcards, t_n=None, use_sample_wildcard=True):
     return (bam_input, bai_input)
 
 
+def get_bbduk_refs(wildcards: snakemake.io.Wildcards):
+    return ",".join(config.get("bbduk", {}).get("fasta", []))
+
+
 def get_num_gpus(rule, wildcards):
     gres = config.get(rule, {"gres": "--gres=gres:gpu:1"}).get("gres", "--gres=gres:gpu:1")[len("--gres=") :]
     gres_dict = dict()

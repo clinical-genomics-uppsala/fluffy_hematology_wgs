@@ -56,6 +56,13 @@ arriba_draw_fusion:
   gtf: ""
   protein_domains: ""
 
+bbduk: 
+  container: "docker://kincekara/bbduk:38.98"
+  fasta:
+    - ""
+  kmer: ""
+  extra: ""
+
 bcftools_SNV:
   all: ""
   aml: ""
