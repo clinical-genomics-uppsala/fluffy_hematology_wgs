@@ -8,7 +8,9 @@ reference:
   fai: "reference/reference.fasta.fai"
   fasta_rna: "reference/reference.fasta"
   genome_dir: "reference"
+  simple_repeats: "reference/simple.bed.gz"
   sites: "reference/sites.vcf.gz"
+  target_genes: "reference/target_genes.txt"
   wgs_intervals: "reference/wgs.interval_list"
 
 annotate_cnv:
@@ -24,6 +26,11 @@ arriba_draw_fusion:
   cytobands: "reference/cytobands.tsv"
   gtf: "reference/assembly.gtf"
   protein_domains: "reference/proteindomain.gff3"
+
+bbduk:
+  fasta:
+    - "reference/id.fasta"
+  kmer: "31"
 
 bcftools_SNV:
   all: "reference/all.bed"

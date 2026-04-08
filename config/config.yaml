@@ -33,6 +33,7 @@ reference:
   fasta_rna: ""
   genome_dir: "" # req by align not used
   sites: ""
+  simple_repeats: ""
   wgs_intervals: ""
   skip_chrs:
     - chrM
@@ -54,6 +55,13 @@ arriba_draw_fusion:
   cytobands: ""
   gtf: ""
   protein_domains: ""
+
+bbduk: 
+  container: "docker://kincekara/bbduk:38.98"
+  fasta:
+    - ""
+  kmer: ""
+  extra: ""
 
 bcftools_SNV:
   all: ""

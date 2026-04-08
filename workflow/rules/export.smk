@@ -4,33 +4,18 @@ __email__ = "arielle.munters@scilifelab.uu.se"
 __license__ = "GPL-3"
 
 
-def get_vcfs(wildcards):
-    if wildcards.analysis == "tn":
-        vcfs = expand(
-            "parabricks/pbrun_mutectcaller_{{analysis}}/{{sample}}.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz",
-            bed=["all", "aml", "tm"],
-        )
-    elif wildcards.analysis == "t":
-        vcfs = expand(
-            "parabricks/pbrun_mutectcaller_{{analysis}}/{{sample}}_T.normalized.vep.ratio.filter.somatic.include.{bed}.vcf.gz",
-            bed=["all", "aml", "tm"],
-        )
-    print(vcfs)
-    return vcfs
-
-
 rule export_to_xlsx_snvs:
     input:
         vcfs=lambda wildcards: get_vcfs(wildcards),
         vcf_pindel="cnv_sv/pindel_vcf/{sample}_T.no_tc.vep_annotated.vcf",
         all_bed=config["bcftools_SNV"]["all"],
         aml_bed=config["bcftools_SNV"]["aml"],
-        tm_bed=config["bcftools_SNV"]["tm"],
         pindel_bed=config["pindel_call"]["include_bed"],
+        tm_bed=config.get("bcftools_SNV", {}).get("tm", ""),
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.snvs.xlsx"),
     params:
-        filterfile=config["filter_vcf"]["somatic"],
+        filterfile=config.get("filter_vcf", {}).get("somatic", ""),
         extra=config.get("export_to_xlsx_snvs", {}).get("extra", ""),
     log:
         "export_to_xlsx/{analysis}/{sample}.snvs.xslx.log",
@@ -54,16 +39,44 @@ rule export_to_xlsx_snvs:
         "../scripts/export_to_xlsx_snvs.py"
 
 
+rule annotate_manta_str:
+    input:
+        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz",
+        bed=config.get("reference", {}).get("simple_repeats", ""),
+        tbi=config.get("reference", {}).get("simple_repeats", "") + ".tbi",
+    output:
+        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf",
+    log:
+        "logs/annotate_str/manta_{analysis}_{sample}.log",
+    resources:
+        partition=config.get("annotate_str", {}).get("partition", config.get("default_resources", {}).get("partition")),
+        time=config.get("annotate_str", {}).get("time", config.get("default_resources", {}).get("time")),
+        mem_mb=config.get("annotate_str", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
+        mem_per_cpu=config.get("annotate_str", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
+        threads=config.get("annotate_str", {}).get("threads", config.get("default_resources", {}).get("threads")),
+    container:
+        config.get("annotate_str", {}).get("container", config["default_container"])
+    script:
+        "../scripts/annotate_str.py"
+
+
 rule export_to_xlsx_manta:
     input:
-        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.vcf",
-        vcfs_bed=expand("cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.include.{bed}.vcf.gz", bed=["all", "aml"]),  #ska tm med?
-        tbi_vcfs_bed=expand("cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.include.{bed}.vcf.gz.tbi", bed=["all", "aml"]),
-        all_bed=config["bcftools_SV"]["all"],
-        aml_bed=config["bcftools_SV"]["aml"],
+        manta="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf",
+        vcfs_bed=expand(
+            "cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz",
+            bed=["all", "aml"],
+        ),
+        tbi_vcfs_bed=expand(
+            "cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz.tbi",
+            bed=["all", "aml"],
+        ),
+        all_bed=config.get("bcftools_SV", {}).get("all", ""),
+        aml_bed=config.get("bcftools_SV", {}).get("aml", ""),
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.manta.xlsx"),
     params:
+        target_genes=config.get("reference", {}).get("target_genes", ""),
         extra=config.get("export_to_xlsx_manta", {}).get("extra", ""),
     log:
         "export_to_xlsx/{analysis}/{sample}.manta.xlsx.log",
@@ -82,7 +95,7 @@ rule export_to_xlsx_manta:
     container:
         config.get("export_to_xlsx_manta", {}).get("container", config["default_container"])
     message:
-        "{rule}: merge {input.vcfs_bed} and {input.vcf} into {output.xlsx}"
+        "{rule}: merge {input.vcfs_bed} and {input.manta} into {output.xlsx}"
     script:
         "../scripts/export_to_xlsx_manta.py"
 

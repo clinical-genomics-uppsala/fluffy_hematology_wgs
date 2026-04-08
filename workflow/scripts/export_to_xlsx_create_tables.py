@@ -1,7 +1,8 @@
-#!/bin/python3
+#!/usr/bin/env python
 
 import gzip
 from pysam import VariantFile
+import re
 
 
 # VEP fields in list to get index
@@ -17,30 +18,53 @@ def index_vep(variantfile):
 def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
     return_dict = {}
     return_dict["filter_flag"] = ",".join(record.filter.keys())
+
+    # --- PINDEL AF FIX ---
+    return_dict["af"] = 0.0
     try:
         return_dict["af"] = float(record.samples[sample_tumor]["AF"][0])
-    except KeyError:
-        return_dict["af"] = int(record.samples[sample_tumor].get("AD")[1]) / sum(record.samples[sample_tumor].get("AD"))
+    except (KeyError, TypeError, IndexError):
+        ad = record.samples[sample_tumor].get("AD")
+        if ad and len(ad) >= 2 and sum(ad) > 0:
+            return_dict["af"] = float(ad[1]) / float(sum(ad))
 
     if sample_normal != "":
-        return_dict["n_af"] = float(record.samples[sample_normal]["AF"][0])
+        try:
+            return_dict["n_af"] = float(record.samples[sample_normal]["AF"][0])
+        except (KeyError, TypeError, IndexError):
+            ad_n = record.samples[sample_normal].get("AD")
+            if ad_n and len(ad_n) >= 2 and sum(ad_n) > 0:
+                return_dict["n_af"] = float(ad_n[1]) / float(sum(ad_n))
+            else:
+                return_dict["n_af"] = ""
     else:
         return_dict["n_af"] = ""
 
     try:
         return_dict["dp"] = int(record.samples[sample_tumor]["DP"])
-    except KeyError:
-        return_dict["dp"] = sum(record.samples[sample_tumor].get("AD"))
+    except (KeyError, TypeError):
+        ad = record.samples[sample_tumor].get("AD")
+        if ad:
+            return_dict["dp"] = sum(ad)
+        else:
+            return_dict["dp"] = 0
 
     if sample_normal != "":
-        return_dict["n_dp"] = int(record.samples[sample_normal]["DP"])
+        try:
+            return_dict["n_dp"] = int(record.samples[sample_normal]["DP"])
+        except (KeyError, TypeError):
+            ad_n = record.samples[sample_normal].get("AD")
+            if ad_n:
+                return_dict["n_dp"] = sum(ad_n)
+            else:
+                return_dict["n_dp"] = ""
     else:
         return_dict["n_dp"] = ""
 
     try:
         return_dict["svlen"] = int(record.info["SVLEN"])
     except KeyError:
-        pass
+        return_dict["svlen"] = ""
 
     try:
         csq = record.info["CSQ"][0].split("|")
@@ -81,7 +105,8 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
         return_dict["max_pop_af"] = csq[csq_index.index("MAX_AF")]
         return_dict["max_pops"] = csq[csq_index.index("MAX_AF_POPS")]
     else:
-        return_dict = dict.fromkeys(
+        # --- UPDATE FIX FÖR ATT BEHÅLLA AF ---
+        return_dict.update(dict.fromkeys(
             [
                 "gene",
                 "transcript",
@@ -96,7 +121,7 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
                 "max_pops",
             ],
             "",
-        )
+        ))
 
     return return_dict
 
@@ -155,6 +180,34 @@ def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, 
         return_dict["depth"] = record.info["BND_DEPTH"]
     except KeyError:
         return_dict["depth"] = ""
+
+    # -- Add manta_AF and STR % columns --
+    try:
+        n_occ_val = record.info.get("manta_N_OCC")
+        if n_occ_val is None:
+            return_dict["manta_n_occ"] = 0
+        else:
+            val = n_occ_val[0] if isinstance(n_occ_val, tuple) else n_occ_val
+            return_dict["manta_n_occ"] = int(val)
+    except (KeyError, ValueError, TypeError):
+        return_dict["manta_n_occ"] = 0
+
+    try:
+        t_occ_val = record.info.get("manta_T_OCC")
+        if t_occ_val is None:
+            return_dict["manta_t_occ"] = 0
+        else:
+            val = t_occ_val[0] if isinstance(t_occ_val, tuple) else t_occ_val
+            return_dict["manta_t_occ"] = int(val)
+    except (KeyError, ValueError, TypeError):
+        return_dict["manta_t_occ"] = 0
+
+    try:
+        str_val = record.info["STR_PERCENT"]
+        return_dict["str_percent"] = round(str_val[0] if isinstance(str_val, tuple) else str_val, 2)
+    except KeyError:
+        return_dict["str_percent"] = 0
+    # ----------------------------------------------------
 
     try:
         pr_values = record.samples[sample_tumor]["PR"]
@@ -344,6 +397,7 @@ def create_manta_tables(
         "SampleFT",
         "HomRef",
     ],
+    target_genes=None,
 ):
     vcf_file = VariantFile(vcf_input)
     sample_tumor = [x for x in list(vcf_file.header.samples) if x.endswith("_T")][0]
@@ -364,6 +418,7 @@ def create_manta_tables(
         "dup": {"data": [], "headers": []},
         "ins": {"data": [], "headers": []},
     }
+
     manta_tables["bnd"]["headers"] = [
         {"header": "Chr"},
         {"header": "Pos"},
@@ -373,6 +428,9 @@ def create_manta_tables(
         {"header": "Details"},
         {"header": "Depth"},
         {"header": "Annotation"},
+        {"header": "manta_N_OCC"},
+        {"header": "manta_T_OCC"},
+        {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
     ]
@@ -385,6 +443,9 @@ def create_manta_tables(
         {"header": "Genes"},
         {"header": "Details"},
         {"header": "Annotation"},
+        {"header": "manta_N_OCC"},
+        {"header": "manta_T_OCC"},
+        {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
     ]
@@ -399,6 +460,9 @@ def create_manta_tables(
         {"header": "Hom Length"},
         {"header": "Hom Sequence"},
         {"header": "Annotation"},
+        {"header": "manta_N_OCC"},
+        {"header": "manta_T_OCC"},
+        {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
     ]
@@ -414,29 +478,35 @@ def create_manta_tables(
         {"header": "Hom Length"},
         {"header": "Hom Sequence"},
         {"header": "Annotation"},
+        {"header": "manta_N_OCC"},
+        {"header": "manta_T_OCC"},
+        {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
     ]
+
     if sample_normal:
-        manta_tables["bnd"]["headers"] = manta_tables["bnd"]["headers"] + [
-            {"header": "Paired-read Normal Freq"},
-            {"header": "Spanning-read Normal Freq"},
-        ]
-        manta_tables["del"]["headers"] = manta_tables["del"]["headers"] + [
-            {"header": "Paired-read Normal Freq"},
-            {"header": "Spanning-read Normal Freq"},
-        ]
-        manta_tables["dup"]["headers"] = manta_tables["dup"]["headers"] + [
-            {"header": "Paired-read Normal Freq"},
-            {"header": "Spanning-read Normal Freq"},
-        ]
-        manta_tables["ins"]["headers"] = manta_tables["ins"]["headers"] + [
-            {"header": "Paired-read Normal Freq"},
-            {"header": "Spanning-read Normal Freq"},
-        ]
+        for sv_type in ["bnd", "del", "dup", "ins"]:
+            manta_tables[sv_type]["headers"] += [
+                {"header": "Paired-read Normal Freq"},
+                {"header": "Spanning-read Normal Freq"},
+            ]
+
+    gene_pattern = None
+    if target_genes:
+        pattern_str = '|'.join([re.escape(g) for g in target_genes])
+        gene_pattern = re.compile(rf'\b({pattern_str})\b', re.IGNORECASE)
+        for sv_type in ["bnd", "del", "dup", "ins"]:
+            manta_tables[sv_type]["headers"].append({"header": "In Target Panel"})
+
     for record in vcf_file.fetch():
         record_values = extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, sample_normal)
         if not any(x in avoid_filterflags for x in record_values["filt_ann"].split(",")):
+            in_target = []
+            if gene_pattern:
+                is_match = "Yes" if gene_pattern.search(record_values["genes"]) else "No"
+                in_target = [is_match]
+
             if "MantaBND" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -447,12 +517,18 @@ def create_manta_tables(
                     record_values["detail"],
                     record_values["depth"],
                     record_values["filt_ann"],
+                    record_values["manta_n_occ"],
+                    record_values["manta_t_occ"],
+                    record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
+
+                outline = outline + in_target
                 manta_tables["bnd"]["data"].append(outline)
+
             elif "MantaDEL" in record_values["id"] and record_values["svlength"] <= -100:
                 outline = [
                     str(record.contig),
@@ -463,12 +539,18 @@ def create_manta_tables(
                     record_values["genes"],
                     record_values["detail"],
                     record_values["filt_ann"],
+                    record_values["manta_n_occ"],
+                    record_values["manta_t_occ"],
+                    record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
+
+                outline = outline + in_target
                 manta_tables["del"]["data"].append(outline)
+
             elif "MantaDUP" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -481,12 +563,18 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
+                    record_values["manta_n_occ"],
+                    record_values["manta_t_occ"],
+                    record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
+
+                outline = outline + in_target
                 manta_tables["dup"]["data"].append(outline)
+
             elif "MantaINS" in record_values["id"]:
                 outline = [
                     str(record.contig),
@@ -500,10 +588,16 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
+                    record_values["manta_n_occ"],
+                    record_values["manta_t_occ"],
+                    record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
                 ]
                 if sample_normal:
                     outline = outline + [record_values["pr_freq_n"], record_values["sr_freq_n"]]
+
+                outline = outline + in_target
                 manta_tables["ins"]["data"].append(outline)
+
     return manta_tables

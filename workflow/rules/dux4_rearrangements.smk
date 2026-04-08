@@ -62,7 +62,7 @@ if aligner == "bwa_gpu":
             region=config.get("dux4_erg", {}).get("region", ""),
         threads: config.get("dux4_erg", {}).get("threads", config["default_resources"]["threads"])
         resources:
-            mem_mb=config.get("fdux4_erg", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
+            mem_mb=config.get("dux4_erg", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
             mem_per_cpu=config.get("dux4_erg", {}).get("mem_per_cpu", config["default_resources"]["mem_per_cpu"]),
             partition=config.get("dux4_erg", {}).get("partition", config["default_resources"]["partition"]),
             threads=config.get("dux4_erg", {}).get("threads", config["default_resources"]["threads"]),

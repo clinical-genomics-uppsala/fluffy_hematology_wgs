@@ -14,6 +14,7 @@ include: "rules/fix_af.smk"
 include: "rules/gatk_cnv_denoise_read_counts_by_sex.smk"
 include: "rules/peddy_create_ped.smk"
 include: "rules/somalier.smk"
+include: "rules/bbduk.smk"
 
 
 ruleorder: fix_af > filtering_filter_vcf
@@ -23,16 +24,8 @@ ruleorder: filtering_bcftools_filter_include_region_snv_t > bgzip_mutect
 ruleorder: cnv_sv_manta_run_workflow_t > tabix_cnv
 ruleorder: cnv_sv_manta_run_workflow_tn > tabix_cnv
 ruleorder: filtering_bcftools_filter_include_region_sv > bgzip_cnv
-
-
-wp = config.get("wp", None)
-
-if wp not in ["wp2", "wp3"]:
-    sys.exit("wp missing from config, valid options: wp2 or wp3")
-
-if wp == "wp2":
-
-    ruleorder: parabricks_pbrun_fq2bam_recal > alignment_samtools_index
+ruleorder: cnv_sv_svdb_query_manta_t > bgzip_cnv
+ruleorder: cnv_sv_svdb_query_manta_tn > bgzip_cnv
 
 
 aligner = config.get("aligner", None)
@@ -44,12 +37,17 @@ elif aligner == "bwa_gpu":
 
     include: "rules/sample_order_multiqc.smk"
 
-    ruleorder: parabricks_pbrun_fq2bam > alignment_samtools_index
     ruleorder: copy_rna_bai > alignment_samtools_index
+
+    wp = config.get("wp", None)
+
+    if wp not in ["wp2", "wp3"]:
+        sys.exit("wp missing from config, valid options: wp2 or wp3")
 
     if wp == "wp2":
 
         ruleorder: copy_crai_t_and_n > misc_samtools_index
+        ruleorder: parabricks_pbrun_fq2bam_recal > alignment_samtools_index
 
 elif aligner == "bwa_sentieon":
 
@@ -60,6 +58,29 @@ elif aligner == "bwa_sentieon":
 rule all:
     input:
         unpack(compile_output_file_list),
+
+
+module alignment:
+    snakefile:
+        get_module_snakefile(
+            config,
+            "hydra-genetics/alignment",
+            path="workflow/Snakefile",
+            tag=config["modules"]["alignment"],
+        )
+    config:
+        config
+
+
+use rule star from alignment as alignment_star with:
+    output:
+        bam=temp("alignment/star/{sample}_{type}.bam"),
+        sj=temp("alignment/star/{sample}_{type}.SJ.out.tab"),
+        reads_per_gene=temp("alignment/star/{sample}_{type}.ReadsPerGene.out.tab"),
+        log_final=temp("alignment/star/{sample}_{type}.Log.final.out"),
+
+
+use rule samtools_index from alignment as alignment_samtools_index
 
 
 module annotation:
@@ -120,7 +141,7 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
         panel=config["simple_sv_annotation"]["panel"],
         fusion_pairs=config["simple_sv_annotation"]["fusion_pairs"],
     output:
-        vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf",
+        vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf"),
     log:
         "cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.log",
     benchmark:
@@ -132,27 +153,32 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
         "{rule}: Annotate {input.vcf}"
 
 
-module alignment:
-    snakefile:
-        get_module_snakefile(
-            config,
-            "hydra-genetics/alignment",
-            path="workflow/Snakefile",
-            tag=config["modules"]["alignment"],
-        )
-    config:
-        config
-
-
-use rule star from alignment as alignment_star with:
+use rule vep from annotation as annotation_vep_svdb_manta_tn with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz.tbi",
+        cache=config["vep"]["vep_cache"],
+        fasta=config["reference"]["fasta"],
     output:
-        bam=temp("alignment/star/{sample}_{type}.bam"),
-        sj=temp("alignment/star/{sample}_{type}.SJ.out.tab"),
-        reads_per_gene=temp("alignment/star/{sample}_{type}.ReadsPerGene.out.tab"),
-        log_final=temp("alignment/star/{sample}_{type}.Log.final.out"),
+        vcf=temp("cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf"),
+    log:
+        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.log",
+    benchmark:
+        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.benchmark.tsv"
 
 
-use rule samtools_index from alignment as alignment_samtools_index
+use rule vep from annotation as annotation_vep_svdb_manta_t with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz.tbi",
+        cache=config["vep"]["vep_cache"],
+        fasta=config["reference"]["fasta"],
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf"),
+    log:
+        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.log",
+    benchmark:
+        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.benchmark.tsv"
 
 
 module cnv_sv:
@@ -168,6 +194,36 @@ module cnv_sv:
 
 
 use rule * from cnv_sv exclude cnvkit_call, cnvkit_scatter, gatk_denoise_read_counts, gatk_collect_allelic_counts as cnv_sv_*
+
+
+use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_tn/{sample}.ssa.vcf.gz",
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf"),
+    log:
+        "logs/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.log",
+    benchmark:
+        "benchmarks/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.tsv"
+    params:
+        db_string=config.get("svdb_query", {}).get("db_manta", ""),
+        extra=config.get("svdb_query", {}).get("extra_manta", ""),
+        prefix=lambda wildcards, output: output[0].replace("_query.vcf", ""),
+
+
+use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
+    input:
+        vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.gz",
+    output:
+        vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf"),
+    log:
+        "logs/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.log",
+    benchmark:
+        "benchmarks/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.tsv"
+    params:
+        db_string=config.get("svdb_query", {}).get("db_manta", ""),
+        extra=config.get("svdb_query", {}).get("extra_manta", ""),
+        prefix=lambda wildcards, output: output[0].replace("_query.vcf", ""),
 
 
 use rule cnvkit_batch from cnv_sv as cnv_sv_cnvkit_batch with:
@@ -217,7 +273,7 @@ if aligner == "bwa_gpu":
         input:
             bam="parabricks/pbrun_fq2bam_recal/{sample}_T.bam",
             bai="parabricks/pbrun_fq2bam_recal/{sample}_T.bam.bai",
-            interval=config.get("reference", {}).get("design_intervals_gatk_cnv", ""),
+            interval=config["reference"]["design_intervals_gatk_cnv"],
 
 
 use rule pindel_generate_config from cnv_sv as cnv_sv_pindel_generate_config with:
@@ -252,7 +308,7 @@ use rule pindel_call from cnv_sv as cnv_sv_pindel_call with:
         bai=lambda wildcards: get_bam_input(wildcards, t_n="T")[1],
         config="cnv_sv/pindel/{sample}_T.cfg",
         ref=config["reference"]["fasta"],
-        include_bed=config.get("pindel_call", {}).get("include_bed", []),
+        include_bed=config["pindel_call"]["include_bed"],
 
 
 module compression:
@@ -274,7 +330,7 @@ use rule samtools_view from compression as compression_samtools_view with:
     input:
         bam=lambda wildcards: get_bam_input(wildcards, t_n=None, use_sample_wildcard=False)[0],
         bai=lambda wildcards: get_bam_input(wildcards, t_n=None, use_sample_wildcard=False)[1],
-        ref=config.get("reference", {}).get("fasta", ""),
+        ref=config["reference"]["fasta"],
 
 
 module filtering:
@@ -336,18 +392,18 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
 
 use rule bcftools_filter_include_region from filtering as filtering_bcftools_filter_include_region_sv with:
     input:
-        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.vcf.gz",
-        tabix="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.vcf.gz.tbi",
+        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf.gz.tbi",
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.gz"),
+        vcf=temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz"),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SV"][wildcards.bed],
         extra=config.get("bcftools_SV", {}).get("extra", ""),
     log:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.gz.log",
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz.log",
     benchmark:
         repeat(
-            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.gz.benchmark.tsv",
+            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz.benchmark.tsv",
             config.get("bcftools_SV", {}).get("benchmark_repeats", 1),
         )
     message:
@@ -371,27 +427,98 @@ use rule * from fusions as fusions_*
 
 use rule arriba from fusions as fusions_arriba with:
     output:
-        fusions="fusions/arriba/{sample}_{type}.fusions.tsv",
-        fusions_dis="fusions/arriba/{sample}_{type}.fusions.discarded.tsv",
+        fusions=temp("fusions/arriba/{sample}_{type}.fusions.tsv"),
+        fusions_dis=temp("fusions/arriba/{sample}_{type}.fusions.discarded.tsv"),
 
 
 use rule fusioncatcher from fusions as fusions_fusioncatcher with:
     priority: 4
     output:
-        fusions="fusions/fusioncatcher/{sample}_{type}/final-list_candidate-fusion-genes.txt",
-        fusions_summary="fusions/fusioncatcher/{sample}_{type}/summary_candidate_fusions.txt",
+        fusions=temp("fusions/fusioncatcher/{sample}_{type}/final-list_candidate-fusion-genes.txt"),
+        fusions_summary=temp("fusions/fusioncatcher/{sample}_{type}/summary_candidate_fusions.txt"),
+    params:
+        output_dir=lambda wildcards, output: os.path.dirname(output.fusions),
+        extra=config.get("fusioncatcher", {}).get("extra", ""),
 
 
 use rule star_fusion from fusions as fusions_star_fusion with:
     output:
         bam="fusions/star_fusion/{sample}_{type}/Aligned.out.bam",
-        fusions="fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.tsv",
-        fusions_abridged="fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.abridged.tsv",
+        fusions=temp("fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.tsv"),
+        fusions_abridged=temp("fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.abridged.tsv"),
         sj="fusions/star_fusion/{sample}_{type}/SJ.out.tab",
         log1=temp("fusions/star_fusion/{sample}_{type}/Log.final.out"),
         log2=temp("fusions/star_fusion/{sample}_{type}/Log.out"),
         log3=temp("fusions/star_fusion/{sample}_{type}/Log.progress.out"),
         rpg=temp("fusions/star_fusion/{sample}_{type}/ReadsPerGene.out.tab"),
+
+
+module misc:
+    snakefile:
+        get_module_snakefile(
+            config,
+            "hydra-genetics/misc",
+            path="workflow/Snakefile",
+            tag=config["modules"]["misc"],
+        )
+    config:
+        config
+
+
+use rule bgzip from misc as bgzip_mutect with:
+    wildcard_constraints:
+        file="parabricks/pbrun_mutectcaller_[A-Za-z0-9-_./]+.vcf",
+
+
+use rule bgzip from misc as bgzip_cnv with:
+    wildcard_constraints:
+        file=r"cnv_sv/(?!.*\.include\.)[A-Za-z0-9-_./]+\.vcf",
+
+
+use rule tabix from misc as tabix_mutect with:
+    wildcard_constraints:
+        file="parabricks/pbrun_mutectcaller_[A-Za-z0-9-_./]+.vcf",
+
+
+use rule tabix from misc as tabix_cnv with:
+    wildcard_constraints:
+        file="cnv_sv/[A-Za-z0-9-_./]+.vcf",
+
+
+use rule bgzip from misc as decompress_manta with:
+    input:
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz",
+    output:
+        temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf"),
+    params:
+        extra="-d",
+    log:
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.log",
+    benchmark:
+        repeat(
+            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.benchmark.tsv",
+            config.get("bgzip", {}).get("benchmark_repeats", 1),
+        )
+    message:
+        "{rule}: decompress {input}"
+
+
+use rule samtools_index from misc as misc_samtools_index with:
+    input:
+        cram="{file}.crumble.cram",
+    output:
+        crai=temp("{file}.crumble.cram.crai"),
+    params:
+        extra=config.get("extra", {}).get("extra", ""),
+    log:
+        "{file}.crumble.cram.crai.log",
+    benchmark:
+        repeat(
+            "{file}.crumble.cram.crai.benchmark.tsv",
+            config.get("samtools_index", {}).get("benchmark_repeats", 1),
+        )
+    message:
+        "{rule}: Index {wildcards.file}.crumble.cram file"
 
 
 module parabricks:
@@ -413,21 +540,6 @@ use rule pbrun_fq2bam_recal from parabricks as parabricks_pbrun_fq2bam_recal wit
     priority: 5
 
 
-module sentieon:
-    snakefile:
-        get_module_snakefile(
-            config,
-            "hydra-genetics/sentieon",
-            path="workflow/Snakefile",
-            tag=config["modules"]["sentieon"],
-        )
-    config:
-        config
-
-
-use rule * from sentieon as sentieon_*
-
-
 module prealignment:
     snakefile:
         get_module_snakefile(
@@ -445,7 +557,12 @@ use rule * from prealignment as prealignment_*
 
 module qc:
     snakefile:
-        get_module_snakefile(config, "hydra-genetics/qc", path="workflow/Snakefile", tag=config["modules"]["qc"])
+        get_module_snakefile(
+            config,
+            "hydra-genetics/qc",
+            path="workflow/Snakefile",
+            tag=config["modules"]["qc"],
+        )
     config:
         config
 
@@ -465,7 +582,7 @@ use rule mosdepth from qc as qc_mosdepth with:
         region=temp("qc/mosdepth/{sample}_{type,T|N}.mosdepth.region.dist.txt"),
         summary=temp("qc/mosdepth/{sample}_{type,T|N}.mosdepth.summary.txt"),
     params:
-        by=config.get("mosdepth", {}).get("by", ""),
+        by=config["mosdepth"]["by"],
         extra=config.get("mosdepth", {}).get("extra", ""),
         thresholds=config.get("mosdepth", {}).get("thresholds", ""),
 
@@ -477,7 +594,13 @@ if aligner == "bwa_gpu":
             files=lambda wildcards: set(
                 [
                     file.format(
-                        sample=sample, type=u.type, lane=u.lane, flowcell=u.flowcell, barcode=u.barcode, read=read, ext=ext
+                        sample=sample,
+                        type=u.type,
+                        lane=u.lane,
+                        flowcell=u.flowcell,
+                        barcode=u.barcode,
+                        read=read,
+                        ext=ext,
                     )
                     for file in config["multiqc"]["reports"][wildcards.report]["qc_files"]
                     for sample in get_samples(samples)
@@ -507,7 +630,13 @@ if aligner == "bwa_sentieon":
             files=lambda wildcards: set(
                 [
                     file.format(
-                        sample=sample, type=u.type, lane=u.lane, flowcell=u.flowcell, barcode=u.barcode, read=read, ext=ext
+                        sample=sample,
+                        type=u.type,
+                        lane=u.lane,
+                        flowcell=u.flowcell,
+                        barcode=u.barcode,
+                        read=read,
+                        ext=ext,
                     )
                     for file in config["multiqc"]["reports"][wildcards.report]["qc_files"]
                     for sample in get_samples(samples)
@@ -538,7 +667,7 @@ use rule peddy from qc as qc_peddy with:
     output:
         ped=temp("qc/peddy/{sample}/peddy.peddy.ped"),
         ped_check=temp("qc/peddy/{sample}/peddy.ped_check.csv"),
-        sex_check="qc/peddy/{sample}/peddy.sex_check.csv",
+        sex_check=temp("qc/peddy/{sample}/peddy.sex_check.csv"),
         het_check=temp("qc/peddy/{sample}/peddy.het_check.csv"),
         ped_html=temp("qc/peddy/{sample}/peddy.html"),
         ped_vs_html=temp("qc/peddy/{sample}/peddy.vs.html"),
@@ -552,7 +681,7 @@ use rule peddy from qc as qc_peddy with:
         )
     params:
         prefix="qc/peddy/{sample}/",
-        extra=config.get("peddy", {}).get("extra", ""),
+        extra=config["peddy"]["extra"],
 
 
 use rule picard_collect_alignment_summary_metrics from qc as qc_picard_alignment_summary_metrics with:
@@ -616,12 +745,12 @@ use rule mosdepth_bed from qc as qc_mosdepth_bed_rna with:
     input:
         bam="alignment/star/{sample}_R.bam",
         bai="alignment/star/{sample}_R.bam.bai",
-        bed=config.get("mosdepth_bed", {}).get("design_bed", ""),
+        bed=config["mosdepth_bed"]["design_bed"],
 
 
 use rule rseqc_gene_body_coverage from qc as qc_rseqc_gene_body_coverage with:
     output:
-        pdf="qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.curves.pdf",
+        pdf=temp("qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.curves.pdf"),
         rscrpt=temp("qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.r"),
         txt=temp("qc/rseqc_gene_body_coverage/{sample}_{type}.geneBodyCoverage.txt"),
 
@@ -629,7 +758,7 @@ use rule rseqc_gene_body_coverage from qc as qc_rseqc_gene_body_coverage with:
 use rule rseqc_inner_distance from qc as qc_rseqc_inner_distance with:
     output:
         freq=temp("qc/rseqc_inner_distance/{sample}_{type}.inner_distance_freq.txt"),
-        plot="qc/rseqc_inner_distance/{sample}_{type}.inner_distance_plot.pdf",
+        plot=temp("qc/rseqc_inner_distance/{sample}_{type}.inner_distance_plot.pdf"),
         rscrpt=temp("qc/rseqc_inner_distance/{sample}_{type}.inner_distance_plot.r"),
         txt=temp("qc/rseqc_inner_distance/{sample}_{type}.inner_distance.txt"),
 
@@ -661,9 +790,7 @@ use rule merge_cnv_json from reports as reports_merge_cnv_json with:
         filtered_cnv_vcfs_tbi=get_filtered_cnv_vcfs_tbi_for_merge_json,
         cnv_vcfs_tbi=get_unfiltered_cnv_vcfs_tbi_for_merge_json,
         cytobands=config.get("merge_cnv_json", {}).get("cytobands", ""),
-        ref_genes=config.get("merge_cnv_json", {}).get(
-            "ref_genes", "/projects/wp1/nobackup/ngs/utveckling/Twist_DNA_DATA/juli/refGene_hg38.txt"
-        ),
+        ref_genes=config.get("merge_cnv_json", {}).get("ref_genes", ""),
 
 
 use rule cnv_html_report from reports as reports_cnv_html_report with:
@@ -676,6 +803,21 @@ use rule cnv_html_report from reports as reports_cnv_html_report with:
         wide_plot_width=config.get("cnv_html_report", {}).get("wide_plot_width", 2000),
     log:
         "reports/cnv_html_report/{sample}_{type}.{tc_method}.cnv_report.html.log",
+
+
+module sentieon:
+    snakefile:
+        get_module_snakefile(
+            config,
+            "hydra-genetics/sentieon",
+            path="workflow/Snakefile",
+            tag=config["modules"]["sentieon"],
+        )
+    config:
+        config
+
+
+use rule * from sentieon as sentieon_*
 
 
 module snv_indels:
@@ -710,7 +852,7 @@ use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
         vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.decomposed.vcf.gz",
         ref=config["reference"]["fasta"],
     output:
-        vcf="parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz",
+        vcf=temp("parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz"),
     log:
         "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.log",
     benchmark:
@@ -718,66 +860,3 @@ use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
             "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.benchmark.tsv",
             config.get("vt_normalize", {}).get("benchmark_repeats", 1),
         )
-
-
-module misc:
-    snakefile:
-        get_module_snakefile(config, "hydra-genetics/misc", path="workflow/Snakefile", tag=config["modules"]["misc"])
-    config:
-        config
-
-
-use rule bgzip from misc as bgzip_mutect with:
-    wildcard_constraints:
-        file="parabricks/pbrun_mutectcaller_[A-Za-z0-9-_./]+.vcf",
-
-
-use rule bgzip from misc as bgzip_cnv with:
-    wildcard_constraints:
-        file="cnv_sv/[A-Za-z0-9-_./]+.vcf",
-
-
-use rule tabix from misc as tabix_mutect with:
-    wildcard_constraints:
-        file="parabricks/pbrun_mutectcaller_[A-Za-z0-9-_./]+.vcf",
-
-
-use rule tabix from misc as tabix_cnv with:
-    wildcard_constraints:
-        file="cnv_sv/[A-Za-z0-9-_./]+.vcf",
-
-
-use rule bgzip from misc as decompress_manta with:
-    input:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.gz",
-    output:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf",
-    params:
-        extra="-d",
-    log:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.log",
-    benchmark:
-        repeat(
-            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.include.{bed}.vcf.benchmark.tsv",
-            config.get("bgzip", {}).get("benchmark_repeats", 1),
-        )
-    message:
-        "{rule}: decompress {input}"
-
-
-use rule samtools_index from misc as misc_samtools_index with:
-    input:
-        cram="{file}.crumble.cram",
-    output:
-        crai=temp("{file}.crumble.cram.crai"),
-    params:
-        extra=config.get("extra", {}).get("extra", ""),
-    log:
-        "{file}.crumble.cram.crai.log",
-    benchmark:
-        repeat(
-            "{file}.crumble.cram.crai.benchmark.tsv",
-            config.get("samtools_index", {}).get("benchmark_repeats", 1),
-        )
-    message:
-        "{rule}: Index {wildcards.file}.crumble.cram file"
