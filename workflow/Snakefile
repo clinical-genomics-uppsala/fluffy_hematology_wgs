@@ -392,18 +392,18 @@ use rule bcftools_filter_include_region from filtering as filtering_bcftools_fil
 
 use rule bcftools_filter_include_region from filtering as filtering_bcftools_filter_include_region_sv with:
     input:
-        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz",
-        tabix="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.vcf.gz.tbi",
+        vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf.gz",
+        tabix="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf.gz.tbi",
     output:
-        vcf=temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz"),
+        vcf=temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz"),
     params:
         filter=lambda wildcards: "-R %s" % config["bcftools_SV"][wildcards.bed],
         extra=config.get("bcftools_SV", {}).get("extra", ""),
     log:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz.log",
+        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz.log",
     benchmark:
         repeat(
-            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz.benchmark.tsv",
+            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz.benchmark.tsv",
             config.get("bcftools_SV", {}).get("benchmark_repeats", 1),
         )
     message:
@@ -472,7 +472,7 @@ use rule bgzip from misc as bgzip_mutect with:
 
 use rule bgzip from misc as bgzip_cnv with:
     wildcard_constraints:
-        file=r"cnv_sv/(?!.*\.include\.(?:all|aml|tm)\.vcf$)[A-Za-z0-9-_./]+\.vcf",
+        file=r"cnv_sv/(?!.*\.include\.)[A-Za-z0-9-_./]+\.vcf",
 
 
 use rule tabix from misc as tabix_mutect with:

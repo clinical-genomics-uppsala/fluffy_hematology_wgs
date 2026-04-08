@@ -64,11 +64,11 @@ rule export_to_xlsx_manta:
     input:
         manta="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf",
         vcfs_bed=expand(
-            "cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.include.{bed}.vcf.gz",
+            "cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz",
             bed=["all", "aml"],
         ),
         tbi_vcfs_bed=expand(
-            "cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.include.{bed}.vcf.gz.tbi",
+            "cnv_sv/manta_run_workflow_{{analysis}}/{{sample}}.ssa.svdb_query.str_annotated.include.{bed}.vcf.gz.tbi",
             bed=["all", "aml"],
         ),
         all_bed=config.get("bcftools_SV", {}).get("all", ""),
