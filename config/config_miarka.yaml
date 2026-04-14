@@ -15,7 +15,7 @@ modules:
   parabricks: "v1.2.1"
   prealignment: "v1.1.0"
   qc: "v0.3.0"
-  reports: "v1.0.3"
+  reports: "v1.1.1"
   snv_indels: "v0.6.0"
   misc: "v0.1.0"
   sentieon: "b002d39"
@@ -475,7 +475,7 @@ pindel2vcf:
   extra: "-is 5 -he 0.01 -e 3"
 
 rseqc_gene_body_coverage:
-  bed: "{{REFERENCE_DATA}}/fluffy/hg38_GENCODE.v38.bed"
+  bed: "{{REFERENCE_DATA}}/fluffy/hg38_GENCODE_V38.downsampled.bed"
   container: "{{APPTAINER_CACHE}}/rseqc_4.0.0.sif"
 
 rseqc_inner_distance:
