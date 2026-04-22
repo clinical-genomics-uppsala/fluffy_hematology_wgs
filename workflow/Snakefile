@@ -653,31 +653,6 @@ if aligner == "bwa_sentieon":
             use_input_files_only=config.get("multiqc", {}).get("use_input_files_only", True),
 
 
-use rule peddy from qc as qc_peddy with:
-    input:
-        vcf="parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vcf.gz",
-        ped="qc/peddy/{sample}.peddy.fam",
-        tbi="parabricks/pbrun_mutectcaller_t/{sample}_T.normalized.vcf.gz.tbi",
-    output:
-        ped=temp("qc/peddy/{sample}/peddy.peddy.ped"),
-        ped_check=temp("qc/peddy/{sample}/peddy.ped_check.csv"),
-        sex_check=temp("qc/peddy/{sample}/peddy.sex_check.csv"),
-        het_check=temp("qc/peddy/{sample}/peddy.het_check.csv"),
-        ped_html=temp("qc/peddy/{sample}/peddy.html"),
-        ped_vs_html=temp("qc/peddy/{sample}/peddy.vs.html"),
-        pca=temp("qc/peddy/{sample}/peddy.background_pca.json"),
-    log:
-        "qc/peddy/{sample}.output.log",
-    benchmark:
-        repeat(
-            "qc/peddy/{sample}.peddy.benchmark.tsv",
-            config.get("peddy", {}).get("benchmark_repeats", 1),
-        )
-    params:
-        prefix="qc/peddy/{sample}/",
-        extra=config["peddy"]["extra"],
-
-
 use rule picard_collect_alignment_summary_metrics from qc as qc_picard_alignment_summary_metrics with:
     input:
         bam=lambda wildcards: get_bam_input(wildcards)[0],
