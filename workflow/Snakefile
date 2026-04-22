@@ -425,12 +425,6 @@ module fusions:
 use rule * from fusions as fusions_*
 
 
-use rule arriba from fusions as fusions_arriba with:
-    output:
-        fusions=temp("fusions/arriba/{sample}_{type}.fusions.tsv"),
-        fusions_dis=temp("fusions/arriba/{sample}_{type}.fusions.discarded.tsv"),
-
-
 use rule fusioncatcher from fusions as fusions_fusioncatcher with:
     priority: 4
     output:
