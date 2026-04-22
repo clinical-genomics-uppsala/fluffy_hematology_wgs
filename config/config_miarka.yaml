@@ -11,7 +11,7 @@ modules:
   cnv_sv: "v0.4.1"
   compression: "v1.1.0"
   filtering: "v0.3.0"
-  fusions: "12f8354"
+  fusions: "v0.3.2"
   parabricks: "v1.2.1"
   prealignment: "v1.1.0"
   qc: "v0.3.0"
@@ -220,16 +220,16 @@ annotate_cnv:
 
 arriba:
   assembly: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
-  blacklist: "{{REFERENCE_DATA}}/fluffy/blacklist_hg38_GRCh38_v2.3.0.tsv.gz"
-  container: "{{APPTAINER_CACHE}}/arriba_2.3.0.sif"
-  extra: "-p {{REFERENCE_DATA}}/fluffy/protein_domains_hg38_GRCh38_v2.3.0.gff3 -k {{REFERENCE_DATA}}/fluffy/known_fusions_hg38_GRCh38_v2.3.0.tsv.gz"
-  gtf: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.93.chr.gtf"
+  blacklist: "{{REFERENCE_DATA}}/fluffy/blacklist_hg38_GRCh38_v2.5.1.tsv.gz"
+  container: "{{APPTAINER_CACHE}}/arriba_2.5.1.sif"
+  extra: "-p {{REFERENCE_DATA}}/fluffy/protein_domains_hg38_GRCh38_v2.5.1.gff3 -k {{REFERENCE_DATA}}/fluffy/known_fusions_hg38_GRCh38_v2.5.1.tsv.gz"
+  gtf: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.115.chr.gtf"
 
 arriba_draw_fusion:
-  container: "{{APPTAINER_CACHE}}/arriba_2.3.0.sif"
-  cytobands: "{{REFERENCE_DATA}}/fluffy/cytobands_hg38_GRCh38_v2.3.0.tsv"
-  gtf: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.93.chr.gtf"
-  protein_domains: "{{REFERENCE_DATA}}/fluffy/protein_domains_hg38_GRCh38_v2.3.0.gff3"
+  container: "{{APPTAINER_CACHE}}/arriba_2.5.1.sif"
+  cytobands: "{{REFERENCE_DATA}}/fluffy/cytobands_hg38_GRCh38_v2.5.1.tsv"
+  gtf: "{{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.115.chr.gtf"
+  protein_domains: "{{REFERENCE_DATA}}/fluffy/protein_domains_hg38_GRCh38_v2.5.1.gff3"
 
 bbduk:
   container: "docker://kincekara/bbduk:38.98"
@@ -519,8 +519,8 @@ spring:
 
 star:
   container: "{{APPTAINER_CACHE}}/star_2.7.10a.sif"
-  genome_index: "{{REFERENCE_DATA}}/fluffy/star_arriba/Homo_sapiens.GRCh38.dna.primary_assembly.star_reference"
-  extra: "--quantMode GeneCounts --sjdbGTFfile {{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.93.chr.gtf --outSAMtype BAM SortedByCoordinate --chimSegmentMin 10 --chimOutType WithinBAM SoftClip --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
+  genome_index: "{{REFERENCE_DATA}}/fluffy/star_arriba/Homo_sapiens.GRCh38.dna.115.star_reference"
+  extra: "--quantMode GeneCounts --sjdbGTFfile {{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.115.chr.gtf --outSAMtype BAM SortedByCoordinate --chimSegmentMin 10 --chimOutType WithinBAM SoftClip --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
 
 star_fusion:
   container: "{{APPTAINER_CACHE}}/starfusion_1.10.1.sif"

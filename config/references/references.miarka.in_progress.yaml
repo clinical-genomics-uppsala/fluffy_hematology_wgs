@@ -85,47 +85,47 @@ arriba:
     url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.dna.primary_assembly.fa
 
   blacklist: 
-    path: fluffy/blacklist_hg38_GRCh38_v2.3.0.tsv.gz
+    path: fluffy/blacklist_hg38_GRCh38_v2.5.1.tsv.gz
     checksum: 8c6899e83e7509ed6b745f17667bd93a
     type: file
-    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.3.0/database/blacklist_hg38_GRCh38_v2.3.0.tsv.gz
+    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.5.1/database/blacklist_hg38_GRCh38_v2.5.1.tsv.gz
 
   gff: 
-    path: fluffy/protein_domains_hg38_GRCh38_v2.3.0.gff3
+    path: fluffy/protein_domains_hg38_GRCh38_v2.5.1.gff3
     checksum: 43c387a784ebeed71b4147076cebf978
     type: file
-    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.3.0/database/protein_domains_hg38_GRCh38_v2.3.0.gff3
+    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.5.1/database/protein_domains_hg38_GRCh38_v2.5.1.gff3
 
   known_fusions: 
-    path: fluffy/known_fusions_hg38_GRCh38_v2.3.0.tsv.gz
+    path: fluffy/known_fusions_hg38_GRCh38_v2.5.1.tsv.gz
     checksum: 2d6975f9c9379085d67f44cf45eac15f
     type: file
-    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.3.0/database/known_fusions_hg38_GRCh38_v2.3.0.tsv.gz
+    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.5.1/database/known_fusions_hg38_GRCh38_v2.5.1.tsv.gz
 
   gtf: 
-    path: fluffy/Homo_sapiens.GRCh38.93.chr.gtf
-    checksum: 51c8827a515072ff96900a1fbe9563f6
+    path: fluffy/Homo_sapiens.GRCh38.115.chr.gtf
+    checksum: 9fb2031d651a758f26e9c74f554a55f1
     type: file
-    url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.93.chr.gtf
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.115.chr.gtf
 
 arriba_draw_fusion:
   cytobands: 
-    path: fluffy/cytobands_hg38_GRCh38_v2.3.0.tsv
+    path: fluffy/cytobands_hg38_GRCh38_v2.5.1.tsv
     checksum: 7bd504feefb33fcfc9be0517439a423c
     type: file
-    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.3.0/database/cytobands_hg38_GRCh38_v2.3.0.tsv
+    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.5.1/database/cytobands_hg38_GRCh38_v2.5.1.tsv
 
   gtf: 
-    path: fluffy/Homo_sapiens.GRCh38.93.chr.gtf
-    checksum: 51c8827a515072ff96900a1fbe9563f6
+    path: fluffy/Homo_sapiens.GRCh38.115.chr.gtf
+    checksum: 9fb2031d651a758f26e9c74f554a55f1
     type: file
-    url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.93.chr.gtf
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.115.chr.gtf
 
   protein_domains: 
-    path: fluffy/protein_domains_hg38_GRCh38_v2.3.0.gff3
+    path: fluffy/protein_domains_hg38_GRCh38_v2.5.1.gff3
     checksum: 43c387a784ebeed71b4147076cebf978
     type: file
-    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.3.0/database/protein_domains_hg38_GRCh38_v2.3.0.gff3
+    url: file:/beegfs-storage/data/ref_data/arriba/arriba_v2.5.1/database/protein_domains_hg38_GRCh38_v2.5.1.gff3
 
 bcftools_SNV:
   all: 
@@ -546,33 +546,32 @@ sortmerna:
 
 star:
   genome_index:
-    compressed_checksum: 91e1dc9d40114ffeccba9a70a94537e4
+    compressed_checksum: 3e62e8cfaeefcf7e5f6b2ab68233ac2d
     path: fluffy/star_arriba
     type: folder
-    url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/star_index_arriba.tar.gz
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/star_index_38.115.tar.gz
     content_checksum:
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/chrLength.txt: d57b2ed04655d661b860b177875421d9
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/chrNameLength.txt: 5bb25def58f5ab73e05711b51aee01df
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/chrName.txt: c93ac05176d615ddec18a1faac7ef355
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/chrStart.txt: a117b5f64c14c8349efd5a01b67f89ba
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/exonGeTrInfo.tab: e3196753164f34c658f11706475bbac0
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/exonInfo.tab: c4ccbbcb881928d0769a715fc9af6727
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/geneInfo.tab: f06b321f71e6e560633e4c8ae6aca512
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/Genome: 6665955d3ef373667a2331ec22bb4f07
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/genomeParameters.txt: 6e7c1164dc96d725bf1529e77752b0ed
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/Log.out: ec45986b9bdcfe3691ca75e6fbb39544
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/SA: b747106dfe23e18c744d6732b5560a93
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/SAindex: ce156b690dcf56bd4221d5dbceeaef93
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/sjdbInfo.txt: 1082ab459363b3f2f7aabcef0979c1ed
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/sjdbList.fromGTF.out.tab: d41d8cd98f00b204e9800998ecf8427e
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/sjdbList.out.tab: d41d8cd98f00b204e9800998ecf8427e
-      Homo_sapiens.GRCh38.dna.primary_assembly.star_reference/transcriptInfo.tab: 1e0ba953ec64016d5165c925332c3d71
+      Homo_sapiens.GRCh38.dna.115.star_reference/exonGeTrInfo.tab: 3fc6206be95cc90594f81b6ee075147b
+      Homo_sapiens.GRCh38.dna.115.star_reference/genomeParameters.txt: 9bcfd26f67868bfe99e28c76de9a95ca
+      Homo_sapiens.GRCh38.dna.115.star_reference/geneInfo.tab: 55adedd4d5b6e0a273c827156d77c383
+      Homo_sapiens.GRCh38.dna.115.star_reference/Genome: 2d3c7404843c77f59ae8131db5c56f02
+      Homo_sapiens.GRCh38.dna.115.star_reference/chrName.txt: c93ac05176d615ddec18a1faac7ef355
+      Homo_sapiens.GRCh38.dna.115.star_reference/chrStart.txt: a117b5f64c14c8349efd5a01b67f89ba
+      Homo_sapiens.GRCh38.dna.115.star_reference/chrNameLength.txt: 5bb25def58f5ab73e05711b51aee01df
+      Homo_sapiens.GRCh38.dna.115.star_reference/chrLength.txt: d57b2ed04655d661b860b177875421d9
+      Homo_sapiens.GRCh38.dna.115.star_reference/transcriptInfo.tab: 9d2a644b023a1fc9340dd4ddbbc5c6cd
+      Homo_sapiens.GRCh38.dna.115.star_reference/SA: 0eeddbde0ba69c19daea16d1dc22214c
+      Homo_sapiens.GRCh38.dna.115.star_reference/SAindex: 1eb54cf4f5ee5e6aea8b69fe828550b9
+      Homo_sapiens.GRCh38.dna.115.star_reference/sjdbList.fromGTF.out.tab: 2eb1f0700db6232b67fb1dffe94a322d
+      Homo_sapiens.GRCh38.dna.115.star_reference/exonInfo.tab: d18ea2d4dc5099d4de5c444fd4f4c6f9
+      Homo_sapiens.GRCh38.dna.115.star_reference/sjdbInfo.txt: ccc541fd5375da7cc89b7f3ee25020c0
+      Homo_sapiens.GRCh38.dna.115.star_reference/sjdbList.out.tab: 83a72a49a728288362ee8b481a849323
 
   gtf: 
-    path: fluffy/Homo_sapiens.GRCh38.93.chr.gtf
-    checksum: 51c8827a515072ff96900a1fbe9563f6
+    path: fluffy/Homo_sapiens.GRCh38.115.chr.gtf
+    checksum: 9fb2031d651a758f26e9c74f554a55f1
     type: file
-    url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.93.chr.gtf
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.115.chr.gtf
 
 star-fusion:
   genome_path:
