@@ -523,7 +523,7 @@ star:
   extra: "--quantMode GeneCounts --sjdbGTFfile {{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.115.chr.gtf --outSAMtype BAM SortedByCoordinate --chimSegmentMin 10 --chimOutType WithinBAM SoftClip --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
 
 star_fusion:
-  container: "{{APPTAINER_CACHE}}/starfusion_1.10.1.sif"
+  container: "{{APPTAINER_CACHE}}/starfusion_1.15.1.sif"
   extra: "--examine_coding_effect"
   genome_path: "{{REFERENCE_DATA}}/fluffy/star-fusion/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir"
 
