@@ -100,8 +100,8 @@ star:
   threads: 20
 
 star_fusion:
-  mem_mb: 49152
-  threads: 8
+  mem_mb: 122880
+  threads: 20
   time: "72:00:00"
 
 vep:

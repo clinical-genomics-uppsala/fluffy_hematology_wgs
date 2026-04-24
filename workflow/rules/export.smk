@@ -104,7 +104,7 @@ rule export_to_xlsx_rna_fusions:
     input:
         arriba="fusions/arriba/{sample}_R.fusions.tsv",
         fusioncatcher="fusions/fusioncatcher/{sample}_R/final-list_candidate-fusion-genes.txt",
-        star_fusion="fusions/star_fusion/{sample}_R/star-fusion.fusion_predictions.tsv",
+        star_fusion="fusions/star_fusion/{sample}_R/star-fusion.fusion_predictions.abridged.coding_effect.tsv",
         dux4_igh_counts="fusions/fusioncatcher/{sample}_R/dux4_counts.txt",
         dux4_igh_calls="fusions/fusioncatcher/{sample}_R/dux4_hits.txt",
     output:
