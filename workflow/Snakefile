@@ -440,7 +440,9 @@ use rule star_fusion from fusions as fusions_star_fusion with:
         bam="fusions/star_fusion/{sample}_{type}/Aligned.out.bam",
         fusions=temp("fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.tsv"),
         fusions_abridged=temp("fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.abridged.tsv"),
-        fusions_coding_effect=temp("fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.abridged.coding_effect.tsv"),
+        fusions_coding_effect=temp(
+            "fusions/star_fusion/{sample}_{type}/star-fusion.fusion_predictions.abridged.coding_effect.tsv"
+        ),
         sj="fusions/star_fusion/{sample}_{type}/SJ.out.tab",
         log1=temp("fusions/star_fusion/{sample}_{type}/Log.final.out"),
         log2=temp("fusions/star_fusion/{sample}_{type}/Log.out"),
