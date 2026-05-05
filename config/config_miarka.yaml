@@ -524,7 +524,7 @@ star:
 
 star_fusion:
   container: "{{APPTAINER_CACHE}}/starfusion_1.15.1.sif"
-  extra: "--examine_coding_effect"
+  extra: "--examine_coding_effect --min_FFPM 0"
   genome_path: "{{REFERENCE_DATA}}/fluffy/star-fusion/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir"
 
 svdb_merge:
