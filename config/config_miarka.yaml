@@ -232,14 +232,14 @@ arriba_draw_fusion:
   protein_domains: "{{REFERENCE_DATA}}/fluffy/protein_domains_hg38_GRCh38_v2.5.1.gff3"
 
 bbduk:
-  container: "docker://kincekara/bbduk:38.98"
+  container: "{{APPTAINER_CACHE}}/bbduk_38.98.sif"
   fasta:
-    - "/data/ref_genomes/GRCh38/sortmerna/rfam-5.8s-database-id98.fasta"
-    - "/data/ref_genomes/GRCh38/sortmerna/rfam-5s-database-id98.fasta"
-    - "/data/ref_genomes/GRCh38/sortmerna/silva-bac-16s-id90.fasta"
-    - "/data/ref_genomes/GRCh38/sortmerna/silva-bac-23s-id98.fasta"
-    - "/data/ref_genomes/GRCh38/sortmerna/silva-euk-18s-id95.fasta"
-    - "/data/ref_genomes/GRCh38/sortmerna/silva-euk-28s-id98.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/rfam-5.8s-database-id98.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/rfam-5s-database-id98.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/silva-bac-16s-id90.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/silva-bac-23s-id98.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/silva-euk-18s-id95.fasta"
+    - "{{REFERENCE_DATA}}/fluffy/sortmerna/sortmerna/silva-euk-28s-id98.fasta"
   kmer: "31"
   extra: "overwrite=t"
 
