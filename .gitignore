@@ -1,2 +1,3 @@
 .snakemake
 workflow/scripts/__pycache__
+CHANGELOG.md
