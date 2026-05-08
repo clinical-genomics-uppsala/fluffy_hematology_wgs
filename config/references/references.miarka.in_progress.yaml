@@ -64,12 +64,24 @@ reference:
     type: file
     url: file:/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/Homo_sapiens_assembly38.known_indels.vcf.gz
 
+  simple_repeats: 
+    path: fluffy/simple_repeats.merged.bed.gz
+    checksum: 96856e40c9dc025732c84d86669ea4f5
+    type: file
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz
+
   wgs_intervals: 
     path: fluffy/homo_sapiens.hg38.wgs.interval_list
     checksum: 3d7e610b5dba434a809827931293f2fe
     type: file
     url: file:/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/homo_sapiens.hg38.wgs.interval_list
 
+  target_genes:
+    path: fluffy/fluffy_genes.txt
+    checksum: c0bf88de70b0858b4804840f2f80713f
+    type: file
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/gene_lists/fluffy_genes.txt
+    
 annotate_cnv:
   cna_exons: 
     path: fluffy/hg38_CNA.bed
