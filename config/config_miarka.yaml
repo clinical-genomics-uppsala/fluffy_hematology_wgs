@@ -344,9 +344,11 @@ gatk_cnv_denoise_read_counts_by_sex:
 
 manta_config_t:
   container: "{{APPTAINER_CACHE}}/manta_1.6.0.sif"
-
+  extra: "--callRegions {{REFERENCE_DATA}}/fluffy/GRCh38_chromosomes.bed.gz"
+  
 manta_config_tn:
   container: "{{APPTAINER_CACHE}}/manta_1.6.0.sif"
+  extra: "--callRegions {{REFERENCE_DATA}}/fluffy/GRCh38_chromosomes.bed.gz"
 
 manta_run_workflow_t:
   container: "{{APPTAINER_CACHE}}/manta_1.6.0.sif"
@@ -540,7 +542,9 @@ svdb_merge:
 svdb_query:
   container: "{{APPTAINER_CACHE}}/svdb_2.6.0.sif"
   db_string: "--db {{REFERENCE_DATA}}/fluffy/230601_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
- 
+  db_manta: "--db /{{REFERENCE_DATA}}/fluffy/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz,{{REFERENCE_DATA}}/fluffy/manta_T_135.sorted.vcf.gz"
+  extra_manta: "--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC"
+
 vep:
   container: "{{APPTAINER_CACHE}}/vep_111.0.sif"
   vep_cache: "{{REFERENCE_DATA}}/fluffy/vep/"
