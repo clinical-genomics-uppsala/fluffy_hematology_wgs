@@ -70,6 +70,13 @@ reference:
     type: file
     url: file:/beegfs-storage/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz
 
+  simple_repeats_tbi: 
+    path: fluffy/simple_repeats.merged.bed.gz.tbi
+    checksum: 83fb0a93680a73ab75a70e09a4a6bd74
+    type: file
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz.tbi
+
+
   wgs_intervals: 
     path: fluffy/homo_sapiens.hg38.wgs.interval_list
     checksum: 3d7e610b5dba434a809827931293f2fe
