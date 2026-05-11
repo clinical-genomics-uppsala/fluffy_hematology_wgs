@@ -401,6 +401,19 @@ gatk_cnv_denoise_read_counts_by_sex:
     type: file
     url: file:/data/ref_genomes/GRCh38/gatk/gatk_cnv_panel_of_normal_male.20250926.hdf5
 
+manta_config_t:
+  call_region:
+    path: fluffy/GRCh38_chromosomes.bed.gz
+    checksum: 9f5c616f44f601bf7be983cc17ead95d 
+    type: file
+    url: file: /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz
+
+  call_region_tbi:
+    path: fluffy/GRCh38_chromosomes.bed.gz.tbi
+    checksum: 3b115d2350fe850cb051a6133ee3659a
+    type: file
+    url: file: /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz.tbi
+    
 merge_cnv_json:
   ref_genes:
     path: fluffy/cnv_report/refGene_hg38.txt
