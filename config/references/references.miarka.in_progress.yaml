@@ -682,7 +682,31 @@ svdb_query:
     checksum: 9b93aa73ad7c199b4cae1719eed8e146
     type: file
     url: file:/beegfs-storage/data/ref_data/wp2/fluffy/svdb/230601_svdb_cnv.vcf
- 
+
+  db1: 
+    path: fluffy/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz
+    checksum: c32d360b7b539bfc2a4fe5e47f0c9a19 
+    type: file
+    url: file:/beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz
+  
+  db1_tbi: 
+    path: fluffy/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz.tbi
+    checksum: 0a8b7c669c9a2aef4ad1bcbdd1f21512
+    type: file
+    url: file:/beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz.tbi
+
+  db2: 
+    path: fluffy/manta_T_135.sorted.vcf.gz
+    checksum: e0c83b2cd4c5054c26ef8039c913058a
+    type: file
+    url: file:/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz
+
+  db2_tbi: 
+    path: fluffy/manta_T_135.sorted.vcf.gz.tbi
+    checksum: 245267de93f84f7269dc1e91c1800a23
+    type: file
+    url: file:/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz.tbi
+
 vep:
   vep_cache:
     compressed_checksum: 226c6a80ec7cee833594cc1092877527 
