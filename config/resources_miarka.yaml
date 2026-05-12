@@ -53,6 +53,10 @@ manta_run_workflow_tn:
   mem_mb: 245760
   threads: 40
 
+merge_cnv_json: 
+  mem_mb: 24576
+  threads: 4
+  
 mosdepth:
   mem_mb: 24576
   threads: 4
