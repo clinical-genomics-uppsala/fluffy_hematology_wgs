@@ -25,6 +25,10 @@ bbduk:
   threads: 8
   time: "1:00:00"
 
+crumble:
+  mem_mb: 49152
+  threads: 8
+  
 fastp_pe:
   mem_mb: 49152
   threads: 8
