@@ -64,12 +64,31 @@ reference:
     type: file
     url: file:/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/Homo_sapiens_assembly38.known_indels.vcf.gz
 
+  simple_repeats: 
+    path: fluffy/simple_repeats.merged.bed.gz
+    checksum: 96856e40c9dc025732c84d86669ea4f5
+    type: file
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz
+
+  simple_repeats_tbi: 
+    path: fluffy/simple_repeats.merged.bed.gz.tbi
+    checksum: 83fb0a93680a73ab75a70e09a4a6bd74
+    type: file
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz.tbi
+
+
   wgs_intervals: 
     path: fluffy/homo_sapiens.hg38.wgs.interval_list
     checksum: 3d7e610b5dba434a809827931293f2fe
     type: file
     url: file:/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/homo_sapiens.hg38.wgs.interval_list
 
+  target_genes:
+    path: fluffy/fluffy_genes.txt
+    checksum: c0bf88de70b0858b4804840f2f80713f
+    type: file
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/gene_lists/fluffy_genes.txt
+    
 annotate_cnv:
   cna_exons: 
     path: fluffy/hg38_CNA.bed
@@ -382,6 +401,19 @@ gatk_cnv_denoise_read_counts_by_sex:
     type: file
     url: file:/data/ref_genomes/GRCh38/gatk/gatk_cnv_panel_of_normal_male.20250926.hdf5
 
+manta_config_t:
+  call_region:
+    path: fluffy/GRCh38_chromosomes.bed.gz
+    checksum: 9f5c616f44f601bf7be983cc17ead95d 
+    type: file
+    url: file: /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz
+
+  call_region_tbi:
+    path: fluffy/GRCh38_chromosomes.bed.gz.tbi
+    checksum: 3b115d2350fe850cb051a6133ee3659a
+    type: file
+    url: file: /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz.tbi
+    
 merge_cnv_json:
   ref_genes:
     path: fluffy/cnv_report/refGene_hg38.txt
@@ -650,7 +682,31 @@ svdb_query:
     checksum: 9b93aa73ad7c199b4cae1719eed8e146
     type: file
     url: file:/beegfs-storage/data/ref_data/wp2/fluffy/svdb/230601_svdb_cnv.vcf
- 
+
+  db1: 
+    path: fluffy/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz
+    checksum: c32d360b7b539bfc2a4fe5e47f0c9a19 
+    type: file
+    url: file:/beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz
+  
+  db1_tbi: 
+    path: fluffy/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz.tbi
+    checksum: 0a8b7c669c9a2aef4ad1bcbdd1f21512
+    type: file
+    url: file:/beegfs-storage/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz.tbi
+
+  db2: 
+    path: fluffy/manta_T_135.sorted.vcf.gz
+    checksum: e0c83b2cd4c5054c26ef8039c913058a
+    type: file
+    url: file:/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz
+
+  db2_tbi: 
+    path: fluffy/manta_T_135.sorted.vcf.gz.tbi
+    checksum: 245267de93f84f7269dc1e91c1800a23
+    type: file
+    url: file:/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz.tbi
+
 vep:
   vep_cache:
     compressed_checksum: 226c6a80ec7cee833594cc1092877527 

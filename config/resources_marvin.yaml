@@ -16,6 +16,7 @@ arriba:
   time: "72:00:00"
 
 bbduk:
+  mem_mb: 49152
   threads: 8
   time: "1:00:00"
 
