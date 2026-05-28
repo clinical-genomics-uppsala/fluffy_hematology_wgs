@@ -139,13 +139,15 @@ def get_bam_input(wildcards, t_n=None, use_sample_wildcard=True):
 
     aligner = config.get("aligner", None)
     if aligner is None:
-        sys.exit("aligner missing from config, valid options: bwa_gpu or bwa_sentieon")
+        sys.exit("aligner missing from config, valid options: bwa, bwa_gpu or bwa_sentieon")
     elif aligner == "bwa_gpu":
         bam_input = "parabricks/pbrun_fq2bam_recal/{}.bam".format(sample_str)
     elif aligner == "bwa_sentieon":
         bam_input = "sentieon/realign/{}_REALIGNED.bam".format(sample_str)
+    elif aligner == "bwa":
+        bam_input = "alignment/samtools_merge_bam/{}.bam".format(sample_str)
     else:
-        sys.exit("valid options for aligner are: bwa_gpu or bwa_sentieon")
+        sys.exit("valid options for aligner are: bwa, bwa_gpu or bwa_sentieon")
 
     bai_input = "{}.bai".format(bam_input)
 
@@ -168,15 +170,19 @@ def get_num_gpus(rule, wildcards):
 def get_vcf_input(wildcards):
     aligner = config.get("aligner", None)
     if aligner is None:
-        sys.exit("aligner missing from config, valid options: bwa_gpu or bwa_sentieon")
+        sys.exit("aligner missing from config, valid options: bwa, bwa_gpu or bwa_sentieon")
     elif aligner == "bwa_gpu":
         vcf_input = "parabricks/pbrun_mutectcaller_t/{}_{}.normalized.vep.filter.germline.vcf".format(
             wildcards.sample, wildcards.type
         )
     elif aligner == "bwa_sentieon":
         vcf_input = "sentieon/tnscope/{}_TNscope_tn_ML.vcf".format(wildcards.sample)
+    elif aligner == "bwa":
+        vcf_input = "snv_indels/vt_normalize/{}_{}.normalized.vep.filter.germline.vcf".format(
+            wildcards.sample, wildcards.type
+        )
     else:
-        sys.exit("valid options for aligner are: bwa_gpu or bwa_sentieon")
+        sys.exit("valid options for aligner are: bwa, bwa_gpu or bwa_sentieon")
 
     return vcf_input
 

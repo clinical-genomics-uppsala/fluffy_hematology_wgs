@@ -1,9 +1,9 @@
-resources: "{{FLUFFY_HOME}}/config/resources.yaml"
+resources: "{{resources}}"
 samples: "samples.tsv"
 units: "units.tsv"
 output: "{{FLUFFY_HOME}}/config/output_files.yaml"
 
-aligner: "bwa_gpu" # bwa_gpu or bwa_sentieon
+aligner: "bwa_gpu" # bwa, bwa_gpu or bwa_sentieon
 
 modules:
   alignment: "906d25d0d4791eb5a54cba9954fddf29e27b85dd"
@@ -11,78 +11,251 @@ modules:
   cnv_sv: "v0.4.1"
   compression: "v1.1.0"
   filtering: "v0.3.0"
-  fusions: "12f8354"
+  fusions: "v0.3.2"
   parabricks: "v1.2.1"
   prealignment: "v1.1.0"
   qc: "v0.3.0"
-  reports: "d6e56ed"
+  reports: "v1.1.1"
   snv_indels: "v0.6.0"
   misc: "v0.1.0"
   sentieon: "b002d39"
 
 general_report: "{{FLUFFY_HOME}}/config/general_report_dummy.yaml"
 
-default_container: "docker://hydragenetics/common:1.8.1"
+default_container: "{{HYDRAGENETICS_PREFIX}}/common{{CONTAINER_SUFFIX}}1.8.1{{CONTAINER_EXT}}"
 
 reference:
-  design_bed: ""
-  design_intervals: "" #hsmetrics
-  design_intervals_gatk_cnv: ""
-  fai: ""
-  fasta: ""
-  fasta_rna: ""
-  genome_dir: "" # req by align not used
-  sites: ""
-  simple_repeats: ""
-  wgs_intervals: ""
+  design_bed: "{{ref_design_bed}}"
+  design_intervals: "{{ref_design_intervals}}"
+  design_intervals_gatk_cnv: "{{ref_design_intervals_gatk_cnv}}"
+  fai: "{{ref_fai}}"
+  fasta: "{{ref_fasta}}"
+  fasta_rna: "{{ref_fasta_rna}}"
+  dict: "{{ref_dict}}"
+  genome_dir: "{{ref_genome_dir}}"
+  sites: "{{ref_sites}}"
+  simple_repeats: "{{ref_simple_repeats}}"
+  wgs_intervals: "{{ref_wgs_intervals}}"
+  target_genes: "{{ref_target_genes}}"
   skip_chrs:
     - chrM
+    - chr1_KI270706v1_random
+    - chr1_KI270707v1_random
+    - chr1_KI270708v1_random
+    - chr1_KI270709v1_random
+    - chr1_KI270710v1_random
+    - chr1_KI270711v1_random
+    - chr1_KI270712v1_random
+    - chr1_KI270713v1_random
+    - chr1_KI270714v1_random
+    - chr2_KI270715v1_random
+    - chr2_KI270716v1_random
+    - chr3_GL000221v1_random
+    - chr4_GL000008v2_random
+    - chr5_GL000208v1_random
+    - chr9_KI270717v1_random
+    - chr9_KI270718v1_random
+    - chr9_KI270719v1_random
+    - chr9_KI270720v1_random
+    - chr11_KI270721v1_random
+    - chr14_GL000009v2_random
+    - chr14_GL000225v1_random
+    - chr14_KI270722v1_random
+    - chr14_GL000194v1_random
+    - chr14_KI270723v1_random
+    - chr14_KI270724v1_random
+    - chr14_KI270725v1_random
+    - chr14_KI270726v1_random
+    - chr15_KI270727v1_random
+    - chr16_KI270728v1_random
+    - chr17_GL000205v2_random
+    - chr17_KI270729v1_random
+    - chr17_KI270730v1_random
+    - chr22_KI270731v1_random
+    - chr22_KI270732v1_random
+    - chr22_KI270733v1_random
+    - chr22_KI270734v1_random
+    - chr22_KI270735v1_random
+    - chr22_KI270736v1_random
+    - chr22_KI270737v1_random
+    - chr22_KI270738v1_random
+    - chr22_KI270739v1_random
+    - chrY_KI270740v1_random
+    - chrUn_KI270302v1
+    - chrUn_KI270304v1
+    - chrUn_KI270303v1
+    - chrUn_KI270305v1
+    - chrUn_KI270322v1
+    - chrUn_KI270320v1
+    - chrUn_KI270310v1
+    - chrUn_KI270316v1
+    - chrUn_KI270315v1
+    - chrUn_KI270312v1
+    - chrUn_KI270311v1
+    - chrUn_KI270317v1
+    - chrUn_KI270412v1
+    - chrUn_KI270411v1
+    - chrUn_KI270414v1
+    - chrUn_KI270419v1
+    - chrUn_KI270418v1
+    - chrUn_KI270420v1
+    - chrUn_KI270424v1
+    - chrUn_KI270417v1
+    - chrUn_KI270422v1
+    - chrUn_KI270423v1
+    - chrUn_KI270425v1
+    - chrUn_KI270429v1
+    - chrUn_KI270442v1
+    - chrUn_KI270466v1
+    - chrUn_KI270465v1
+    - chrUn_KI270467v1
+    - chrUn_KI270435v1
+    - chrUn_KI270438v1
+    - chrUn_KI270468v1
+    - chrUn_KI270510v1
+    - chrUn_KI270509v1
+    - chrUn_KI270518v1
+    - chrUn_KI270508v1
+    - chrUn_KI270516v1
+    - chrUn_KI270512v1
+    - chrUn_KI270519v1
+    - chrUn_KI270522v1
+    - chrUn_KI270511v1
+    - chrUn_KI270515v1
+    - chrUn_KI270507v1
+    - chrUn_KI270517v1
+    - chrUn_KI270529v1
+    - chrUn_KI270528v1
+    - chrUn_KI270530v1
+    - chrUn_KI270539v1
+    - chrUn_KI270538v1
+    - chrUn_KI270544v1
+    - chrUn_KI270548v1
+    - chrUn_KI270583v1
+    - chrUn_KI270587v1
+    - chrUn_KI270580v1
+    - chrUn_KI270581v1
+    - chrUn_KI270579v1
+    - chrUn_KI270589v1
+    - chrUn_KI270590v1
+    - chrUn_KI270584v1
+    - chrUn_KI270582v1
+    - chrUn_KI270588v1
+    - chrUn_KI270593v1
+    - chrUn_KI270591v1
+    - chrUn_KI270330v1
+    - chrUn_KI270329v1
+    - chrUn_KI270334v1
+    - chrUn_KI270333v1
+    - chrUn_KI270335v1
+    - chrUn_KI270338v1
+    - chrUn_KI270340v1
+    - chrUn_KI270336v1
+    - chrUn_KI270337v1
+    - chrUn_KI270363v1
+    - chrUn_KI270364v1
+    - chrUn_KI270362v1
+    - chrUn_KI270366v1
+    - chrUn_KI270378v1
+    - chrUn_KI270379v1
+    - chrUn_KI270389v1
+    - chrUn_KI270390v1
+    - chrUn_KI270387v1
+    - chrUn_KI270395v1
+    - chrUn_KI270396v1
+    - chrUn_KI270388v1
+    - chrUn_KI270394v1
+    - chrUn_KI270386v1
+    - chrUn_KI270391v1
+    - chrUn_KI270383v1
+    - chrUn_KI270393v1
+    - chrUn_KI270384v1
+    - chrUn_KI270392v1
+    - chrUn_KI270381v1
+    - chrUn_KI270385v1
+    - chrUn_KI270382v1
+    - chrUn_KI270376v1
+    - chrUn_KI270374v1
+    - chrUn_KI270372v1
+    - chrUn_KI270373v1
+    - chrUn_KI270375v1
+    - chrUn_KI270371v1
+    - chrUn_KI270448v1
+    - chrUn_KI270521v1
+    - chrUn_GL000195v1
+    - chrUn_GL000219v1
+    - chrUn_GL000220v1
+    - chrUn_GL000224v1
+    - chrUn_KI270741v1
+    - chrUn_GL000226v1
+    - chrUn_GL000213v1
+    - chrUn_KI270743v1
+    - chrUn_KI270744v1
+    - chrUn_KI270745v1
+    - chrUn_KI270746v1
+    - chrUn_KI270747v1
+    - chrUn_KI270748v1
+    - chrUn_KI270749v1
+    - chrUn_KI270750v1
+    - chrUn_KI270751v1
+    - chrUn_KI270752v1
+    - chrUn_KI270753v1
+    - chrUn_KI270754v1
+    - chrUn_KI270755v1
+    - chrUn_KI270756v1
+    - chrUn_KI270757v1
+    - chrUn_GL000214v1
+    - chrUn_KI270742v1
+    - chrUn_GL000216v2
+    - chrUn_GL000218v1
+    - chrEBV
 
 trimmer_software: "fastp_pe"
 
+wp: "wp2"
+
 annotate_cnv:
-  cna_exons: "" 
+  cna_exons: "{{ref_cna_exons}}"
 
 arriba:
-  assembly: ""
-  blacklist: ""
-  container: "docker://hydragenetics/arriba:2.3.0"
-  extra: "-p "
-  gtf: ""
+  assembly: "{{ref_arriba_assembly}}"
+  blacklist: "{{ref_arriba_blacklist}}"
+  container: "{{HYDRAGENETICS_PREFIX}}/arriba{{CONTAINER_SUFFIX}}2.5.1{{CONTAINER_EXT}}"
+  extra: "{{ref_arriba_extra}}"
+  gtf: "{{ref_arriba_gtf}}"
 
 arriba_draw_fusion:
-  container: "docker://hydragenetics/arriba:2.3.0"
-  cytobands: ""
-  gtf: ""
-  protein_domains: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/arriba{{CONTAINER_SUFFIX}}2.5.1{{CONTAINER_EXT}}"
+  cytobands: "{{ref_arriba_draw_cytobands}}"
+  gtf: "{{ref_arriba_draw_gtf}}"
+  protein_domains: "{{ref_arriba_draw_protein_domains}}"
 
-bbduk: 
-  container: "docker://kincekara/bbduk:38.98"
-  fasta:
-    - ""
-  kmer: ""
-  extra: ""
+bbduk:
+  container: "{{KINCEKARA_PREFIX}}/bbduk{{CONTAINER_SUFFIX}}38.98{{CONTAINER_EXT}}"
+  fasta: "{{ref_sortmerna_fasta}}"
+  kmer: "31"
+  extra: "overwrite=t"
 
 bcftools_SNV:
-  all: ""
-  aml: ""
-  tm: "" 
+  all: "{{ref_bcftools_snv_all}}"
+  aml: "{{ref_bcftools_snv_aml}}"
+  tm: "{{ref_bcftools_snv_tm}}"
 
 bcftools_SV:
-  all: ""
-  aml: ""
+  all: "{{ref_bcftools_sv_all}}"
+  aml: "{{ref_bcftools_sv_aml}}"
 
 cnvkit_batch:
-  container: "docker://hydragenetics/cnvkit:0.9.9"
+  container: "{{HYDRAGENETICS_PREFIX}}/cnvkit{{CONTAINER_SUFFIX}}0.9.9{{CONTAINER_EXT}}"
   method: "wgs"
-  normal_reference: ""
+  normal_reference: "{{ref_cnvkit_pon}}"
   extra: "--drop-low-coverage "
 
 cnvkit_call:
-  container: "docker://hydragenetics/cnvkit:0.9.9"
+  container: "{{HYDRAGENETICS_PREFIX}}/cnvkit{{CONTAINER_SUFFIX}}0.9.9{{CONTAINER_EXT}}"
 
 cnvkit_diagram:
-  container: "docker://hydragenetics/cnvkit:0.9.9"
+  container: "{{HYDRAGENETICS_PREFIX}}/cnvkit{{CONTAINER_SUFFIX}}0.9.9{{CONTAINER_EXT}}"
 
 cnv_html_report:
   show_table: true
@@ -94,21 +267,30 @@ cnv_html_report:
   wide_plot_width: 2500
 
 cnvkit_scatter:
-  container: "docker://hydragenetics/cnvkit:0.9.9"
+  container: "{{HYDRAGENETICS_PREFIX}}/cnvkit{{CONTAINER_SUFFIX}}0.9.9{{CONTAINER_EXT}}"
   extra: "-c {locus} --y-min -5 --y-max 5"
-  cna: 
+  cna:
     "chr4": "DUX4"
+    "chr5": "EBF1"
+    "chr7": "IKZF1"
+    "chr9": "CDKN2A,CDKN2B,PAX5"
+    "chr11": "KMT2A"
+    "chr12": "BTG1,ETV6,ZNF384"
+    "chr13": "RB1"
+    "chr17": "TP53"
+    "chr21": "ERG,RUNX1"
+    "chrX": "CRLF2,CSF2RA,IL3RA,P2RY8"
 
 cnvkit_scatter_whole:
-  container: "docker://hydragenetics/cnvkit:0.9.9"
+  container: "{{HYDRAGENETICS_PREFIX}}/cnvkit{{CONTAINER_SUFFIX}}0.9.9{{CONTAINER_EXT}}"
   extra: "--y-min -5 --y-max 5"
 
 cnvkit_table:
-  bedfile: ""
-  cyto_coordinates: ""
+  bedfile: "{{ref_cnvkit_table_bed}}"
+  cyto_coordinates: "{{ref_cnvkit_table_cyto}}"
 
 crumble:
-  container: "docker://hydragenetics/crumble:0.8.3"
+  container: "{{HYDRAGENETICS_PREFIX}}/crumble{{CONTAINER_SUFFIX}}0.8.3{{CONTAINER_EXT}}"
   extra: "-O CRAM"
 
 dux4_igh:
@@ -118,10 +300,10 @@ dux4_erg:
   region: "chr21:38380027-38498442"
 
 fastp_pe:
-  container: "docker://hydragenetics/fastp:0.20.1"
+  container: "{{HYDRAGENETICS_PREFIX}}/fastp{{CONTAINER_SUFFIX}}0.20.1{{CONTAINER_EXT}}"
 
 fastqc:
-  container: "docker://hydragenetics/fastqc:0.11.9"
+  container: "{{HYDRAGENETICS_PREFIX}}/fastqc{{CONTAINER_SUFFIX}}0.11.9{{CONTAINER_EXT}}"
 
 filter_vcf:
   sample_name_regex: "^([A-Za-z0-9-]+_[RT])$"
@@ -130,55 +312,57 @@ filter_vcf:
   somatic: "{{FLUFFY_HOME}}/config/config_snv_softfilter.yaml"
 
 fusioncatcher:
-  container: "docker://hydragenetics/fusioncatcher:1.33"
-  genome_path: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/fusioncatcher{{CONTAINER_SUFFIX}}1.33{{CONTAINER_EXT}}"
+  genome_path: "{{ref_fusioncatcher_path}}"
 
 gatk_call_copy_ratio_segments:
-  container: "docker://hydragenetics/gatk4:4.2.2.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/gatk4{{CONTAINER_SUFFIX}}4.2.2.0{{CONTAINER_EXT}}"
 
 gatk_cnv_collect_allelic_counts:
-  container: "docker://hydragenetics/gatk4:4.2.2.0"
-  SNP_interval: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/gatk4{{CONTAINER_SUFFIX}}4.2.2.0{{CONTAINER_EXT}}"
+  SNP_interval: "{{ref_gatk_snp_interval}}"
 
 gatk_collect_read_counts:
-  container: "docker://hydragenetics/gatk4:4.2.2.0"
-  
+  container: "{{HYDRAGENETICS_PREFIX}}/gatk4{{CONTAINER_SUFFIX}}4.2.2.0{{CONTAINER_EXT}}"
+
 gatk_model_segments:
-  container: "docker://hydragenetics/gatk4:4.2.2.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/gatk4{{CONTAINER_SUFFIX}}4.2.2.0{{CONTAINER_EXT}}"
 
 gatk_cnv_denoise_read_counts_by_sex:
-  container: "docker://hydragenetics/gatk4:4.2.2.0"
-  pon_female: ""
-  pon_male: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/gatk4{{CONTAINER_SUFFIX}}4.2.2.0{{CONTAINER_EXT}}"
+  pon_female: "{{ref_gatk_pon_female}}"
+  pon_male: "{{ref_gatk_pon_male}}"
 
 manta_config_t:
-  container: "docker://hydragenetics/manta:1.6.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/manta{{CONTAINER_SUFFIX}}1.6.0{{CONTAINER_EXT}}"
+  extra: "--callRegions {{REFERENCE_DATA}}/fluffy/GRCh38_chromosomes.bed.gz"
 
 manta_config_tn:
-  container: "docker://hydragenetics/manta:1.6.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/manta{{CONTAINER_SUFFIX}}1.6.0{{CONTAINER_EXT}}"
+  extra: "--callRegions {{REFERENCE_DATA}}/fluffy/GRCh38_chromosomes.bed.gz"
 
 manta_run_workflow_t:
-  container: "docker://hydragenetics/manta:1.6.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/manta{{CONTAINER_SUFFIX}}1.6.0{{CONTAINER_EXT}}"
 
 manta_run_workflow_tn:
-  container: "docker://hydragenetics/manta:1.6.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/manta{{CONTAINER_SUFFIX}}1.6.0{{CONTAINER_EXT}}"
 
 merge_cnv_json:
   cytobands: "{{FLUFFY_HOME}}/config/cytoBand.hg38.txt"
-  ref_genes: "reference/hg38.refGene.gtf"
+  ref_genes: "{{ref_merge_cnv_ref_genes}}"
 
 mosdepth:
   by: "500"
-  container: "docker://hydragenetics/mosdepth:0.3.2"
+  container: "{{HYDRAGENETICS_PREFIX}}/mosdepth{{CONTAINER_SUFFIX}}0.3.2{{CONTAINER_EXT}}"
   extra: "--fast-mode --no-per-base --mapq 20 "
   thresholds: "1,5,10,15,20,30,50"
 
 mosdepth_bed:
-  container: "docker://hydragenetics/mosdepth:0.3.2"
-  design_bed: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/mosdepth{{CONTAINER_SUFFIX}}0.3.2{{CONTAINER_EXT}}"
+  design_bed: "{{ref_mosdepth_design_bed}}"
 
 multiqc:
-  container: "docker://hydragenetics/multiqc:1.21"
+  container: "{{HYDRAGENETICS_PREFIX}}/multiqc{{CONTAINER_SUFFIX}}1.25.1{{CONTAINER_EXT}}"
   reports:
     DNA:
       config: "{{FLUFFY_HOME}}/config/multiqc_dna_config.yaml"
@@ -225,40 +409,41 @@ multiqc:
         - "qc/rseqc_inner_distance/{sample}_{type}.inner_distance.txt"
         - "qc/rseqc_inner_distance/{sample}_{type}.inner_distance_freq.txt"
         - "prealignment/fastp_pe/{sample}_{type}_{flowcell}_{lane}_{barcode}_fastp.json"
-        - "prealignment/sortmerna/{sample}_{type}.rrna.log"
         - "qc/multiqc/RNA_number.table.tsv"
         - "qc/picard_collect_alignment_summary_metrics/{sample}_{type}.alignment_summary_metrics.txt"
         - "fusions/star_fusion/{sample}_{type}/Log.final.out"
         - "fusions/star_fusion/{sample}_{type}/ReadsPerGene.out.tab"
+        - "prealignment/bbduk/{sample}_{type}.rrna.log"
 
 pbrun_fq2bam_recal:
-  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1"
+  container: "{{NVIDIA_PREFIX}}/clara-parabricks{{CONTAINER_SUFFIX}}4.5.1-1{{CONTAINER_EXT}}"
+  extra: "--gpusort --gpuwrite --num-cpu-threads-per-stage 10 --bwa-nstreams 2"
 
 pbrun_mutectcaller_t:
-  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1"
+  container: "{{NVIDIA_PREFIX}}/clara-parabricks{{CONTAINER_SUFFIX}}4.5.1-1{{CONTAINER_EXT}}"
 
 pbrun_mutectcaller_tn:
-  container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1"
-  
+  container: "{{NVIDIA_PREFIX}}/clara-parabricks{{CONTAINER_SUFFIX}}4.5.1-1{{CONTAINER_EXT}}"
+
 peddy:
-  container: "docker://hydragenetics/peddy:0.4.8"
+  container: "{{HYDRAGENETICS_PREFIX}}/peddy{{CONTAINER_SUFFIX}}0.4.8{{CONTAINER_EXT}}"
   extra: "--sites hg38 "
-  config: "{{FLUFFY_HOME}}/config/peddy_mqc.yaml" 
+  config: "{{FLUFFY_HOME}}/config/peddy_mqc.yaml"
 
 picard_collect_alignment_summary_metrics:
-  container: "docker://hydragenetics/picard:2.25.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/picard{{CONTAINER_SUFFIX}}2.25.0{{CONTAINER_EXT}}"
 
 picard_collect_duplication_metrics:
-  container: "docker://hydragenetics/picard:2.25.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/picard{{CONTAINER_SUFFIX}}2.25.0{{CONTAINER_EXT}}"
 
 picard_collect_gc_bias_metrics:
-  container: "docker://hydragenetics/picard:2.25.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/picard{{CONTAINER_SUFFIX}}2.25.0{{CONTAINER_EXT}}"
 
 picard_collect_hs_metrics:
-  container: "docker://hydragenetics/picard:2.25.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/picard{{CONTAINER_SUFFIX}}2.25.0{{CONTAINER_EXT}}"
 
 picard_collect_multiple_metrics:
-  container: "docker://hydragenetics/picard:2.25.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/picard{{CONTAINER_SUFFIX}}2.25.0{{CONTAINER_EXT}}"
   output_ext:
     - "alignment_summary_metrics"
     - "base_distribution_by_cycle_metrics"
@@ -271,83 +456,65 @@ picard_collect_multiple_metrics:
     - "quality_distribution.pdf"
 
 picard_collect_wgs_metrics:
-  container: "docker://hydragenetics/picard:2.25.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/picard{{CONTAINER_SUFFIX}}2.25.0{{CONTAINER_EXT}}"
 
 pindel_update_vcf_sequence_dictionary:
-  container: "docker://hydragenetics/picard:2.25.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/picard{{CONTAINER_SUFFIX}}2.25.0{{CONTAINER_EXT}}"
 
 pindel_call:
-  include_bed: ""
-  container: "docker://hydragenetics/pindel:0.2.5b9"
+  include_bed: "{{ref_pindel_include_bed}}"
+  container: "{{HYDRAGENETICS_PREFIX}}/pindel{{CONTAINER_SUFFIX}}0.2.5b9{{CONTAINER_EXT}}"
 
 pindel2vcf:
-  container: "docker://hydragenetics/pindel:0.2.5b9"
+  container: "{{HYDRAGENETICS_PREFIX}}/pindel{{CONTAINER_SUFFIX}}0.2.5b9{{CONTAINER_EXT}}"
   extra: "-is 5 -he 0.01 -e 3"
 
 rseqc_gene_body_coverage:
-  bed: ""
-  container: "docker://hydragenetics/rseqc:4.0.0"
+  bed: "{{ref_rseqc_gene_body_bed}}"
+  container: "{{HYDRAGENETICS_PREFIX}}/rseqc{{CONTAINER_SUFFIX}}4.0.0{{CONTAINER_EXT}}"
 
 rseqc_inner_distance:
-  bed: ""
-  container: "docker://hydragenetics/rseqc:4.0.0"
-
-sentieon:
-  container: "" 
-  reference: ""
-  sentieon: ""
-  mills: ""
-  dbsnp: ""
-  tnscope_settings: "--min_init_normal_lod 0.5 --min_normal_lod 3.0 --min_init_tumor_lod 1.0 --min_tumor_lod 3 --trim_soft_clip"
-  dnascope_settings: "--pcr_indel_model NONE"
-  dbsnp: ""
-  dnascope_model: ""
-  tnscope_model: ""
+  bed: "{{ref_rseqc_inner_dist_bed}}"
+  container: "{{HYDRAGENETICS_PREFIX}}/rseqc{{CONTAINER_SUFFIX}}4.0.0{{CONTAINER_EXT}}"
 
 simple_sv_annotation:
-  container: "docker://hydragenetics/simple_sv_annotation:2019.02.18"
-  panel: ""
-  fusion_pairs: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/simple_sv_annotation{{CONTAINER_SUFFIX}}2019.02.18{{CONTAINER_EXT}}"
+  panel: "{{ref_simple_sv_panel}}"
+  fusion_pairs: "{{ref_simple_sv_fusion_pairs}}"
 
 snpeff:
-  container: "docker://hydragenetics/snpeff:5.0"
-  db: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/snpeff{{CONTAINER_SUFFIX}}5.0{{CONTAINER_EXT}}"
+  db: "{{ref_snpeff_db}}"
 
 somalier_extract:
-  container: "docker://brentp/somalier:v0.2.18"
-  sites: ""
+  container: "{{BRENTP_PREFIX}}/somalier{{CONTAINER_SUFFIX}}v0.2.18{{CONTAINER_EXT}}"
+  sites: "{{ref_somalier_sites}}"
   extra: ""
-  
+
 somalier_mqc:
-  config: "{{FLUFFY_HOME}}/config/somalier_mqc.yaml"   
+  config: "{{FLUFFY_HOME}}/config/somalier_mqc.yaml"
 
 somalier_relate: 
-  container: "docker://brentp/somalier:v0.2.18"
+  container: "{{BRENTP_PREFIX}}/somalier{{CONTAINER_SUFFIX}}v0.2.18{{CONTAINER_EXT}}"
   extra: "--infer"
 
 sortmerna:
-  container: "docker://hydragenetics/sortmerna:4.3.4"
-  fasta:
-    - ""
-    - ""
-    - ""
-    - ""
-    - ""
-    - ""
-  index: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/sortmerna{{CONTAINER_SUFFIX}}4.3.4{{CONTAINER_EXT}}"
+  fasta: "{{ref_sortmerna_fasta}}"
+  index: "{{ref_sortmerna_index}}"
 
 spring:
-  container: "docker://hydragenetics/spring:1.0.1"
+  container: "{{HYDRAGENETICS_PREFIX}}/spring{{CONTAINER_SUFFIX}}1.1.1{{CONTAINER_EXT}}"
 
 star:
-  container: "docker://hydragenetics/star:2.7.10a"
-  genome_index: ""
-  extra: "--quantMode GeneCounts --sjdbGTFfile /path/to/arriba_ref.gtf --outSAMtype BAM SortedByCoordinate --chimSegmentMin 10 --chimOutType WithinBAM SoftClip --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
+  container: "{{HYDRAGENETICS_PREFIX}}/star{{CONTAINER_SUFFIX}}2.7.10a{{CONTAINER_EXT}}"
+  genome_index: "{{ref_star_index}}"
+  extra: "--quantMode GeneCounts --sjdbGTFfile {{ref_arriba_gtf}} --outSAMtype BAM SortedByCoordinate --chimSegmentMin 10 --chimOutType WithinBAM SoftClip --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
 
 star_fusion:
-  container: "docker://trinityctat/starfusion:1.10.1"
+  container: "{{TRINITYCTAT_PREFIX}}/starfusion{{CONTAINER_SUFFIX}}1.15.1{{CONTAINER_EXT}}"
   extra: "--examine_coding_effect"
-  genome_path: ""
+  genome_path: "{{ref_star_fusion_path}}"
 
 svdb_merge:
   tc_method:
@@ -355,20 +522,29 @@ svdb_merge:
       cnv_caller:
         - cnvkit
         - gatk
-  container: "docker://hydragenetics/svdb:2.6.0"
+  container: "{{HYDRAGENETICS_PREFIX}}/svdb{{CONTAINER_SUFFIX}}2.6.0{{CONTAINER_EXT}}"
 
 svdb_query:
-  container: "docker://hydragenetics/svdb:2.6.0"
-  db_string: "--db path_to_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
+  container: "{{HYDRAGENETICS_PREFIX}}/svdb{{CONTAINER_SUFFIX}}2.6.0{{CONTAINER_EXT}}"
+  db_string: "--db {{ref_svdb_query_db}} --out_frq Normal_AF --out_occ Normal_OCC"
+  db_manta: "{{ref_svdb_query_db_manta}}"
+  extra_manta: "--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC"
 
 vep:
-  container: "docker://hydragenetics/vep:111"
-  vep_cache: ""
+  container: "{{HYDRAGENETICS_PREFIX}}/vep{{CONTAINER_SUFFIX}}111.0{{CONTAINER_EXT}}"
+  vep_cache: "{{ref_vep_cache}}"
   mode: "--offline --cache --merged "
   extra: "--assembly GRCh38 --check_existing --pick --variant_class --everything "
 
 vt_decompose:
-  container: "docker://hydragenetics/vt:2015.11.10"
+  container: "{{HYDRAGENETICS_PREFIX}}/vt{{CONTAINER_SUFFIX}}2015.11.10{{CONTAINER_EXT}}"
 
 vt_normalize:
-  container: "docker://hydragenetics/vt:2015.11.10"
+  container: "{{HYDRAGENETICS_PREFIX}}/vt{{CONTAINER_SUFFIX}}2015.11.10{{CONTAINER_EXT}}"
+
+# rindels:
+#   bin: "bin/rindels"
+#   extra: "--ont"
+
+# rs_qc:
+#   bin: "bin/rs-qc"

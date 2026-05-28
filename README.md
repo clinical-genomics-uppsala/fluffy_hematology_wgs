@@ -24,6 +24,10 @@ opensource GATK tools if required. The following modules are currently part of t
 - prealignment
 - qc
 
+## Local and offline setup
+
+See [docs/setup.md](docs/setup.md) for the shared layout, the `profiles/local` and `profiles/slurm` entrypoints, and the `module_root` setting used for offline module resolution.
+
 ## :heavy_exclamation_mark: Dependencies
 
 In order to use this module, the following dependencies are required:

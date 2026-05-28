@@ -3,6 +3,18 @@ __copyright__ = "Copyright 2022, Martin Rippin, Arielle R Munters"
 __email__ = "arielle.munters@scilifelab.uu.se, nina.hollfelder@scilifelab.uu.se"
 __license__ = "GPL-3"
 
+from pathlib import Path
+
+
+def resolve_module_snakefile(repo, path="workflow/Snakefile"):
+    module_root = config.get("module_root")
+    if not module_root:
+        return None
+    candidate = Path(module_root) / repo.split("/")[-1] / path
+    if candidate.exists():
+        return str(candidate)
+    return None
+
 
 include: "rules/common.smk"
 include: "rules/annotate.smk"
@@ -30,8 +42,8 @@ ruleorder: cnv_sv_svdb_query_manta_tn > bgzip_cnv
 
 aligner = config.get("aligner", None)
 
-if aligner is None or (aligner != "bwa_gpu" and aligner != "bwa_sentieon"):
-    sys.exit("aligner missing from config, valid options: bwa_gpu or bwa_sentieon")
+if aligner is None or (aligner != "bwa" and aligner != "bwa_gpu" and aligner != "bwa_sentieon"):
+    sys.exit("aligner missing from config, valid options: bwa, bwa_gpu or bwa_sentieon")
 
 elif aligner == "bwa_gpu":
 
@@ -62,7 +74,8 @@ rule all:
 
 module alignment:
     snakefile:
-        get_module_snakefile(
+        resolve_module_snakefile("hydra-genetics/alignment")
+        or get_module_snakefile(
             config,
             "hydra-genetics/alignment",
             path="workflow/Snakefile",
@@ -70,6 +83,12 @@ module alignment:
         )
     config:
         config
+
+
+if aligner == "bwa":
+    use rule bwa_mem from alignment as alignment_bwa_mem
+    use rule bwa_mem_merge from alignment as alignment_bwa_mem_merge
+    use rule samtools_sort from alignment as alignment_samtools_sort
 
 
 use rule star from alignment as alignment_star with:
@@ -85,7 +104,8 @@ use rule samtools_index from alignment as alignment_samtools_index
 
 module annotation:
     snakefile:
-        get_module_snakefile(
+        resolve_module_snakefile("hydra-genetics/annotation")
+        or get_module_snakefile(
             config,
             "hydra-genetics/annotation",
             path="workflow/Snakefile",
@@ -832,3 +852,39 @@ use rule vt_normalize from snv_indels as snv_indels_vt_normalize with:
             "parabricks/pbrun_mutectcaller_{analysis}/{sample_type}.normalized.vcf.gz.benchmark.tsv",
             config.get("vt_normalize", {}).get("benchmark_repeats", 1),
         )
+
+
+# rule varcall_rindels:
+#     input:
+#         bam=lambda wildcards: get_bam_input(wildcards, t_n="T")[0],
+#         bai=lambda wildcards: get_bam_input(wildcards, t_n="T")[1],
+#         ref=config["reference"]["fasta"],
+#     output:
+#         vcf="snv_indels/rindels/{sample}_{type}.rindels.vcf",
+#     params:
+#         bin=config.get("rindels", {}).get("bin", "bin/rindels"),
+#         extra=config.get("rindels", {}).get("extra", "--ont"),
+#     shell:
+#         "{params.bin} -b {input.bam} -r {input.ref} -o {output.vcf} {params.extra}"
+
+# rule rs_qc_fastq:
+#     input:
+#         fastq="qc/fastqc/{sample}_{type}_{flowcell}_{lane}_{barcode}_{read}_fastqc.zip",
+#     output:
+#         html="qc/rs_qc/{sample}_{type}_{flowcell}_{lane}_{barcode}_{read}_fastq_report.html",
+#     params:
+#         bin=config.get("rs_qc", {}).get("bin", "bin/rs-qc"),
+#     shell:
+#         "{params.bin} fastq -i {input.fastq} -o {output.html}"
+
+# rule rs_qc_rna:
+#     input:
+#         bam="alignment/star/{sample}_R.bam",
+#         bai="alignment/star/{sample}_R.bam.bai",
+#         ref=config["reference"]["fasta"],
+#     output:
+#         txt="qc/rs_qc/{sample}_{type}.rs_qc_rna.txt",
+#     params:
+#         bin=config.get("rs_qc", {}).get("bin", "bin/rs-qc"),
+#     shell:
+#         "{params.bin} rna -b {input.bam} -r {input.ref} -o {output.txt}"

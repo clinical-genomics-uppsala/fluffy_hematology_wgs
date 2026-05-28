@@ -1,0 +1,137 @@
+# Miarka reference registry for hg38 assets and containers.
+reference:
+  fasta:
+    path: fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta
+  design_bed:
+    path: fluffy/homo_sapiens.hg38.wgs.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/homo_sapiens.hg38.wgs.bed
+  design_intervals:
+    path: fluffy/Twist_Comprehensive_Exome_Covered_Targets_hg38.interval_list
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/Twist_Comprehensive_Exome_Covered_Targets_hg38.interval_list
+  design_intervals_gatk_cnv:
+    path: fluffy/gatk/hg38.preprocessed.20250926.interval_list
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/gatk/hg38.preprocessed.20250926.interval_list
+  fasta_rna:
+    path: fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa
+  fai:
+    path: fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta.fai
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.fasta.fai
+  dict:
+    path: fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.dict
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.dict
+  genome_dir:
+    path: fluffy/homo_sapiens_star/
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/homo_sapiens_star/
+  sites:
+    path: fluffy/Homo_sapiens_assembly38.known_indels.vcf.gz
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/Homo_sapiens_assembly38.known_indels.vcf.gz
+  wgs_intervals:
+    path: fluffy/homo_sapiens.hg38.wgs.interval_list
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/homo_sapiens.hg38.wgs.interval_list
+  cna_exons:
+    path: fluffy/hg38_CNA.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/hg38_CNA.bed
+  arriba_assembly:
+    path: fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/Homo_sapiens.GRCh38.dna.primary_assembly.fa
+  arriba_blacklist:
+    path: fluffy/blacklist_hg38_GRCh38_v2.5.1.tsv.gz
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/blacklist_hg38_GRCh38_v2.5.1.tsv.gz
+  arriba_extra:
+    path: fluffy/protein_domains_and_known_fusions
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/
+  arriba_gtf:
+    path: fluffy/Homo_sapiens.GRCh38.115.chr.gtf
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/Homo_sapiens.GRCh38.115.chr.gtf
+  arriba_draw_cytobands:
+    path: fluffy/cytobands_hg38_GRCh38_v2.5.1.tsv
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/cytobands_hg38_GRCh38_v2.5.1.tsv
+  arriba_draw_gtf:
+    path: fluffy/Homo_sapiens.GRCh38.115.chr.gtf
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/Homo_sapiens.GRCh38.115.chr.gtf
+  arriba_draw_protein_domains:
+    path: fluffy/protein_domains_hg38_GRCh38_v2.5.1.gff3
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/protein_domains_hg38_GRCh38_v2.5.1.gff3
+  bcftools_snv_all:
+    path: fluffy/all_snv_38.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/all_snv_38.bed
+  bcftools_snv_aml:
+    path: fluffy/aml_snv_38_2022-02-25.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/aml_snv_38_2022-02-25.bed
+  bcftools_snv_tm:
+    path: fluffy/Twist_myeloid_coding_exons_added_regions.250904.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/Twist_myeloid_coding_exons_added_regions.250904.bed
+  bcftools_sv_all:
+    path: fluffy/all_sv_38.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/all_sv_38.bed
+  bcftools_sv_aml:
+    path: fluffy/aml_sv_38.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/aml_sv_38.bed
+  cnvkit_pon:
+    path: fluffy/cnvkit/Reference_Normal_pool.WGS.250822.bin1000.cnn
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/cnvkit/Reference_Normal_pool.WGS.250822.bin1000.cnn
+  cnvkit_table_bed:
+    path: fluffy/cnvkit/hg38_CNA.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/cnvkit/hg38_CNA.bed
+  cnvkit_table_cyto:
+    path: fluffy/cnvkit/genomicPos_cytogenCoord.txt
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/cnvkit/genomicPos_cytogenCoord.txt
+  fusioncatcher_path:
+    path: fluffy/fusioncatcher/human_v102
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/fusioncatcher/human_v102
+  gatk_snp_interval:
+    path: fluffy/gnomad.genomes.r3.0.sites.maf001.snv-only.hg38.sorted.vcf
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/gnomad.genomes.r3.0.sites.maf001.snv-only.hg38.sorted.vcf
+  gatk_pon_female:
+    path: fluffy/gatk_pon/gatk_cnv_panel_of_normal_female.20250926.hdf5
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/gatk_pon/gatk_cnv_panel_of_normal_female.20250926.hdf5
+  gatk_pon_male:
+    path: fluffy/gatk_pon/gatk_cnv_panel_of_normal_male.20250926.hdf5
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/gatk_pon/gatk_cnv_panel_of_normal_male.20250926.hdf5
+  merge_cnv_ref_genes:
+    path: fluffy/cnv_report/refGene_hg38.txt
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/cnv_report/refGene_hg38.txt
+  mosdepth_design_bed:
+    path: fluffy/GRCh38_all_exon_sorted.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/GRCh38_all_exon_sorted.bed
+  pindel_include_bed:
+    path: fluffy/pindel/aml_pindel_38_240912.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/pindel/aml_pindel_38_240912.bed
+  rseqc_gene_body_bed:
+    path: fluffy/hg38_GENCODE_V38.downsampled.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/hg38_GENCODE_V38.downsampled.bed
+  rseqc_inner_dist_bed:
+    path: fluffy/hg38_GENCODE.v38.bed
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/hg38_GENCODE.v38.bed
+  simple_sv_panel:
+    path: fluffy/az-cancer-panel.txt
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/az-cancer-panel.txt
+  simple_sv_fusion_pairs:
+    path: fluffy/fusion_pairs.txt
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/fusion_pairs.txt
+  snpeff_db:
+    path: fluffy/snpeff/GRCh38.99
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/snpeff/GRCh38.99
+  somalier_sites:
+    path: fluffy/somalier/sites.hg38.vcf.gz
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/somalier/sites.hg38.vcf.gz
+  sortmerna_fasta:
+    path: fluffy/sortmerna/fasta
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/sortmerna/
+  sortmerna_index:
+    path: fluffy/sortmerna/idx
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/sortmerna/idx
+  star_index:
+    path: fluffy/star_arriba/Homo_sapiens.GRCh38.dna.115.star_reference
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/star_arriba/Homo_sapiens.GRCh38.dna.115.star_reference
+  star_fusion_path:
+    path: fluffy/star_fusion/ctat_genome_lib_build_dir
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/star-fusion/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir
+  svdb_query_db:
+    path: fluffy/230601_svdb_cnv.vcf
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/230601_svdb_cnv.vcf
+  vep_cache:
+    path: fluffy/vep/
+    url: file:/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files/fluffy/vep/

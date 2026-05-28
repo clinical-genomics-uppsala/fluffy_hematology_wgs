@@ -1,0 +1,12 @@
+jobs: 100
+keep-going: True
+restart-times: 1
+rerun-incomplete: True
+max-jobs-per-second: 20
+max-status-checks-per-second: 100
+use-singularity: True
+default-resources: [gres="",]
+drmaa: "-p {resources.partition} -t {resources.time} -n {resources.threads} --mem={resources.mem_mb} --mem-per-cpu={resources.mem_per_cpu} {resources.gres} -J {rule} -e slurm/{rule}_%j.err -o slurm/{rule}_%j.out --nodes=1-1"
+drmaa-log-dir: "slurm"
+singularity-args: "--cleanenv --bind /beegfs-archive,/beegfs-scratch,/beegfs-storage,/home,/data,/projects -B /beegfs-scratch/wp4/wp2_wgs_tmp:/tmp --nv --containall"
+singularity-prefix: "/beegfs-storage/projects/wp4/nobackup/singularity_cache/"
