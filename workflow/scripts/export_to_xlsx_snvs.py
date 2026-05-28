@@ -230,5 +230,6 @@ for sheet in subsections + ["pindel"]:
         "A4:D" + str(len(bed_data) + 5), {"data": bed_data, "columns": heading_list, "style": "Table Style Light 1"}
     )
 
+workbook.set_size(1800, 1200)
 workbook.close()
 logging.info(f"All done")

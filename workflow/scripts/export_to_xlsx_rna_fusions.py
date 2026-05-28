@@ -171,5 +171,6 @@ worksheet_starfusion.add_table(
     table_area, {"columns": starfusion_table["headers"], "data": starfusion_table["data"], "style": "Table Style Light 1"}
 )
 
+workbook.set_size(1800, 1200)
 workbook.close()
 logging.info(f"All done!")

@@ -126,4 +126,5 @@ for chromosome in chromosomes:
             worksheet.write_row(row, col, line)
         row += 1
 
+workbook.set_size(1800, 1200)
 workbook.close()
