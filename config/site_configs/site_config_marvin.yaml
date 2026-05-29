@@ -3,7 +3,7 @@ REFERENCE_DATA: "/beegfs-storage/data/ref_genomes/GRCh38"
 APPTAINER_CACHE: "/beegfs-storage/projects/wp4/nobackup/singularity_cache"
 hydra_local_path: "/beegfs-storage/projects/wp4/nobackup/workspace/camille_test/hydra-genetics"
 
-resources: "config/resources/resources_marvin.yaml"
+resources: "{{FLUFFY_HOME}}/config/resources/resources_marvin.yaml"
 
 CONTAINER_PREFIX: "docker://hydragenetics"
 CONTAINER_SUFFIX: ":"

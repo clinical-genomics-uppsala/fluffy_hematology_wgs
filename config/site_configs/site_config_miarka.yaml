@@ -3,7 +3,7 @@ REFERENCE_DATA: "/proj/ngi2024001/nobackup/bin/wp2_iht/design_and_ref_files"
 APPTAINER_CACHE: "/proj/ngi2024001/nobackup/bin/wp2_iht/apptainer_cache"
 hydra_local_path: "/proj/ngi2024001/nobackup/bin/wp2_iht/hydra-genetics"
 
-resources: "config/resources/resources_miarka.yaml"
+resources: "{{FLUFFY_HOME}}/config/resources/resources_miarka.yaml"
 
 CONTAINER_PREFIX: "{{APPTAINER_CACHE}}"
 CONTAINER_SUFFIX: "_"

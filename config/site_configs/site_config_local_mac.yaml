@@ -3,7 +3,7 @@ REFERENCE_DATA: "references"
 APPTAINER_CACHE: "apptainer_cache"
 hydra_local_path: "develop/hydra-genetics"
 
-resources: "config/resources/resources_marvin.yaml"
+resources: "{{FLUFFY_HOME}}/config/resources/resources_marvin.yaml"
 
 # Container registry configuration (uses standard Docker URIs locally)
 CONTAINER_PREFIX: "docker://hydragenetics"
