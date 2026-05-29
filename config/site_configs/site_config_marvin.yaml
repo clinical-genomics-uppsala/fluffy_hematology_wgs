@@ -1,7 +1,7 @@
 # Marvin site config for fluffy_hematology_wgs
 REFERENCE_DATA: "/beegfs-storage/data/ref_genomes/GRCh38"
 APPTAINER_CACHE: "/beegfs-storage/projects/wp4/nobackup/singularity_cache"
-hydra_local_path: "/beegfs-storage/projects/wp4/nobackup/workspace/camille_test/hydra-genetics"
+hydra_local_path: "/projects/bin/wp2_iht/fluffy/hydra-genetics"
 
 resources: "{{FLUFFY_HOME}}/config/resources/resources_marvin.yaml"
 
