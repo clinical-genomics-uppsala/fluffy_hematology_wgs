@@ -242,6 +242,12 @@ bbduk:
   kmer: "31"
   extra: "overwrite=t samplerate=0.01"
 
+bwa_mem:
+  extra: "-K 10000000"
+
+bwa_mem_merge:
+  extra: "-K 10000000"
+
 bcftools_SNV:
   all: "{{ref_bcftools_snv_all}}"
   aml: "{{ref_bcftools_snv_aml}}"
