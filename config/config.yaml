@@ -240,7 +240,7 @@ bbduk:
     - "{{ref_sortmerna_fasta5}}"
     - "{{ref_sortmerna_fasta6}}"
   kmer: "31"
-  extra: "overwrite=t"
+  extra: "overwrite=t samplerate=0.01"
 
 bcftools_SNV:
   all: "{{ref_bcftools_snv_all}}"
