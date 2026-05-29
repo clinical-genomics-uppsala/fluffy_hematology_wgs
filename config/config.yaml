@@ -232,7 +232,13 @@ arriba_draw_fusion:
 
 bbduk:
   container: "{{KINCEKARA_PREFIX}}/bbduk{{CONTAINER_SUFFIX}}38.98{{CONTAINER_EXT}}"
-  fasta: "{{ref_sortmerna_fasta}}"
+  fasta:
+    - "{{ref_sortmerna_fasta1}}"
+    - "{{ref_sortmerna_fasta2}}"
+    - "{{ref_sortmerna_fasta3}}"
+    - "{{ref_sortmerna_fasta4}}"
+    - "{{ref_sortmerna_fasta5}}"
+    - "{{ref_sortmerna_fasta6}}"
   kmer: "31"
   extra: "overwrite=t"
 
@@ -500,7 +506,13 @@ somalier_relate:
 
 sortmerna:
   container: "{{HYDRAGENETICS_PREFIX}}/sortmerna{{CONTAINER_SUFFIX}}4.3.4{{CONTAINER_EXT}}"
-  fasta: "{{ref_sortmerna_fasta}}"
+  fasta:
+    - "{{ref_sortmerna_fasta1}}"
+    - "{{ref_sortmerna_fasta2}}"
+    - "{{ref_sortmerna_fasta3}}"
+    - "{{ref_sortmerna_fasta4}}"
+    - "{{ref_sortmerna_fasta5}}"
+    - "{{ref_sortmerna_fasta6}}"
   index: "{{ref_sortmerna_index}}"
 
 spring:
