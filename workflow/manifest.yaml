@@ -1,0 +1,74 @@
+---
+pipeline:
+  id: wp3_iht
+  name: fluffy_hematology_wgs
+  assay: hematology_wgs
+  genome_build: GRCh38
+
+entrypoints:
+  analysis: workflow/Snakefile
+  references: null
+
+layout:
+  local_rules_dir: workflow/rules
+  local_scripts_dir: workflow/scripts
+  schemas_dir: workflow/schemas
+  report: null
+
+rule_groups:
+  common: workflow/rules/common.smk
+  annotation: workflow/rules/annotate.smk
+  trimming: workflow/rules/bbduk.smk
+  cnvkit: workflow/rules/cnvkit.smk
+  cnvkit_table: workflow/rules/cnvkit_table.smk
+  dux4_rearrangements: workflow/rules/dux4_rearrangements.smk
+  export: workflow/rules/export.smk
+  allele_frequency_fixup: workflow/rules/fix_af.smk
+  gatk_cnv_by_sex: workflow/rules/gatk_cnv_denoise_read_counts_by_sex.smk
+  html_output: workflow/rules/html_output.smk
+  peddy: workflow/rules/peddy_create_ped.smk
+  multiqc_order: workflow/rules/sample_order_multiqc.smk
+  somalier: workflow/rules/somalier.smk
+
+hydra_modules:
+  source: config.modules
+  loader: hydra_genetics.utils.misc.get_module_snakefile
+  local_module_root_config_key: module_root
+  modules:
+    - alignment
+    - annotation
+    - cnv_sv
+    - compression
+    - filtering
+    - fusions
+    - misc
+    - parabricks
+    - prealignment
+    - qc
+    - reports
+    - sentieon
+    - snv_indels
+
+scripts:
+  pipeline_specific:
+    - workflow/scripts/annotate_normal_ratio.py
+    - workflow/scripts/annotate_str.py
+    - workflow/scripts/cnvkit_to_table.py
+    - workflow/scripts/export_to_xlsx_create_tables.py
+    - workflow/scripts/export_to_xlsx_manta.py
+    - workflow/scripts/export_to_xlsx_rna_fusions.py
+    - workflow/scripts/export_to_xlsx_snvs.py
+    - workflow/scripts/fix_af.py
+    - workflow/scripts/merge_cnv_json.py
+    - workflow/scripts/peddy_create_ped.py
+    - workflow/scripts/somalier_create_ped.py
+    - workflow/scripts/somalier_mqc_config.py
+  shared_report_candidates:
+    - workflow/scripts/create_peddy_mqc_config.py
+    - workflow/scripts/sample_order_multiqc.py
+
+harmonization_notes:
+  - Largest wp2/wp3 legacy workflow in this comparison set; use it as the stress test, not the first refactor.
+  - Snakefile has extensive module overrides that encode real clinical workflow behavior.
+  - common.smk currently owns many pipeline-specific helper functions plus output expansion and copy rules.
+  - Export and report scripts should be compared with Poppy, Neville, Hastings, Marple, and Poirot before hydra migration.
