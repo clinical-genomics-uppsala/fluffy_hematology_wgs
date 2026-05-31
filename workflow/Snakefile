@@ -6,16 +6,6 @@ __license__ = "GPL-3"
 from pathlib import Path
 
 
-def resolve_module_snakefile(repo, path="workflow/Snakefile"):
-    module_root = config.get("module_root")
-    if not module_root:
-        return None
-    candidate = Path(module_root) / repo.split("/")[-1] / path
-    if candidate.exists():
-        return str(candidate)
-    return None
-
-
 include: "rules/common.smk"
 include: "rules/annotate.smk"
 include: "rules/cnvkit.smk"
@@ -74,8 +64,7 @@ rule all:
 
 module alignment:
     snakefile:
-        resolve_module_snakefile("hydra-genetics/alignment")
-        or get_module_snakefile(
+        get_module_snakefile(
             config,
             "hydra-genetics/alignment",
             path="workflow/Snakefile",
@@ -104,8 +93,7 @@ use rule samtools_index from alignment as alignment_samtools_index
 
 module annotation:
     snakefile:
-        resolve_module_snakefile("hydra-genetics/annotation")
-        or get_module_snakefile(
+        get_module_snakefile(
             config,
             "hydra-genetics/annotation",
             path="workflow/Snakefile",
