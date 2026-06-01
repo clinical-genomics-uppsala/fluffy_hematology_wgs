@@ -244,6 +244,12 @@ bbduk:
 
 bwa_mem:
   extra: "-K 10000000"
+  amb: "{{ref_fasta}}.amb"
+  ann: "{{ref_fasta}}.ann"
+  bwt: "{{ref_fasta}}.bwt"
+  pac: "{{ref_fasta}}.pac"
+  sa: "{{ref_fasta}}.sa"
+
 
 bwa_mem_merge:
   extra: "-K 10000000"
