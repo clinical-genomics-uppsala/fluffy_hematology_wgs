@@ -15,6 +15,7 @@ include: "rules/gatk_cnv_denoise_read_counts_by_sex.smk"
 include: "rules/peddy_create_ped.smk"
 include: "rules/somalier.smk"
 include: "rules/bbduk.smk"
+include: "rules/pelops.smk"
 
 
 ruleorder: fix_af > filtering_filter_vcf
