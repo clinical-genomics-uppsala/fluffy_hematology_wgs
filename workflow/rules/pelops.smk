@@ -63,4 +63,3 @@ rule extract_srpb:
         "{rule}: extract SRPB for DUX4 - IGH rearrangements {input.json} and save to a tsv file"
     script:
         "../scripts/extract_srpb.py"
-
