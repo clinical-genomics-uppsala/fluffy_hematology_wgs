@@ -27,12 +27,10 @@ rule pelops:
         partition=config.get("pelops", {}).get("partition", config["default_resources"]["partition"]),
         threads=config.get("pelops", {}).get("threads", config["default_resources"]["threads"]),
         time=config.get("pelops", {}).get("time", config["default_resources"]["time"]),
-    container:
-        config.get("pelops", {}).get("container", config["default_container"])
     message:
         "{rule}: calculate SRPB for DUX4 rearrangements with pelops in {input.bam}"
     shell:
-        "(pelops dux4r --json "
+        "(pelops dux4r "
         "--export {params.dir} "
         "--json {output.json} "
         "{params.extra} {input.bam}) &> {log}"
