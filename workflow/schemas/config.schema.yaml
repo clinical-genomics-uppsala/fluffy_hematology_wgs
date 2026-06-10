@@ -702,7 +702,7 @@ properties:
     type: object
     description: parameters for peddy
     properties:
-      containter:
+      container:
         type: string
         description: name or path to docker/singularity container
       config: 
@@ -715,6 +715,19 @@ properties:
       - container
       - config
       - extra
+
+  pelops:
+    type: object
+    description: parameters for pelops
+    properties:
+      containerr:
+        type: string
+        description: name or path to docker/singularity container
+      extra:
+        type: string
+        description: additional parameters for pelops e.g. --only-igh-dux4
+    required:
+      - container
 
   picard_collect_alignment_summary_metrics:
     type: object

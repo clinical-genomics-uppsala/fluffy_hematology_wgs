@@ -440,6 +440,10 @@ peddy:
   extra: "--sites hg38 "
   config: "{{FLUFFY_HOME}}/config/peddy_mqc.yaml"
 
+pelops:
+  container: "docker://hydragenetics/pelops:0.8.0"
+  extra: ""
+
 picard_collect_alignment_summary_metrics:
   container: "docker://hydragenetics/picard:2.25.0"
 

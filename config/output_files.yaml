@@ -141,6 +141,11 @@ files:
     output: "{sample}/DNA_fusions/{sample}_T.dux4_erg_read_count.txt"
     types: ["T"]
 
+  - name: Pelops tsv
+    input: "fusions/pelops/{sample}/{sample}.tsv"
+    output: "{sample}/DNA_fusions/{sample}_pelops.txt" 
+    types: ["T"]
+
   # SVs
   
   - name: Manta T vcf svdb str

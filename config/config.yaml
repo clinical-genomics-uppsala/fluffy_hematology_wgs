@@ -239,7 +239,11 @@ pbrun_mutectcaller_t:
 
 pbrun_mutectcaller_tn:
   container: "docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1"
-  
+
+pelops:
+  container: "docker://hydragenetics/pelops:0.8.0"
+  extra: ""
+
 peddy:
   container: "docker://hydragenetics/peddy:0.4.8"
   extra: "--sites hg38 "
