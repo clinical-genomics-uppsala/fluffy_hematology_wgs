@@ -27,6 +27,8 @@ rule pelops:
         partition=config.get("pelops", {}).get("partition", config["default_resources"]["partition"]),
         threads=config.get("pelops", {}).get("threads", config["default_resources"]["threads"]),
         time=config.get("pelops", {}).get("time", config["default_resources"]["time"]),
+    container:
+        config.get("pelops", {}).get("container", config["default_container"])
     message:
         "{rule}: calculate SRPB for DUX4 rearrangements with pelops in {input.bam}"
     shell:

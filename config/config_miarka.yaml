@@ -439,6 +439,10 @@ peddy:
   extra: "--sites hg38 "
   config: "{{FLUFFY_HOME}}/config/peddy_mqc.yaml"
 
+pelops:
+  container: "{{APPTAINER_CACHE}}/pelops_0.8.0.sif"
+  extra: ""
+  
 picard_collect_alignment_summary_metrics:
   container: "{{APPTAINER_CACHE}}/picard_2.25.0.sif"
 
