@@ -12,7 +12,7 @@ slurm: True
 default-resources:
   - slurm_partition="core"
   - slurm_account="ngi2024001"
-  - runtime="24h"
+  - runtime="36h"
   - nodes=1
 
 set-resources:
