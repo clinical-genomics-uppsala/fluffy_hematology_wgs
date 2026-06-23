@@ -12,7 +12,7 @@ slurm: True
 default-resources:
   - slurm_partition="core"
   - slurm_account="ngi2024001"
-  - runtime="24h"
+  - runtime="12h"
   - nodes=1
 
 set-resources:
@@ -24,6 +24,7 @@ set-resources:
   - parabricks_pbrun_mutectcaller_tn:slurm_partition="gpu"
   - compression_crumble:runtime=2000
   - fusions_fusioncatcher:runtime=2000
+  - bbduk:runtime=60
 
 configfiles: ["config/config.yaml", "config/config_production_pipeline.miarka.yaml"]
 singularity-args: "-e --cleanenv -B /proj -B $HOME --nv"
