@@ -12,7 +12,7 @@ slurm: True
 default-resources:
   - slurm_partition="core"
   - slurm_account="ngi2024001"
-  - runtime="12h"
+  - runtime="36h"
   - nodes=1
 
 set-resources:
@@ -29,7 +29,6 @@ set-resources:
   - fusions_fusioncatcher:runtime=2000
   - bbduk:runtime=60
 
-configfiles: ["config/config.yaml", "config/config_production_pipeline.miarka.yaml"]
 singularity-args: "-e --cleanenv -B /proj -B $HOME --nv"
 singularity-prefix: "/proj/ngi2024001/nobackup/bin/wp2_iht/apptainer_cache"
 wrapper-prefix: "git+file://proj/ngi2024001/nobackup/bin/wp2_iht/${TAG_OR_BRANCH}/snakemake-wrappers/"
