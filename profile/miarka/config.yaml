@@ -18,10 +18,16 @@ default-resources:
 set-resources:
   - parabricks_pbrun_fq2bam_recal:slurm_extra="--gres=gpu:l40s:6"
   - parabricks_pbrun_fq2bam_recal:slurm_partition="gpu"
+  - parabricks_pbrun_fq2bam_recal:runtime=180
   - parabricks_pbrun_mutectcaller_t:slurm_extra="--gres=gpu:l40s:2"
   - parabricks_pbrun_mutectcaller_t:slurm_partition="gpu"
+  - parabricks_pbrun_mutectcaller_t:runtime=180
   - parabricks_pbrun_mutectcaller_tn:slurm_extra="--gres=gpu:l40s:2"
   - parabricks_pbrun_mutectcaller_tn:slurm_partition="gpu"
+  - parabricks_pbrun_mutectcaller_tn:runtime=180
+  - compression_crumble:runtime=2000
+  - fusions_fusioncatcher:runtime=2000
+  - bbduk:runtime=60
 
 singularity-args: "-e --cleanenv -B /proj -B $HOME --nv"
 singularity-prefix: "/proj/ngi2024001/nobackup/bin/wp2_iht/apptainer_cache"
