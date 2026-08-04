@@ -344,9 +344,6 @@ if target_genes_path:
     target_genes = load_target_genes(target_genes_path)
 
 manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
-manta_tables_full = filter_maxdepth_by_support(manta_tables_full, 0.05)
-manta_tables_full["bnd"] = filter_complex_and_junk_bnd(manta_tables_full["bnd"], max_sites=4)
-
 
 # 2. Creating xlsx workbook
 workbook = xlsxwriter.Workbook(snakemake.output.xlsx)
