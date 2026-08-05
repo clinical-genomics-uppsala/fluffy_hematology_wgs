@@ -4,7 +4,7 @@ import gzip
 from pysam import VariantFile
 import re
 
-MIN_DEL_LEN = -100
+MIN_DEL_SIZE = 100
 
 
 # VEP fields in list to get index
@@ -191,6 +191,82 @@ def index_manta_annotation_fields(variantfile, annotation_id):
     return None
 
 
+def _info_values(record, key):
+    """Return all INFO values as a tuple."""
+    value = record.info.get(key)
+
+    if value in (None, "", "."):
+        return ()
+
+    if isinstance(value, (tuple, list)):
+        return tuple(value)
+
+    return (value,)
+
+
+def _extract_manta_annotations(record, ann_index, simple_ann_index):
+    """Extract compact gene labels and details, preferring SIMPLE_ANN."""
+    simple_annotations = _info_values(record, "SIMPLE_ANN")
+
+    if simple_annotations:
+        if not simple_ann_index:
+            raise ValueError(
+                "Manta VCF contains SIMPLE_ANN records "
+                "but no SIMPLE_ANN header definition"
+            )
+
+        gene_idx = simple_ann_index.index("GENE(s)")
+        transcript_idx = simple_ann_index.index("TRANSCRIPT")
+        detail_idx = simple_ann_index.index(
+            "DETAIL (exon losses, KNOWN_FUSION, "
+            "ON_PRIORITY_LIST, NOT_PRIORITISED)"
+        )
+
+        genes = []
+        details = []
+
+        for annotation in simple_annotations:
+            values = annotation.split("|")
+
+            gene_label = (
+                f"{values[gene_idx]}({values[transcript_idx]})"
+            )
+            if gene_label not in genes:
+                genes.append(gene_label)
+
+            detail = values[detail_idx]
+            if detail not in details:
+                details.append(detail)
+
+        return ", ".join(genes), ", ".join(details)
+
+    annotations = _info_values(record, "ANN")
+
+    if annotations:
+        if not ann_index:
+            raise ValueError(
+                "Manta VCF contains ANN records "
+                "but no ANN header definition"
+            )
+
+        gene_name_idx = ann_index.index("Gene_Name")
+        gene_id_idx = ann_index.index("Gene_ID")
+
+        genes = []
+
+        for annotation in annotations:
+            values = annotation.split("|")
+            gene_label = (
+                f"{values[gene_name_idx]}({values[gene_id_idx]})"
+            )
+            if gene_label not in genes:
+                genes.append(gene_label)
+
+        return ", ".join(genes), ""
+
+    return "NA", "NA"
+
+
 def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, sample_normal=""):
     return_dict = {}
     return_dict["filt_ann"] = ",".join(record.filter.keys())
@@ -201,59 +277,16 @@ def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, 
     return_dict["manta_n_af"] = info_as_float(record, "manta_N_AF")
     return_dict["manta_t_af"] = info_as_float(record, "manta_T_AF")
     return_dict["str_percent"] = info_as_float(record, "STR_PERCENT", default=0, decimals=2)
-
-    genes = []
-    details = []
-    try:
-        record.info["SIMPLE_ANN"]
-    except KeyError:
-        try:
-            record.info["ANN"]
-        except KeyError:
-            return_dict["genes"] = "NA"
-            return_dict["detail"] = "NA"
-        else:
-            if not ann_index:
-                raise ValueError("Manta VCF contains ANN records but no ANN header definition")
-            for annotation in record.info["ANN"]:
-                annotation_values = annotation.split("|")
-                gene_name_id = (
-                    annotation_values[ann_index.index("Gene_Name")] + "(" + annotation_values[ann_index.index("Gene_ID")] + ")"
-                )
-                if gene_name_id not in genes:
-                    genes.append(gene_name_id)
-
-            return_dict["genes"] = ", ".join(genes)
-            return_dict["detail"] = ""
-    else:
-        if not simple_ann_index:
-            raise ValueError("Manta VCF contains SIMPLE_ANN records but no SIMPLE_ANN header definition")
-        for annotation in record.info["SIMPLE_ANN"]:
-            annotation_values = annotation.split("|")
-            gene_name_id = (
-                annotation_values[simple_ann_index.index("GENE(s)")] + "("
-                + annotation_values[simple_ann_index.index("TRANSCRIPT")] + ")"
-            )
-            if gene_name_id not in genes:
-                genes.append(gene_name_id)
-            detail = annotation_values[
-                simple_ann_index.index("DETAIL (exon losses, KNOWN_FUSION, ON_PRIORITY_LIST, NOT_PRIORITISED)")
-            ]
-            if detail not in details:
-                details.append(detail)
-
-        return_dict["genes"] = ", ".join(genes)
-        return_dict["detail"] = ", ".join(details)
+    return_dict["genes"], return_dict["detail"] = _extract_manta_annotations(record, ann_index, simple_ann_index)
 
     # create a common id for BND mates
     mate_id = first_info_value(record, "MATEID")
     if mate_id is not None:
         return_dict["bnd_event_id"] = "|".join(sorted([return_dict["id"], str(mate_id)]))
     else:
-        # Missing MATEID represents a single-record event.
         return_dict["bnd_event_id"] = return_dict["id"]
 
-    # extract paired read and spannig read frequncies
+    # extract paired read and spanning read frequncies
     tumor_sample = record.samples[sample_tumor]
     return_dict["pr_freq"] = support_frequency(tumor_sample, "PR")
     return_dict["sr_freq"] = support_frequency(tumor_sample, "SR")
@@ -544,7 +577,11 @@ def create_manta_tables(
                 outline = outline + in_target
                 manta_tables["bnd"]["data"].append(outline)
 
-            elif "MantaDEL" in record_values["id"] and record_values["svlength"] <= MIN_DEL_LEN:
+            elif (
+                "MantaDEL" in record_values["id"]
+                and record_values["svlength"] is not None
+                and record_values["svlength"] <= -MIN_DEL_SIZE
+            ):
                 outline = [
                     str(record.contig),
                     int(record.pos),

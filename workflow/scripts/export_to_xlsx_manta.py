@@ -38,7 +38,7 @@ def load_target_genes(filepath):
     if not filepath:
         logging.warning("No target gene list supplied; target-panel summaries will be omitted.")
         return []
-    
+
     try:
         with open(filepath, encoding="utf-8") as gene_file:
             genes = [line.strip() for line in gene_file if line.strip()]
@@ -60,9 +60,7 @@ def load_target_genes(filepath):
 
 def format_manta_table(table, sample_name, format_2dec):
     """
-    Pre-processes the table data to:
-    1. Prepend 'Sample Name' to all rows.
-    2. Convert any frequency columns to exactly two decimal places.
+    Pre-processes the table data to add 'Sample Name' to all rows and convert freq columns to two decimal places.
     """
     if not table or "headers" not in table:
         return
@@ -110,7 +108,7 @@ def apply_compact_formatting(worksheet, headers, data):
         lower_header = header_str.lower()
         if "freq" in lower_header or "af" in lower_header or "chr" in lower_header:
             final_width = 6
-        elif "pos" in lower_header or "length" in lower_header or "sample" in lower_header:
+        elif "pos" in lower_header or "length" in lower_header:
             final_width = 12
         elif "mantaid" in lower_header:
             final_width = 16
@@ -226,7 +224,7 @@ def _is_junk_bnd(row, column_indexes):
 
 
 def known_fusion_events(table):
-    """Return complete BND events containing a KNOWN_FUSION annotation."""
+    """Return all available rows for BND events containing a KNOWN_FUSION annotation."""
     columns = _column_indexes(table)
     details_idx = columns.get("details")
 
@@ -361,7 +359,6 @@ def write_target_summary(worksheet, start_row, title, table_data, format_heading
     if not table_data or "headers" not in table_data:
         return start_row
 
-    headers = table_data["headers"]
     data = table_data.get("data", [])
 
     columns = _column_indexes(table_data)
@@ -377,7 +374,6 @@ def write_target_summary(worksheet, start_row, title, table_data, format_heading
     ]
 
     if event_atomic and target_data:
-        columns = _column_indexes(table_data)
 
         selected_event_ids = {
             _bnd_event_key(row, columns)
@@ -527,8 +523,7 @@ filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "
 # Load target genes for easy filtering in Excel
 target_genes = []
 target_genes_path = getattr(snakemake.params, "target_genes", "") or getattr(snakemake.input, "target_genes", "")
-if target_genes_path:
-    target_genes = load_target_genes(target_genes_path)
+target_genes = load_target_genes(target_genes_path)
 
 manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
 manta_tables_all = create_manta_tables(snakemake.input.manta, avoid_filterflags=[], target_genes=target_genes)
@@ -536,7 +531,7 @@ blocking_filter_flags = set(filter_flags) - {"MaxDepth"}
 manta_tables_maxdepth = create_maxdepth_bnd_rescue_table(
     manta_tables_all,
     blocking_filter_flags,
-    min_support=0.05,
+    min_support == MAXDEPTH_RESCUE_MIN_SUPPORT,
 )
 
 # 2. Creating xlsx workbook
