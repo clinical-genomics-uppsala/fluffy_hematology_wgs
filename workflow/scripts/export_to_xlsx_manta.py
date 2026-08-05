@@ -12,13 +12,22 @@ MAX_OVERVIEW_NORMAL_AF = 0.2
 MAXDEPTH_RESCUE_MIN_SUPPORT = 0.05
 
 COLUMN_WIDTHS = {
-    "Sample Name": 24,
-    "Chr": 8,
-    "Pos": 11,
-    "EndPos": 11,
+    "Sample Name": 18,
+    "Chr": 6,
+    "Pos": 10,
+    "EndPos": 10,
     "Ref": 12,
     "Alt": 24,
     "SV Length": 11,
+    "Depth": 6,
+    "In Target Panel": 6,
+    "manta_N_OCC": 6,
+    "manta_T_OCC": 6,
+    "manta_N_AF": 8,
+    "manta_T_AF": 8,
+    "STR %": 6,
+    "Paired-read freq": 6,
+    "Spanning-read freq": 6,
     "MantaID": 24,
     "BND Event ID": 30,
     "BreakEnd": 24,
@@ -27,15 +36,6 @@ COLUMN_WIDTHS = {
     "Hom Length": 11,
     "Hom Sequence": 18,
     "Annotation": 16,
-    "Depth": 10,
-    "manta_N_OCC": 12,
-    "manta_T_OCC": 12,
-    "manta_N_AF": 10,
-    "manta_T_AF": 10,
-    "STR %": 8,
-    "Paired-read freq": 16,
-    "Spanning-read freq": 18,
-    "In Target Panel": 16,
 }
 
 logging.basicConfig(
@@ -157,7 +157,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     # Create the table with default styling. This automatically applies an autofilter.
     worksheet.add_table(
         table_area,
-        {"columns": headers, "data": data, "style": "Table Style Light 1"},
+        {"columns": excel_headers(headers), "data": data, "style": "Table Style Light 1"},
     )
 
     apply_compact_formatting(worksheet, headers, data)
@@ -224,6 +224,17 @@ def _is_junk_bnd(row, column_indexes):
     )
 
 
+def excel_headers(headers):
+    """Create display-only Excel headers."""
+    return [
+        {
+            **header,
+            "header": header.get("header", "").replace("manta_", "", 1),
+        }
+        for header in headers
+    ]
+
+
 def known_fusion_events(table):
     """Return all available rows for BND events containing a KNOWN_FUSION annotation."""
     columns = _column_indexes(table)
@@ -262,6 +273,36 @@ def has_high_normal_af(row, normal_af_idx):
         normal_af_idx is not None
         and _as_float(row[normal_af_idx], default=0.0) > MAX_OVERVIEW_NORMAL_AF
     )
+
+
+def align_overview_table(table_data, selected_data):
+    """Put Overview fields in the fixed COLUMN_WIDTHS order."""
+    source_headers = table_data["headers"]
+    source_indexes = {
+        header.get("header"): index
+        for index, header in enumerate(source_headers)
+    }
+
+    headers = []
+    for name in COLUMN_WIDTHS:
+        if name in source_indexes:
+            headers.append(
+                dict(source_headers[source_indexes[name]])
+            )
+        else:
+            headers.append({"header": name})
+
+    aligned_data = [
+        [
+            row[source_indexes[name]]
+            if name in source_indexes
+            else ""
+            for name in COLUMN_WIDTHS
+        ]
+        for row in selected_data
+    ]
+
+    return headers, aligned_data
 
 
 def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=False):
@@ -315,8 +356,10 @@ def write_overview_summary(
     if not selected_data and empty_message is None:
         return start_row
 
-    headers = table_data["headers"]
-
+    headers, selected_data = align_overview_table(
+        table_data,
+        selected_data,
+    )
     worksheet.write(start_row, 0, title, format_heading)
     table_start_row = start_row + 2
 
@@ -336,7 +379,7 @@ def write_overview_summary(
     worksheet.add_table(
         table_area,
         {
-            "columns": headers,
+            "columns": excel_headers(headers),
             "data": selected_data,
             "style": "Table Style Light 1",
         },
@@ -683,6 +726,6 @@ new_row_idx = write_overview_summary(
 if new_row_idx != maxdepth_start:
     row_idx = new_row_idx
 
-workbook.set_size(1800, 1200)
+workbook.set_size(1900, 1400)
 workbook.close()
 logging.info("All done")
