@@ -9,6 +9,7 @@ import os
 from collections import Counter
 
 MAX_OVERVIEW_NORMAL_AF = 0.2
+MAXDEPTH_RESCUE_MIN_SUPPORT = 0.05
 
 logging.basicConfig(
     format="{asctime} - {levelname} - {message}",
@@ -34,14 +35,26 @@ def convert_columns_to_letter(nr_columns):
 
 
 def load_target_genes(filepath):
-    genes = []
-    if filepath and os.path.exists(filepath):
-        try:
-            with open(filepath, 'r') as f:
-                genes = [line.strip() for line in f if line.strip()]
-            logging.info(f"Loaded {len(genes)} target genes from {filepath}")
-        except Exception as e:
-            logging.error(f"Could not load gene list: {e}")
+    if not filepath:
+        logging.warning("No target gene list supplied; target-panel summaries will be omitted.")
+        return []
+    
+    try:
+        with open(filepath, encoding="utf-8") as gene_file:
+            genes = [line.strip() for line in gene_file if line.strip()]
+    except FileNotFoundError as error:
+        raise FileNotFoundError(
+            f"Target gene list does not exist: {filepath}"
+        ) from error
+    except OSError as error:
+        raise OSError(
+            f"Could not read target gene list: {filepath}"
+        ) from error
+
+    if not genes:
+        raise ValueError(f"Target gene list is empty: {filepath}")
+
+    logging.info("Loaded %d target genes from %s", len(genes), filepath)
     return genes
 
 
@@ -126,22 +139,16 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     worksheet.write("A5", "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
     row_offset = 7
     if "Deletions" in sheet_name:
-        worksheet.write("A7", "Calls have to be longer than 100 bp to be included.")
+        worksheet.write("A7", "Deletions have to be longer than 100 bp to be included.")
         row_offset = 8
 
     headers = table_data["headers"]
     data = table_data["data"]
 
     # 1. Find columns
-    svdb_col_idx = -1
-    target_col_idx = -1
-    for idx, header_dict in enumerate(headers):
-        header_name = header_dict.get("header")
-
-        if header_name == "manta_N_AF":
-            svdb_col_idx = idx
-        elif header_name == "In Target Panel":
-            target_col_idx = idx
+    columns = _column_indexes(table_data)
+    svdb_col_idx = columns.get("manta_n_af")
+    target_col_idx = columns.get("in target panel")
 
     # xlsxwriter's add_table requires 1-based Excel coordinates (e.g., A7:K20)
     column_end = convert_columns_to_letter(len(headers))
@@ -157,21 +164,16 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     apply_compact_formatting(worksheet, headers, data)
 
     # Hide rows with high manta_N_AF, except target-gene variants
-    if svdb_col_idx != -1 and data:
+    if svdb_col_idx is not None and data:
         for i, row_data in enumerate(data):
             excel_row_index = row_offset + i
 
             is_target = (
-                target_col_idx != -1
+                target_col_idx is not None
                 and str(row_data[target_col_idx]).strip().lower() == "yes"
             )
 
-            try:
-                high_normal_af = float(row_data[svdb_col_idx]) > 0.2
-            except (ValueError, TypeError):
-                high_normal_af = False
-
-            if high_normal_af and not is_target:
+            if has_high_normal_af(row_data, svdb_col_idx) and not is_target:
                 worksheet.set_row(excel_row_index, options={"hidden": True})
 
     return worksheet
@@ -256,6 +258,13 @@ def known_fusion_events(table):
     return selected_rows
 
 
+def has_high_normal_af(row, normal_af_idx):
+    return (
+        normal_af_idx is not None
+        and _as_float(row[normal_af_idx], default=0.0) > MAX_OVERVIEW_NORMAL_AF
+    )
+
+
 def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=False):
     """
     Remove Overview candidates with normal-panel AF above the configured limit.
@@ -267,13 +276,10 @@ def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=F
     if normal_af_idx is None:
         return list(selected_data)
 
-    def has_high_normal_af(row):
-        return (_as_float(row[normal_af_idx], default=0.0) > MAX_OVERVIEW_NORMAL_AF)
-
     if not event_atomic:
-        return [row for row in selected_data if not has_high_normal_af(row)]
+        return [row for row in selected_data if not has_high_normal_af(row, normal_af_idx)]
 
-    excluded_event_ids = {_bnd_event_key(row, columns) for row in selected_data if has_high_normal_af(row)}
+    excluded_event_ids = {_bnd_event_key(row, columns) for row in selected_data if has_high_normal_af(row, normal_af_idx)}
 
     return [
         row
@@ -358,14 +364,8 @@ def write_target_summary(worksheet, start_row, title, table_data, format_heading
     headers = table_data["headers"]
     data = table_data.get("data", [])
 
-    target_col_idx = next(
-        (
-            idx
-            for idx, header in enumerate(headers)
-            if header.get("header") == "In Target Panel"
-        ),
-        None,
-    )
+    columns = _column_indexes(table_data)
+    target_col_idx = columns.get("in target panel")
 
     if target_col_idx is None:
         return start_row

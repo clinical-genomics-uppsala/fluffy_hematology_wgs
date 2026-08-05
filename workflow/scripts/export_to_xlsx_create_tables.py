@@ -4,6 +4,8 @@ import gzip
 from pysam import VariantFile
 import re
 
+MIN_DEL_LEN = -100
+
 
 # VEP fields in list to get index
 def index_vep(variantfile):
@@ -542,7 +544,7 @@ def create_manta_tables(
                 outline = outline + in_target
                 manta_tables["bnd"]["data"].append(outline)
 
-            elif "MantaDEL" in record_values["id"] and record_values["svlength"] <= -100:
+            elif "MantaDEL" in record_values["id"] and record_values["svlength"] <= MIN_DEL_LEN:
                 outline = [
                     str(record.contig),
                     int(record.pos),
