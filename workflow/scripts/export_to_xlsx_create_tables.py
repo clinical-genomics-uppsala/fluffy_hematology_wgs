@@ -433,6 +433,7 @@ def create_manta_tables(
         {"header": "manta_N_OCC"},
         {"header": "manta_T_OCC"},
         {"header": "manta_N_AF"},
+        {"header": "manta_T_AF"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
