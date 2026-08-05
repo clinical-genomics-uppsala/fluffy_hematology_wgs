@@ -11,6 +11,33 @@ from collections import Counter
 MAX_OVERVIEW_NORMAL_AF = 0.2
 MAXDEPTH_RESCUE_MIN_SUPPORT = 0.05
 
+COLUMN_WIDTHS = {
+    "Sample Name": 24,
+    "Chr": 8,
+    "Pos": 11,
+    "EndPos": 11,
+    "Ref": 12,
+    "Alt": 24,
+    "SV Length": 11,
+    "MantaID": 24,
+    "BND Event ID": 30,
+    "BreakEnd": 24,
+    "Genes": 26,
+    "Details": 20,
+    "Hom Length": 11,
+    "Hom Sequence": 18,
+    "Annotation": 16,
+    "Depth": 10,
+    "manta_N_OCC": 12,
+    "manta_T_OCC": 12,
+    "manta_N_AF": 10,
+    "manta_T_AF": 10,
+    "STR %": 8,
+    "Paired-read freq": 16,
+    "Spanning-read freq": 18,
+    "In Target Panel": 16,
+}
+
 logging.basicConfig(
     format="{asctime} - {levelname} - {message}",
     style="{",
@@ -92,32 +119,11 @@ def format_manta_table(table, sample_name, format_2dec):
 
 
 def apply_compact_formatting(worksheet, headers, data):
-    """
-    Scans the data and applies sets column widths based on header name and content.
-    """
-    for col_idx, h in enumerate(headers):
-        header_str = str(h.get("header", ""))
-        max_len = len(header_str)
-
-        # Sample the first 100 rows to find max content length
-        for row in data[:100]:
-            if col_idx < len(row) and row[col_idx] is not None:
-                max_len = max(max_len, len(str(row[col_idx])))
-
-        # Apply compact constraints based on column type
-        lower_header = header_str.lower()
-        if "freq" in lower_header or "af" in lower_header or "chr" in lower_header:
-            final_width = 6
-        elif "pos" in lower_header or "length" in lower_header:
-            final_width = 12
-        elif "mantaid" in lower_header:
-            final_width = 16
-        elif "gene" in lower_header or "sample" in lower_header:
-            final_width = 20
-        else:
-            final_width = min(max_len + 2, 35)  # Allow slightly longer text cols but cap at 35
-
-        worksheet.set_column(col_idx, col_idx, final_width)
+    """Apply stable, field-specific widths to an exported table."""
+    for col_idx, header in enumerate(headers):
+        name = header.get("header", "")
+        width = COLUMN_WIDTHS.get(name, 14)
+        worksheet.set_column(col_idx, col_idx, width)
 
 
 def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, set_cols=None):
@@ -126,11 +132,6 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 
     worksheet = workbook.add_worksheet(sheet_name)
     format_heading = workbook.add_format({"bold": True, "font_size": 18})
-
-    # Set column widths if specified
-    if set_cols:
-        for col_range, width in set_cols.items():
-            worksheet.set_column(col_range, width)
 
     worksheet.write("A1", title, format_heading)
     worksheet.write("A3", "Sample: " + str(sample_name))
