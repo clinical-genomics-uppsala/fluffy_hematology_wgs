@@ -8,6 +8,7 @@ import logging
 import os
 from collections import Counter
 
+MAX_OVERVIEW_NORMAL_AF = 0.2
 
 logging.basicConfig(
     format="{asctime} - {levelname} - {message}",
@@ -108,85 +109,6 @@ def apply_compact_formatting(worksheet, headers, data):
         worksheet.set_column(col_idx, col_idx, final_width)
 
 
-def write_target_summary(worksheet, start_row, title, table_data, format_heading, event_atomic=False):
-    """
-    Write variants annotated as belonging to the target panel.
-
-    When event_atomic is True, all rows belonging to a selected BND event
-    are included if at least one breakend is in the target panel.
-    """
-    if not table_data or "headers" not in table_data:
-        return start_row
-
-    headers = table_data["headers"]
-    data = table_data.get("data", [])
-
-    target_col_idx = next(
-        (
-            idx
-            for idx, header in enumerate(headers)
-            if header.get("header") == "In Target Panel"
-        ),
-        None,
-    )
-
-    if target_col_idx is None:
-        return start_row
-
-    target_data = [
-        row
-        for row in data
-        if str(row[target_col_idx]).strip().lower() == "yes"
-    ]
-
-    if event_atomic and target_data:
-        columns = _column_indexes(table_data)
-
-        selected_event_ids = {
-            _bnd_event_key(row, columns)
-            for row in target_data
-        }
-
-        target_data = [
-            row
-            for row in data
-            if _bnd_event_key(row, columns) in selected_event_ids
-        ]
-
-    worksheet.write(start_row, 0, title, format_heading)
-    table_start_idx = start_row + 2
-
-    if not target_data:
-        worksheet.write(
-            table_start_idx,
-            0,
-            "Inga target-varianter hittades för denna typ.",
-        )
-        return table_start_idx + 3
-
-    column_end = convert_columns_to_letter(len(headers))
-    excel_start_row = table_start_idx + 1
-    excel_end_row = excel_start_row + len(target_data)
-    table_area = f"A{excel_start_row}:{column_end}{excel_end_row}"
-
-    worksheet.add_table(
-        table_area,
-        {
-            "columns": headers,
-            "data": target_data,
-            "style": "Table Style Light 1",
-        },
-    )
-
-    apply_compact_formatting(
-        worksheet,
-        headers,
-        target_data,
-    )
-
-    return table_start_idx + len(target_data) + 4
-
-
 def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, set_cols=None):
     if not table_data or "headers" not in table_data:
         return None
@@ -269,14 +191,6 @@ def _as_float(value, default=0.0):
         return default
 
 
-def _annotation_flags(row, column_indexes):
-    return {
-        flag.strip()
-        for flag in str(row[column_indexes["annotation"]]).split(",")
-        if flag.strip()
-    }
-
-
 def _bnd_event_key(row, column_indexes):
     """Return a stable BND event key, falling back to a single-record event."""
     event_idx = column_indexes.get("bnd event id")
@@ -285,6 +199,14 @@ def _bnd_event_key(row, column_indexes):
 
     id_idx = column_indexes.get("mantaid")
     return str(row[id_idx]) if id_idx is not None else id(row)
+
+
+def _annotation_flags(row, column_indexes):
+    return {
+        flag.strip()
+        for flag in str(row[column_indexes["annotation"]]).split(",")
+        if flag.strip()
+    }
 
 
 def _is_junk_bnd(row, column_indexes):
@@ -334,13 +256,72 @@ def known_fusion_events(table):
     return selected_rows
 
 
-def write_known_fusion_summary(worksheet, start_row, title, headers, selected_data, format_heading):
-    """Write selected KNOWN_FUSION BND events to the Overview sheet."""
-    if not selected_data:
+def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=False):
+    """
+    Remove Overview candidates with normal-panel AF above the configured limit.
+    BND events are removed as complete events when event_atomic is True.
+    """
+    columns = _column_indexes(table_data)
+    normal_af_idx = columns.get("manta_n_af")
+
+    if normal_af_idx is None:
+        return list(selected_data)
+
+    def has_high_normal_af(row):
+        return (_as_float(row[normal_af_idx], default=0.0) > MAX_OVERVIEW_NORMAL_AF)
+
+    if not event_atomic:
+        return [row for row in selected_data if not has_high_normal_af(row)]
+
+    excluded_event_ids = {_bnd_event_key(row, columns) for row in selected_data if has_high_normal_af(row)}
+
+    return [
+        row
+        for row in selected_data
+        if _bnd_event_key(row, columns) not in excluded_event_ids
+    ]
+
+
+def write_overview_summary(
+    worksheet,
+    start_row,
+    title,
+    table_data,
+    selected_data,
+    format_heading,
+    empty_message=None,
+    event_atomic=False,
+):
+    """
+    Apply the common Overview filters and write a summary table.
+
+    BND summaries are filtered as complete events when event_atomic is True.
+    When no rows remain, the section is omitted unless empty_message is given.
+    """
+    if not table_data or "headers" not in table_data:
         return start_row
+
+    selected_data = _filter_overview_rows_by_normal_af(
+        table_data,
+        selected_data,
+        event_atomic=event_atomic,
+    )
+
+    if not selected_data and empty_message is None:
+        return start_row
+
+    headers = table_data["headers"]
 
     worksheet.write(start_row, 0, title, format_heading)
     table_start_row = start_row + 2
+
+    if not selected_data:
+        worksheet.write(
+            table_start_row,
+            0,
+            empty_message,
+        )
+        return table_start_row + 3
 
     column_end = convert_columns_to_letter(len(headers))
     excel_start_row = table_start_row + 1
@@ -356,9 +337,69 @@ def write_known_fusion_summary(worksheet, start_row, title, headers, selected_da
         },
     )
 
-    apply_compact_formatting(worksheet, headers, selected_data)
+    apply_compact_formatting(
+        worksheet,
+        headers,
+        selected_data,
+    )
 
     return table_start_row + len(selected_data) + 4
+
+
+def write_target_summary(worksheet, start_row, title, table_data, format_heading, event_atomic=False):
+    """
+    Select target-panel variants and write them to the Overview sheet.
+    When event_atomic is True, all rows belonging to a selected BND event
+    are included if at least one breakend is in the target panel.
+    """
+    if not table_data or "headers" not in table_data:
+        return start_row
+
+    headers = table_data["headers"]
+    data = table_data.get("data", [])
+
+    target_col_idx = next(
+        (
+            idx
+            for idx, header in enumerate(headers)
+            if header.get("header") == "In Target Panel"
+        ),
+        None,
+    )
+
+    if target_col_idx is None:
+        return start_row
+
+    target_data = [
+        row
+        for row in data
+        if str(row[target_col_idx]).strip().lower() == "yes"
+    ]
+
+    if event_atomic and target_data:
+        columns = _column_indexes(table_data)
+
+        selected_event_ids = {
+            _bnd_event_key(row, columns)
+            for row in target_data
+        }
+
+        target_data = [
+            row
+            for row in data
+            if _bnd_event_key(row, columns) in selected_event_ids
+        ]
+
+    return write_overview_summary(
+        worksheet,
+        start_row,
+        title,
+        table_data,
+        target_data,
+        format_heading,
+        empty_message="Inga target-varianter hittades för denna typ.",
+        event_atomic=event_atomic,
+    )
 
 
 def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_support=0.05):
@@ -473,31 +514,6 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
         )
 
     return rescue_table
-
-
-def write_maxdepth_rescue_summary(worksheet, start_row, title, table_data, format_heading):
-    """Write accepted MaxDepth BND rescue calls to the Overview sheet."""
-    if not table_data or not table_data.get("data"):
-        return start_row
-
-    headers = table_data["headers"]
-    data = table_data["data"]
-
-    worksheet.write(start_row, 0, title, format_heading)
-    table_start_row = start_row + 2
-
-    column_end = convert_columns_to_letter(len(headers))
-    excel_start_row = table_start_row + 1
-    excel_end_row = excel_start_row + len(data)
-    table_area = f"A{excel_start_row}:{column_end}{excel_end_row}"
-
-    worksheet.add_table(
-        table_area,
-        {"columns": headers, "data": data, "style": "Table Style Light 1"},
-    )
-    apply_compact_formatting(worksheet, headers, data)
-
-    return table_start_row + len(data) + 4
 
 
 """ MAIN EXECUTION """
@@ -641,26 +657,35 @@ for sv_key, sv_title in summaries:
 
 known_fusion_rows = known_fusion_events(manta_tables_full["bnd"])
 
-if known_fusion_rows:
-    row_idx += 2
-    row_idx = write_known_fusion_summary(
-        worksheet_overview,
-        row_idx,
-        "Translocations (KNOWN_FUSION)",
-        manta_tables_full["bnd"]["headers"],
-        known_fusion_rows,
-        format_overview_title,
-    )
+known_fusion_start = row_idx + 2
 
-if manta_tables_maxdepth.get("data"):
-    row_idx += 2
-    row_idx = write_maxdepth_rescue_summary(
-        worksheet_overview,
-        row_idx,
-        "MaxDepth rescue calls",
-        manta_tables_maxdepth,
-        format_overview_title,
-    )
+new_row_idx = write_overview_summary(
+    worksheet_overview,
+    known_fusion_start,
+    "Translocations (KNOWN_FUSION)",
+    manta_tables_full["bnd"],
+    known_fusion_rows,
+    format_overview_title,
+    event_atomic=True,
+)
+
+if new_row_idx != known_fusion_start:
+    row_idx = new_row_idx
+
+maxdepth_start = row_idx + 2
+
+new_row_idx = write_overview_summary(
+    worksheet_overview,
+    maxdepth_start,
+    "MaxDepth rescue calls",
+    manta_tables_maxdepth,
+    manta_tables_maxdepth.get("data", []),
+    format_overview_title,
+    event_atomic=True,
+)
+
+if new_row_idx != maxdepth_start:
+    row_idx = new_row_idx
 
 workbook.set_size(1800, 1200)
 workbook.close()
