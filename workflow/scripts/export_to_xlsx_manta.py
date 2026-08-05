@@ -11,7 +11,7 @@ from collections import Counter
 MAX_OVERVIEW_NORMAL_AF = 0.2
 MAXDEPTH_RESCUE_MIN_SUPPORT = 0.05
 
-COLUMN_WIDTHS = {
+COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "Sample Name": 18,
     "Chr": 6,
     "Pos": 10,
@@ -19,23 +19,23 @@ COLUMN_WIDTHS = {
     "Ref": 12,
     "Alt": 24,
     "SV Length": 11,
+    "MantaID": 12,
     "Depth": 6,
     "In Target Panel": 6,
     "manta_N_OCC": 6,
     "manta_T_OCC": 6,
     "manta_N_AF": 8,
     "manta_T_AF": 8,
-    "STR %": 6,
+    "STR %": 4,
     "Paired-read freq": 6,
     "Spanning-read freq": 6,
-    "MantaID": 24,
-    "BND Event ID": 30,
-    "BreakEnd": 24,
+    "Annotation": 16,
     "Genes": 26,
     "Details": 20,
     "Hom Length": 11,
     "Hom Sequence": 18,
-    "Annotation": 16,
+    "BreakEnd": 18,
+    "BND Event ID": 30,
 }
 
 logging.basicConfig(
@@ -726,6 +726,6 @@ new_row_idx = write_overview_summary(
 if new_row_idx != maxdepth_start:
     row_idx = new_row_idx
 
-workbook.set_size(1900, 1400)
+workbook.set_size(1800, 1200)
 workbook.close()
 logging.info("All done")
