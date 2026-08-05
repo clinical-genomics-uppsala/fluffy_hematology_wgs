@@ -398,7 +398,7 @@ def write_target_summary(worksheet, start_row, title, table_data, format_heading
     )
 
 
-def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_support=0.05):
+def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_support=MAXDEPTH_RESCUE_MIN_SUPPORT):
     """
     Return BND events classified as MaxDepth if they pass our rescue criteria.
 
@@ -531,7 +531,7 @@ blocking_filter_flags = set(filter_flags) - {"MaxDepth"}
 manta_tables_maxdepth = create_maxdepth_bnd_rescue_table(
     manta_tables_all,
     blocking_filter_flags,
-    min_support == MAXDEPTH_RESCUE_MIN_SUPPORT,
+    min_support=MAXDEPTH_RESCUE_MIN_SUPPORT,
 )
 
 # 2. Creating xlsx workbook
