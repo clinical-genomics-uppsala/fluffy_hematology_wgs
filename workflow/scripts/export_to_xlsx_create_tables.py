@@ -140,7 +140,7 @@ def first_info_value(record, key, default=None):
     return value
 
 
-def info_as_int(record, key, default=None):
+def info_as_int(record, key, default=0):
     value = first_info_value(record, key)
     if value is None:
         return default
@@ -150,7 +150,7 @@ def info_as_int(record, key, default=None):
         return default
 
 
-def info_as_float(record, key, default=None, decimals=None):
+def info_as_float(record, key, default=0.0, decimals=None):
     value = first_info_value(record, key)
     if value is None:
         return default
