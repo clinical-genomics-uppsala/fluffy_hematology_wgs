@@ -2,6 +2,7 @@
 
 from export_to_xlsx_create_tables import *
 import xlsxwriter
+from xlsxwriter.utility import xl_col_to_name
 import datetime
 import sys
 import logging
@@ -9,6 +10,7 @@ import os
 from collections import Counter
 
 MAX_OVERVIEW_NORMAL_AF = 0.2
+MANTA_NORMAL_AF_CAUTION_THRESHOLD = 0.05
 MAXDEPTH_RESCUE_MIN_SUPPORT = 0.05
 
 COLUMN_WIDTHS = {  # This is also used to order columns on Overview
@@ -126,6 +128,63 @@ def apply_compact_formatting(worksheet, headers, data):
         worksheet.set_column(col_idx, col_idx, width)
 
 
+def add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset):
+    """Color complete data rows according to the normal-sample allele frequency."""
+    columns = _column_indexes({"headers": headers})
+    af_idx = columns.get("manta_n_af")
+    if af_idx is None or not data:
+        return
+
+    af_col = xl_col_to_name(af_idx)
+    last_col = xl_col_to_name(len(headers) - 1)
+    first_data_row = row_offset + 1
+    last_data_row = row_offset + len(data)
+    data_range = f"A{first_data_row}:{last_col}{last_data_row}"
+
+    format_red = workbook.add_format({
+        "bg_color": "#FFC7CE",
+        "font_color": "#9C0006",
+    })
+    format_yellow = workbook.add_format({
+        "bg_color": "#FFF8E1",
+        "font_color": "#8A6D1D",
+    })
+    format_green = workbook.add_format({
+        "bg_color": "#C6EFCE",
+        "font_color": "#006100",
+    })
+
+    # The column is absolute, while the row remains relative so Excel evaluates
+    # the rule against the corresponding manta_N_AF value in each row.
+    worksheet.conditional_format(data_range, {
+        "type": "formula",
+        "criteria": (
+            f"=AND(ISNUMBER(${af_col}{first_data_row}),"
+            f"${af_col}{first_data_row}>{MAX_OVERVIEW_NORMAL_AF})"
+        ),
+        "format": format_red,
+        "stop_if_true": True,
+    })
+    worksheet.conditional_format(data_range, {
+        "type": "formula",
+        "criteria": (
+            f"=AND(ISNUMBER(${af_col}{first_data_row}),"
+            f"${af_col}{first_data_row}>={MANTA_NORMAL_AF_CAUTION_THRESHOLD},"
+            f"${af_col}{first_data_row}<={MAX_OVERVIEW_NORMAL_AF})"
+        ),
+        "format": format_yellow,
+        "stop_if_true": True,
+    })
+    worksheet.conditional_format(data_range, {
+        "type": "formula",
+        "criteria": (
+            f"=AND(ISNUMBER(${af_col}{first_data_row}),"
+            f"${af_col}{first_data_row}<{MANTA_NORMAL_AF_CAUTION_THRESHOLD})"
+        ),
+        "format": format_green,
+    })
+
+
 def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, set_cols=None):
     if not table_data or "headers" not in table_data:
         return None
@@ -161,6 +220,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     )
 
     apply_compact_formatting(worksheet, headers, data)
+    add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset)
 
     # Hide rows with high manta_N_AF, except target-gene variants
     if svdb_col_idx is not None and data:
@@ -330,6 +390,7 @@ def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=F
 
 def write_overview_summary(
     worksheet,
+    workbook,
     start_row,
     title,
     table_data,
@@ -390,11 +451,18 @@ def write_overview_summary(
         headers,
         selected_data,
     )
+    add_manta_af_row_colors(
+        worksheet,
+        workbook,
+        headers,
+        selected_data,
+        excel_start_row,
+    )
 
     return table_start_row + len(selected_data) + 4
 
 
-def write_target_summary(worksheet, start_row, title, table_data, format_heading, event_atomic=False):
+def write_target_summary(worksheet, workbook, start_row, title, table_data, format_heading, event_atomic=False):
     """
     Select target-panel variants and write them to the Overview sheet.
     When event_atomic is True, all rows belonging to a selected BND event
@@ -432,6 +500,7 @@ def write_target_summary(worksheet, start_row, title, table_data, format_heading
 
     return write_overview_summary(
         worksheet,
+        workbook,
         start_row,
         title,
         table_data,
@@ -687,6 +756,7 @@ summaries = [
 for sv_key, sv_title in summaries:
     row_idx = write_target_summary(
         worksheet_overview,
+        workbook,
         row_idx,
         sv_title,
         manta_tables_full[sv_key],
@@ -700,6 +770,7 @@ known_fusion_start = row_idx + 2
 
 new_row_idx = write_overview_summary(
     worksheet_overview,
+    workbook,
     known_fusion_start,
     "Translocations (KNOWN_FUSION)",
     manta_tables_full["bnd"],
@@ -715,6 +786,7 @@ maxdepth_start = row_idx + 2
 
 new_row_idx = write_overview_summary(
     worksheet_overview,
+    workbook,
     maxdepth_start,
     "MaxDepth rescue calls",
     manta_tables_maxdepth,
