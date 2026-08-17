@@ -272,6 +272,7 @@ def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, 
     return_dict["filt_ann"] = ",".join(record.filter.keys())
     return_dict["id"] = record.id or ""
     return_dict["depth"] = first_info_value(record, "BND_DEPTH", default="")
+    # helper functions sets svdb vales to 0 if missing:
     return_dict["manta_n_occ"] = info_as_int(record, "manta_N_OCC")
     return_dict["manta_t_occ"] = info_as_int(record, "manta_T_OCC")
     return_dict["manta_n_af"] = info_as_float(record, "manta_N_AF")
