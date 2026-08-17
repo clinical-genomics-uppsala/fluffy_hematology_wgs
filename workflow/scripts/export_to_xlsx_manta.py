@@ -500,9 +500,8 @@ def write_target_summary(worksheet, workbook, start_row, title, table_data, form
     data = table_data.get("data", [])
 
     columns = _column_indexes(table_data)
-    target_col_idx = columns.get("in target panel")
 
-    if target_col_idx is None:
+    if "in target panel" not in columns:
         return start_row
 
     target_data = [
@@ -541,14 +540,17 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
     """
     Return BND events classified as MaxDepth if they pass our rescue criteria.
 
-    The input tables should contain all BND records so that MATEID-linked
-    partners are available. An event is rescued only when:
+    Manta flags MaxDepth on breakpoints in regions with depth 3x above the
+    chromosome mean. Such regions are enriched for mapping artefacts, but strictly removing events based on
+    maxdepth was found to remove some true variants. The calls are still kept off the ordinary sheets and only 
+    the subset below is surfaced, in its own Overview section, for manual review.
+
+    An event is rescued only when:
 
     - at least one breakpoint is flagged MaxDepth;
-    - no event row has another blocking filter;
-    - every MaxDepth breakpoint has PR or SR frequency >= min_support;
-    - no MaxDepth breakpoint is present in the normal panel;
-    - neither breakpoint points to a junk/alternate contig.
+    - no breakpoint has another blocking filter;
+    - every MaxDepth breakpoint has PR or SR frequency >= min_support (0.05);
+    - neither breakpoint is present in the normal pane or in a junk/alternate contig.
 
     When accepted, every row belonging to the BND event is returned.
     """
@@ -619,9 +621,9 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
             for row in maxdepth_rows
         )
 
-        maxdepth_row_has_normal_panel_hit = any(
+        event_has_normal_panel_hit = any(
             _as_float(row[columns["manta_n_occ"]]) != 0
-            for row in maxdepth_rows
+            for row in event_rows
         )
 
         has_junk_contig = any(
