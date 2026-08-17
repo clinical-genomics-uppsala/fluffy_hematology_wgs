@@ -102,9 +102,17 @@ properties:
       genome_dir:
         type: string
         description: path to genome directory for star align
+      simple_repeats:
+        type: string
+        description: path to bgzipped bed file with simple repeats, used to annotate manta calls with STR_PERCENT
       sites:
         type: string
         description: path to known sites list file
+      target_genes:
+        type: string
+        description: >
+          path to a text file with one gene symbol per line. Calls hitting these genes are flagged
+          in the manta xlsx and are exempt from the normal-panel AF filtering. Leave empty to skip
       wgs_intervals:
         type: string
         description: path to wgs interval file

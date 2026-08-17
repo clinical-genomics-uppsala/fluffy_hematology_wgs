@@ -662,8 +662,7 @@ sample_name = snakemake.output.xlsx.split("/")[-1].split(".manta.xlsx")[0]
 filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "NoPairSupport", "SampleFT", "HomRef", "MaxDepth"]
 
 # Load target genes for easy filtering in Excel
-target_genes = []
-target_genes_path = getattr(snakemake.params, "target_genes", "") or getattr(snakemake.input, "target_genes", "")
+target_genes_path = getattr(snakemake.input, "target_genes", "") or getattr(snakemake.params, "target_genes", "")
 target_genes = load_target_genes(target_genes_path)
 
 manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
