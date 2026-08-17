@@ -206,7 +206,6 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     # 1. Find columns
     columns = _column_indexes(table_data)
     svdb_col_idx = columns.get("manta_n_af")
-    target_col_idx = columns.get("in target panel")
 
     # xlsxwriter's add_table requires 1-based Excel coordinates (e.g., A7:K20)
     column_end = convert_columns_to_letter(len(headers))
@@ -227,12 +226,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
         for i, row_data in enumerate(data):
             excel_row_index = row_offset + i
 
-            is_target = (
-                target_col_idx is not None
-                and str(row_data[target_col_idx]).strip().lower() == "yes"
-            )
-
-            if has_high_normal_af(row_data, svdb_col_idx) and not is_target:
+            if has_high_normal_af(row_data, svdb_col_idx) and not is_in_target_panel(row_data, columns):
                 worksheet.set_row(excel_row_index, options={"hidden": True})
 
     return worksheet
@@ -335,6 +329,18 @@ def has_high_normal_af(row, normal_af_idx):
     )
 
 
+def is_in_target_panel(row, column_indexes):
+    """
+    True when the row is flagged as belonging to the target gene panel.
+    """
+    target_idx = column_indexes.get("in target panel")
+
+    return (
+        target_idx is not None
+        and str(row[target_idx]).strip().lower() == "yes"
+    )
+
+
 def align_overview_table(table_data, selected_data):
     """Put Overview fields in the fixed COLUMN_WIDTHS order."""
     source_headers = table_data["headers"]
@@ -368,7 +374,13 @@ def align_overview_table(table_data, selected_data):
 def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=False):
     """
     Remove Overview candidates with normal-panel AF above the configured limit.
-    BND events are removed as complete events when event_atomic is True.
+
+    Target-panel rows are exempt, so gene-list calls that stay visible on the
+    data sheets are kept here as well. They are still colour-coded by
+    manta_N_AF, which flags them as frequent in the normal panel.
+
+    BND events are removed as complete events when event_atomic is True, and
+    an event is exempt when any of its breakends is in the target panel.
     """
     columns = _column_indexes(table_data)
     normal_af_idx = columns.get("manta_n_af")
@@ -377,9 +389,23 @@ def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=F
         return list(selected_data)
 
     if not event_atomic:
-        return [row for row in selected_data if not has_high_normal_af(row, normal_af_idx)]
+        return [
+            row
+            for row in selected_data
+            if not has_high_normal_af(row, normal_af_idx) or is_in_target_panel(row, columns)
+        ]
 
-    excluded_event_ids = {_bnd_event_key(row, columns) for row in selected_data if has_high_normal_af(row, normal_af_idx)}
+    exempt_event_ids = {
+        _bnd_event_key(row, columns)
+        for row in selected_data
+        if is_in_target_panel(row, columns)
+    }
+
+    excluded_event_ids = {
+        _bnd_event_key(row, columns)
+        for row in selected_data
+        if has_high_normal_af(row, normal_af_idx)
+    } - exempt_event_ids
 
     return [
         row
@@ -482,7 +508,7 @@ def write_target_summary(worksheet, workbook, start_row, title, table_data, form
     target_data = [
         row
         for row in data
-        if str(row[target_col_idx]).strip().lower() == "yes"
+        if is_in_target_panel(row, columns)
     ]
 
     if event_atomic and target_data:
