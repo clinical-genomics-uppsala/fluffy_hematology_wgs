@@ -635,7 +635,7 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
             rescue_stats["other_filter"] += 1
         elif not all_maxdepth_rows_have_support:
             rescue_stats["low_support"] += 1
-        elif maxdepth_row_has_normal_panel_hit:
+        elif event_has_normal_panel_hit:
             rescue_stats["normal_panel"] += 1
         elif has_junk_contig:
             rescue_stats["junk_contig"] += 1
