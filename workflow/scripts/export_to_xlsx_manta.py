@@ -542,7 +542,7 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
 
     Manta flags MaxDepth on breakpoints in regions with depth 3x above the
     chromosome mean. Such regions are enriched for mapping artefacts, but strictly removing events based on
-    maxdepth was found to remove some true variants. The calls are still kept off the ordinary sheets and only 
+    maxdepth was found to remove some true variants. The calls are still kept off the ordinary sheets and only
     the subset below is surfaced, in its own Overview section, for manual review.
 
     An event is rescued only when:
