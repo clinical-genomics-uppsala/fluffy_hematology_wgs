@@ -728,7 +728,7 @@ properties:
     type: object
     description: parameters for pelops
     properties:
-      containerr:
+      container:
         type: string
         description: name or path to docker/singularity container
       extra:
