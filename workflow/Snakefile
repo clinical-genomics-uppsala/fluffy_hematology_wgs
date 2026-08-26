@@ -78,8 +78,7 @@ def manta_report_targets(wildcards):
             for unit_type in unit_types:
                 if unit_type in filedef["types"]:
                     targets.append(
-                        pathlib.Path(output_spec["directory"])
-                        / filedef["output"].format(sample=sample, type=unit_type)
+                        pathlib.Path(output_spec["directory"]) / filedef["output"].format(sample=sample, type=unit_type)
                     )
 
     return targets
@@ -87,9 +86,9 @@ def manta_report_targets(wildcards):
 
 rule manta_reports:
     input:
-        manta_report_targets
+        manta_report_targets,
 
-        
+
 module alignment:
     snakefile:
         get_module_snakefile(
