@@ -49,6 +49,7 @@ def _is_junk_bnd(row, column_indexes):
         for value in (chr_value, partner_value)
     )
 
+
 def add_maxdepth_rescue_column(table, rescue_table):
     """Mark both breakends belonging to a rescued MaxDepth event."""
     if not table or "headers" not in table:

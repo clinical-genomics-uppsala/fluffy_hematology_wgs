@@ -492,9 +492,6 @@ def write_target_summary(worksheet, workbook, start_row, title, table_data, form
     )
 
 
-
-
-
 """ MAIN EXECUTION """
 
 # 1. Prepping data
