@@ -317,7 +317,7 @@ def manta_report_targets(wildcards):
                     )
 
     return targets
-    
+
 
 def generate_copy_rules(output_spec):
     output_directory = pathlib.Path(output_spec["directory"])
