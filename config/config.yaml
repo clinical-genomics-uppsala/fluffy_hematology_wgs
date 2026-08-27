@@ -34,6 +34,7 @@ reference:
   genome_dir: "" # req by align not used
   sites: ""
   simple_repeats: ""
+  target_genes: ""
   wgs_intervals: ""
   skip_chrs:
     - chrM

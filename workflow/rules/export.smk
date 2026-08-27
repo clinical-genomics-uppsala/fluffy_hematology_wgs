@@ -73,16 +73,16 @@ rule export_to_xlsx_manta:
         ),
         all_bed=config.get("bcftools_SV", {}).get("all", ""),
         aml_bed=config.get("bcftools_SV", {}).get("aml", ""),
-    output:
-        xlsx=temp("export_to_xlsx/{analysis}/{sample}.manta.xlsx"),
-    params:
         target_genes=config.get("reference", {}).get("target_genes", ""),
+    output:
+        xlsx=temp("export_to_xlsx/{analysis}/{sample}.manta_new.xlsx"),
+    params:
         extra=config.get("export_to_xlsx_manta", {}).get("extra", ""),
     log:
-        "export_to_xlsx/{analysis}/{sample}.manta.xlsx.log",
+        "export_to_xlsx/{analysis}/{sample}.manta_new.xlsx.log",
     benchmark:
         repeat(
-            "export_to_xlsx/{analysis}/{sample}.manta.xlsx.benchmark.tsv",
+            "export_to_xlsx/{analysis}/{sample}.manta_new.xlsx.benchmark.tsv",
             config.get("export_to_xlsx_manta", {}).get("benchmark_repeats", 1),
         )
     threads: config.get("export_to_xlsx_manta", {}).get("threads", config["default_resources"]["threads"])

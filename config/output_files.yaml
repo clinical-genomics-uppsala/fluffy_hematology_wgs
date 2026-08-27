@@ -179,8 +179,8 @@ files:
     types: ["T"]
 
   - name: Manta T xlsx
-    input: "export_to_xlsx/t/{sample}.manta.xlsx"
-    output: "{sample}/SV/{sample}_T.manta.xlsx"
+    input: "export_to_xlsx/t/{sample}.manta_new.xlsx"
+    output: "{sample}/SV/{sample}_T.manta_new.xlsx"
     types: ["T"]
   
   # Matched samples TN
@@ -263,8 +263,8 @@ files:
     types: ["TN"]
 
   - name: Manta TN xlsx
-    input: "export_to_xlsx/tn/{sample}.manta.xlsx"
-    output: "{sample}/SV/{sample}_TN.manta.xlsx"
+    input: "export_to_xlsx/tn/{sample}.manta_new.xlsx"
+    output: "{sample}/SV/{sample}_TN.manta_new.xlsx"
     types: ["TN"]
 
   # RNA
