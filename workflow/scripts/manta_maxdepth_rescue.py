@@ -199,6 +199,12 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
 
 
 def merge_manta_tables(base_table, extra_table):
+    """Merge extra_table's new rows into base_table, keeping Chr/Pos order.
+    Contigs are ranked by the order they first appear in base_table, not
+    alphabetically, so chr2 still sorts before chr10 the way the original
+    VCF (and the rest of the report) does. A contig only seen in the merged
+    rows falls after all contigs already present.
+    """
     if base_table["headers"] != extra_table["headers"]:
         raise ValueError("Cannot merge Manta tables with different headers")
 
@@ -213,11 +219,36 @@ def merge_manta_tables(base_table, extra_table):
         for row in base_table.get("data", [])
     }
 
-    for row in extra_table.get("data", []):
-        manta_id = str(row[manta_id_idx])
-        if manta_id not in existing_ids:
-            base_table["data"].append(row.copy())
-            existing_ids.add(manta_id)
+    new_rows = [
+        row.copy()
+        for row in extra_table.get("data", [])
+        if str(row[manta_id_idx]) not in existing_ids
+    ]
+
+    if not new_rows:
+        return base_table
+
+    chr_idx = columns.get("chr")
+    pos_idx = columns.get("pos")
+
+    if chr_idx is None or pos_idx is None:
+        base_table["data"].extend(new_rows)
+        return base_table
+
+    contig_rank = {}
+    for row in base_table["data"]:
+        contig_rank.setdefault(row[chr_idx], len(contig_rank))
+
+    def sort_key(row):
+        rank = contig_rank.setdefault(row[chr_idx], len(contig_rank))
+        try:
+            pos = int(row[pos_idx])
+        except (TypeError, ValueError):
+            pos = 0
+        return (rank, pos)
+
+    base_table["data"].extend(new_rows)
+    base_table["data"].sort(key=sort_key)
 
     return base_table
 

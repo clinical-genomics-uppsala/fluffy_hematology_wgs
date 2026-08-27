@@ -487,7 +487,7 @@ def write_target_summary(worksheet, workbook, start_row, title, table_data, form
         table_data,
         target_data,
         format_heading,
-        empty_message="Inga target-varianter hittades för denna typ.",
+        empty_message="No target-variants found for this type.",
         event_atomic=event_atomic,
     )
 
