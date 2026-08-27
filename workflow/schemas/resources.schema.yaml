@@ -348,7 +348,7 @@ properties:
         type: string
         description: max execution time
 
-  gatk_cnv_model_segments:
+  gatk_model_segments:
     type: object
     description: resource definitions for gatk_cnv_model_segments
     properties:
@@ -528,7 +528,7 @@ properties:
         type: string
         description: max execution time
  
-  pbrun_fq2bam:
+  pbrun_fq2bam_recal:
     type: object
     description: resource definitions for pbrun_fq2bam
     properties:
