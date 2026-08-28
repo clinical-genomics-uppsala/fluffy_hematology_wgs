@@ -302,6 +302,9 @@ crumble:
   container: "{{APPTAINER_CACHE}}/crumble_0.8.3.sif"
   extra: "-O CRAM"
 
+export_to_xlsx_rna_fusions:
+  fusioncatcher_genelist: "{{FLUFFY_HOME}}/config/fusioncatcher_genelist.txt"
+
 dux4_igh:
   region: "chr14:105586437-106879844"
 

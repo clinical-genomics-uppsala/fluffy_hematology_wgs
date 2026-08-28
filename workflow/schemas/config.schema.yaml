@@ -406,6 +406,9 @@ properties:
     type: object
     description: parameters for export_to_xlsx_snvs
     properties:
+      fusioncatcher_genelist:
+        type: string
+        description: path to fusioncatcher genelist for table on overview sheet
       benchmark_repeats:
         type: integer
         description: set number of times benchmark should be repeated
