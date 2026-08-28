@@ -28,6 +28,28 @@ def convert_columns_to_letter(nr_columns):
 
 """ Prepping input data """
 logging.info("Prepping input data")
+
+logging.debug("Loading fusioncatcher genelist if exists")
+single_genes = set()
+gene_pairs = set()
+if snakemake.params.fusioncatcher_genelist:
+    with open(snakemake.params.fusioncatcher_genelist, "r") as genelist_txt:
+        for lline in genelist_txt:
+            entry = lline.strip()
+            if not entry:
+                continue
+            if "|" in entry:
+                parts = [p.strip().upper() for p in entry.split("|") if p.strip()]
+                if len(parts) == 2:
+                    gene_pairs.add(frozenset(parts))
+                else:
+                    logging.error(f"Invalid fusion pair format: {entry}, only pairs allowed")
+                    sys.exit(1)
+            else:
+                single_genes.add(entry.upper())
+        logging.debug(f"Loaded {len(single_genes)=} single genes and {len(gene_pairs)=} gene pairs")
+
+
 sample_name = snakemake.input.arriba.split("/")[-1].split("_")[0]
 logging.debug(f"Loading arriba results: {snakemake.input.arriba=}")
 arriba_table = {"headers": [], "data": []}
@@ -41,15 +63,24 @@ with open(snakemake.input.arriba, "r") as arriba_tsv:
 
 logging.debug(f"Loading fusioncatcher results: {snakemake.input.fusioncatcher=}")
 fusioncatcher_table = {"headers": [], "data": []}
+fusioncatcher_table_short = {"headers": [], "data": []}
 with open(snakemake.input.fusioncatcher, "r") as fusioncatcher_tsv:
     first_row = True
     for lline in fusioncatcher_tsv:
         line = lline.strip().split("\t")
         if first_row:
             [fusioncatcher_table["headers"].append({"header": column}) for column in line]
+            [fusioncatcher_table_short["headers"].append({"header": column}) for column in line]
             first_row = False
         else:
             fusioncatcher_table["data"].append(line)
+            g1 = line[0].strip().upper()
+            g2 = line[1].strip().upper()
+            if g1 in single_genes or g2 in single_genes or frozenset([g1, g2]) in gene_pairs:
+                fusioncatcher_table_short["data"].append(line)
+logging.debug(f"Calculating number of DUX4 hits in short fusioncatcher table. ")
+dux4_calls = sum(1 for row in fusioncatcher_table_short["data"] if "DUX4" in row[0].upper() or "DUX4" in row[1].upper())
+logging.debug(f"Number of DUX4 hits in short fusioncatcher table: {dux4_calls}")
 
 
 logging.debug(f"Loading starfusion input: {snakemake.input.star_fusion=}")
@@ -60,20 +91,6 @@ with open(snakemake.input.star_fusion, "r") as starfusion_tsv:
             [starfusion_table["headers"].append({"header": column}) for column in lline[1:].strip().split("\t")]
         else:
             starfusion_table["data"].append(lline.strip().split("\t"))
-
-
-logging.debug(f"Loading dux4 counts: {snakemake.input.dux4_igh_counts=}")
-with open(snakemake.input.dux4_igh_counts, "r") as counts_txt:
-    lline = counts_txt.readline()
-    dux_calls = lline.strip().split("\t")[0]
-
-logging.debug(f"Loading dux4 hits: {snakemake.input.dux4_igh_calls=}")
-dux4_table = {"headers": fusioncatcher_table["headers"], "data": []}
-with open(snakemake.input.dux4_igh_calls, "r") as calls_txt:
-    for lline in calls_txt:
-        if lline.strip() != "none":
-            line = lline.strip().split("\t")
-            dux4_table["data"].append(line)
 
 
 """ Creating xlsx file """
@@ -102,18 +119,28 @@ worksheet_overview.write_url(8, 0, "internal:'Arriba'!A1", string="Arriba fusion
 worksheet_overview.write_url(9, 0, "internal:'Fusioncatcher'!A1", string="Fusioncatcher results")
 worksheet_overview.write_url(10, 0, "internal:'StarFusion'!A1", string="StarFusion results")
 
-worksheet_overview.write(12, 0, "DUX4-IGH and DUX4-ERG hits from Fusioncatcher", format_bold)
-worksheet_overview.write(13, 0, "Number of hits: " + dux_calls)
-
-i = 15
-column_end = convert_columns_to_letter(len(dux4_table["headers"]))
-if len(dux4_table["data"]) > 0:
-    table_area = "A" + str(i) + ":" + column_end + str(len(dux4_table["data"]) + i)
-else:
-    table_area = "A" + str(i) + ":" + column_end + str(i + 1)
-worksheet_overview.add_table(
-    table_area, {"columns": dux4_table["headers"], "data": dux4_table["data"], "style": "Table Style Light 1"}
+worksheet_overview.write(12, 0, "DUX4-IGH and DUX4-ERG hits from Fusioncatcher", format_bold)  # keep?
+worksheet_overview.write(13, 0, "Number of hits: " + str(dux4_calls))
+worksheet_overview.write(
+    14, 0, "Genes included in Fusioncatcher short table: " + ", ".join(sorted(list(single_genes | gene_pairs)))
 )
+
+i = 16
+logging.debug(f"Creating fusioncatcher short table")
+worksheet_overview.write(i - 2, 0, "Fusioncatcher hits matching gene list", format_bold)
+column_end = convert_columns_to_letter(len(fusioncatcher_table_short["headers"]))
+if len(fusioncatcher_table_short["data"]) > 0:
+    table_area_short = "A" + str(i) + ":" + column_end + str(len(fusioncatcher_table_short["data"]) + i)
+else:
+    table_area_short = "A" + str(i) + ":" + column_end + str(i + 1)
+    worksheet_overview.add_table(
+        table_area_short,
+        {
+            "columns": fusioncatcher_table_short["headers"],
+            "data": fusioncatcher_table_short["data"],
+            "style": "Table Style Light 1",
+        },
+    )
 
 # Arriba sheet
 logging.debug(f"Creating Arriba sheet")
