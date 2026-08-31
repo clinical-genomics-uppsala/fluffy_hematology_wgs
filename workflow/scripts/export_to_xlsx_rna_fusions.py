@@ -33,6 +33,8 @@ logging.info("Prepping input data")
 logging.info("Loading fusioncatcher genelist if exists")
 single_genes = set()
 gene_pairs = set()
+dux_pairs = set()
+
 if snakemake.params.fusioncatcher_genelist:
     with open(snakemake.params.fusioncatcher_genelist, "r") as genelist_txt:
         for lline in genelist_txt:
@@ -42,13 +44,17 @@ if snakemake.params.fusioncatcher_genelist:
             if "|" in entry:
                 parts = [p.strip().upper() for p in entry.split("|") if p.strip()]
                 if len(parts) == 2:
-                    gene_pairs.add(frozenset(parts))
+                    if "DUX4" in parts:
+                        dux_pairs.add(frozenset(parts))
+                    else:
+                        gene_pairs.add(frozenset(parts))
                 else:
                     logging.error(f"Invalid fusion pair format: {entry}, only pairs allowed")
                     sys.exit(1)
             else:
                 single_genes.add(entry.upper())
         logging.debug(f"Loaded {len(single_genes)=} single genes and {len(gene_pairs)=} gene pairs")
+        logging.debug(f"DUX4 genepairs: {dux_pairs=}")
         logging.debug("Genes included in Fusioncatcher short table: " + str(single_genes | gene_pairs))
 
 
@@ -66,13 +72,11 @@ with open(snakemake.input.arriba, "r") as arriba_tsv:
 # Loading fusioncatcher results in to three different lists/tables
 #     - fusioncatcher_table: the whole table
 #     - fusioncatcher_table_short: fusioncatcher results with only genes from single_genes and gene_pairs included, inframe fusions in one list and the rest in another to be able to print with in-frame fusions first
-#     - fusioncatcher_dux_table: fusions DUX4::IGH or DUX4::ERG
+#     - fusioncatcher_dux_table: all genepairs that include DUX4 from the genelist
 logging.info(f"Loading fusioncatcher results: {snakemake.input.fusioncatcher=}")
 fusioncatcher_table = {"headers": [], "data": []}
 fusioncatcher_table_short = {"inframe_rows": [], "the_rest_rows": []}
 fusioncatcher_dux_table = {"data": []}
-dux_pairs = [frozenset(["DUX4", "ERG"]), frozenset(["DUX4", "IGH@"])]
-logging.debug(f"{dux_pairs=}")
 with open(snakemake.input.fusioncatcher, "r") as fusioncatcher_tsv:
     first_row = True
     for lline in fusioncatcher_tsv:
