@@ -79,12 +79,13 @@ with open(snakemake.input.fusioncatcher, "r") as fusioncatcher_tsv:
         line = lline.strip().split("\t")
         if first_row:
             [fusioncatcher_table["headers"].append({"header": column}) for column in line]
+            predicted_effect_idx = line.index("Predicted_effect")
             first_row = False
         else:
             fusioncatcher_table["data"].append(line)
             g1 = line[0].strip().upper()
             g2 = line[1].strip().upper()
-            predicted_effect = line[fusioncatcher_table["headers"].index("Predicted_effects")].strip().lower()
+            predicted_effect = line[predicted_effect_idx].strip().lower()
             if frozenset([g1, g2]) in dux_pairs:
                 fusioncatcher_dux_table["data"].append(line)
             elif g1 in single_genes or g2 in single_genes or frozenset([g1, g2]) in gene_pairs:
