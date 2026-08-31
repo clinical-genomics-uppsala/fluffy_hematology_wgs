@@ -71,7 +71,8 @@ with open(snakemake.input.arriba, "r") as arriba_tsv:
 
 # Loading fusioncatcher results in to three different lists/tables
 #     - fusioncatcher_table: the whole table
-#     - fusioncatcher_table_short: fusioncatcher results with only genes from single_genes and gene_pairs included, inframe fusions in one list and the rest in another to be able to print with in-frame fusions first
+#     - fusioncatcher_table_short: fusioncatcher results with only genes from single_genes and gene_pairs included,
+#           inframe fusions in one list and the rest in another to be able to print with in-frame fusions first
 #     - fusioncatcher_dux_table: all genepairs that include DUX4 from the genelist
 logging.info(f"Loading fusioncatcher results: {snakemake.input.fusioncatcher=}")
 fusioncatcher_table = {"headers": [], "data": []}
