@@ -73,7 +73,7 @@ rule somalier_combine_fam:
     output:
         ped="qc/somalier/somalier_all.ped",
     log:
-        "qc/peddy/somalier_all.ped.log",
+        "qc/somalier/somalier_all.ped.log",
     benchmark:
         repeat(
             "qc/somalier/somalier_all.ped.benchmark.tsv",
