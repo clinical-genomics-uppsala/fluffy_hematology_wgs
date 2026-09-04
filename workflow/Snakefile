@@ -154,34 +154,6 @@ use rule simple_sv_annotation from annotation as annotation_simple_sv_annotation
         "{rule}: Annotate {input.vcf}"
 
 
-use rule vep from annotation as annotation_vep_svdb_manta_tn with:
-    input:
-        vcf="cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz",
-        tabix="cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf.gz.tbi",
-        cache=config["vep"]["vep_cache"],
-        fasta=config["reference"]["fasta"],
-    output:
-        vcf=temp("cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf"),
-    log:
-        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.log",
-    benchmark:
-        "cnv_sv/manta_run_workflow_tn/{file}.vep_annotated.vcf.benchmark.tsv"
-
-
-use rule vep from annotation as annotation_vep_svdb_manta_t with:
-    input:
-        vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz",
-        tabix="cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf.gz.tbi",
-        cache=config["vep"]["vep_cache"],
-        fasta=config["reference"]["fasta"],
-    output:
-        vcf=temp("cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf"),
-    log:
-        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.log",
-    benchmark:
-        "cnv_sv/manta_run_workflow_t/{file}.vep_annotated.vcf.benchmark.tsv"
-
-
 module cnv_sv:
     snakefile:
         get_module_snakefile(
@@ -481,24 +453,6 @@ use rule tabix from misc as tabix_mutect with:
 use rule tabix from misc as tabix_cnv with:
     wildcard_constraints:
         file="cnv_sv/[A-Za-z0-9-_./]+.vcf",
-
-
-use rule bgzip from misc as decompress_manta with:
-    input:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.gz",
-    output:
-        temp("cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf"),
-    params:
-        extra="-d",
-    log:
-        "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.log",
-    benchmark:
-        repeat(
-            "cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.include.{bed}.vcf.benchmark.tsv",
-            config.get("bgzip", {}).get("benchmark_repeats", 1),
-        )
-    message:
-        "{rule}: decompress {input}"
 
 
 use rule samtools_index from misc as misc_samtools_index with:

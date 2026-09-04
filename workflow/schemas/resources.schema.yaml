@@ -68,6 +68,26 @@ properties:
         type: string
         description: max execution time
 
+  annotate_str:
+    type: object
+    description: resource definitions for annotate_str
+    properties:
+      mem_mb:
+        type: integer
+        description: max memory in MB to be available
+      mem_per_cpu:
+        type: integer
+        description: memory in MB used per cpu
+      partition:
+        type: string
+        description: partition to use on cluster
+      threads:
+        type: integer
+        description: number of threads to be available
+      time:
+        type: string
+        description: max execution time
+        
   arriba:
     type: object
     description: resource definitions for arriba
@@ -328,7 +348,7 @@ properties:
         type: string
         description: max execution time
 
-  gatk_cnv_model_segments:
+  gatk_model_segments:
     type: object
     description: resource definitions for gatk_cnv_model_segments
     properties:
@@ -508,7 +528,7 @@ properties:
         type: string
         description: max execution time
  
-  pbrun_fq2bam:
+  pbrun_fq2bam_recal:
     type: object
     description: resource definitions for pbrun_fq2bam
     properties:
