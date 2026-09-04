@@ -102,9 +102,19 @@ properties:
       genome_dir:
         type: string
         description: path to genome directory for star align
+      simple_repeats:
+        type: string
+        description: >
+          path to bgzipped bed file with simple repeats, used to annotate manta calls with STR_PERCENT. 
+          A tabix index must exist next to it as <path>.tbi, since the rule takes both as input
       sites:
         type: string
         description: path to known sites list file
+      target_genes:
+        type: string
+        description: >
+          path to a text file with one gene symbol per line. Calls hitting these genes are flagged
+          in the manta xlsx and are exempt from the normal-panel AF filtering. Leave empty to skip
       wgs_intervals:
         type: string
         description: path to wgs interval file
@@ -140,6 +150,17 @@ properties:
   annotate_normal_ratio:
     type: object
     description: parameters for annotate_normal_ratio to annotate snvs tn vcfs
+    properties:
+      benchmark_repeats:
+        type: integer
+        description: set number of times benchmark should be repeated
+      container:
+        type: string
+        description: name or path to docker/singularity container
+
+  annotate_str:
+    type: object
+    description: parameters for annotate_str to add STR_PERCENT to manta calls
     properties:
       benchmark_repeats:
         type: integer
@@ -402,6 +423,17 @@ properties:
     required:
       - region
 
+  extract_srpb:
+    type: object
+    description: parameters for extract_srpb to pull SRPB values from the pelops json
+    properties:
+      benchmark_repeats:
+        type: integer
+        description: set number of times benchmark should be repeated
+      container:
+        type: string
+        description: name or path to docker/singularity container
+        
   export_to_xlsx_snvs:
     type: object
     description: parameters for export_to_xlsx_snvs
@@ -723,7 +755,7 @@ properties:
     type: object
     description: parameters for pelops
     properties:
-      containerr:
+      container:
         type: string
         description: name or path to docker/singularity container
       extra:
