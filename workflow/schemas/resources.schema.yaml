@@ -350,7 +350,7 @@ properties:
 
   gatk_model_segments:
     type: object
-    description: resource definitions for gatk_cnv_model_segments
+    description: resource definitions for gatk_model_segments
     properties:
       mem_mb:
         type: integer
@@ -530,7 +530,7 @@ properties:
  
   pbrun_fq2bam_recal:
     type: object
-    description: resource definitions for pbrun_fq2bam
+    description: resource definitions for pbrun_fq2bam_recal
     properties:
       gres:
         type: string
