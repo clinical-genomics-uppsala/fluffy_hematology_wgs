@@ -546,7 +546,7 @@ def write_target_summary(worksheet, workbook, start_row, title, table_data, form
 
 """ MAIN EXECUTION """
 
-## 1. Prepping data
+# 1. Prepping data
 logging.info(f"Prepping data, such as loading {snakemake.input.manta}=")
 sample_name = snakemake.output.xlsx.split("/")[-1].split(".manta")[0]
 
@@ -725,13 +725,18 @@ worksheet_overview.write(
     "Somatic BND events are rescued for manual review if all of the following criteria are met:"
 )
 row_idx += 1
-worksheet_overview.write(row_idx, 0, "  1. Variant support: At least one breakpoint has PR_AF or SR_AF >= 5% in the tumor sample.")
+worksheet_overview.write(
+    row_idx, 0, "  1. Variant support: At least one breakpoint has PR_AF or SR_AF >= 5% in the tumor sample.")
 row_idx += 1
-worksheet_overview.write(row_idx, 0, "  2. Normal panel: Zero evidence in the normal panel (manta_N_OCC == 0).")
+worksheet_overview.write(
+    row_idx, 0, "  2. Normal panel: Zero evidence in the normal panel (manta_N_OCC == 0).")
 row_idx += 1
-worksheet_overview.write(row_idx, 0, "  3. Clean quality: No other blocking filter flags (MinQUAL, MinGQ, MinSomaticScore, Ploidy, MaxMQ0Frac, NoPairSupport, SampleFT, HomRef).")
+worksheet_overview.write(
+    row_idx, 0, "  3. Clean quality: No other blocking filter flags")
 row_idx += 1
-worksheet_overview.write(row_idx, 0, "  4. Canonical contigs: Both breakends must be located on standard chromosomes (excluding decoy/alternate/random contigs).")
+worksheet_overview.write(
+    row_idx, 0,
+    "  4. Canonical contigs: Both breakends must be located on standard chromosomes (excluding decoy/alternate/random contigs).")
 row_idx += 1
 worksheet_overview.write(
     row_idx, 0,
