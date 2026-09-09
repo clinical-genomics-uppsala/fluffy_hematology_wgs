@@ -73,7 +73,6 @@ def add_maxdepth_rescue_row_color(
     rescue_format = workbook.add_format({
         "bg_color": "#DDEBF7",
         "font_color": "#1F4E78",
-        "bold": True,
     })
 
     worksheet.conditional_format(data_range, {
@@ -196,17 +195,20 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 
     worksheet = workbook.add_worksheet(sheet_name)
     format_heading = workbook.add_format({"bold": True, "font_size": 18})
-
-    worksheet.write("A1", title, format_heading)
-    worksheet.write("A3", "Sample: " + str(sample_name))
-    worksheet.write("A5", "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
-    if "Translocations" in sheet_name:
-        worksheet.write("A6", "MaxDepth calls passing rescue criteria are included.")
-
-    row_offset = 7
-    if "Deletions" in sheet_name:
-        worksheet.write("A7", "Deletions have to be longer than 100 bp to be included.")
-        row_offset = 8
+    format_bold = workbook.add_format({"bold": True})
+    format_italic = workbook.add_format({"italic": True})
+    format_legend_orange = workbook.add_format({
+        "bg_color": "#ffd280",
+        "font_color": "#000000",
+        "border": 1,
+        "valign": "vcenter",
+    })
+    format_legend_rescue = workbook.add_format({
+        "bg_color": "#DDEBF7",
+        "font_color": "#1F4E78",
+        "border": 1,
+        "valign": "vcenter",
+    })
 
     headers = table_data["headers"]
     data = table_data["data"]
@@ -214,6 +216,56 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     # 1. Find columns
     columns = column_indexes(table_data)
     svdb_col_idx = columns.get("manta_n_af")
+
+    legend_end_col = min(max(len(headers) - 1, 5), 7)
+
+    curr_row = 0
+    worksheet.write(curr_row, 0, title, format_heading)
+    curr_row += 2
+
+    worksheet.write(curr_row, 0, "Sample: " + str(sample_name))
+    curr_row += 1
+
+    worksheet.write(curr_row, 0, "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
+    curr_row += 1
+
+    if "Deletions" in sheet_name:
+        worksheet.write(curr_row, 0, "Deletions have to be longer than 100 bp to be included.")
+        curr_row += 1
+
+    if "Translocations" in sheet_name:
+        worksheet.write(curr_row, 0, "MaxDepth calls passing rescue criteria are included.")
+        curr_row += 1
+
+    worksheet.write(
+        curr_row,
+        0,
+        "Note: Calls with normal panel AF > 0.20 are hidden by default to reduce recurrent noise (unless in target panel). "
+        "To unhide all rows in Excel: Select all (Ctrl+A / Cmd+A) -> Right-click row numbers -> Unhide.",
+        format_italic,
+    )
+    curr_row += 2
+
+    worksheet.write(curr_row, 0, "Color Legend:", format_bold)
+    curr_row += 1
+
+    worksheet.merge_range(
+        curr_row, 0, curr_row, legend_end_col,
+        "  Orange: High frequency in normal panel (manta_N_AF > 0.20, annotated via SVDB query against manta_normal_panel)",
+        format_legend_orange,
+    )
+    curr_row += 1
+
+    if "Translocations" in sheet_name:
+        worksheet.merge_range(
+            curr_row, 0, curr_row, legend_end_col,
+            "  Light Blue: MaxDepth Rescue call passing rescue criteria",
+            format_legend_rescue,
+        )
+        curr_row += 1
+
+    curr_row += 1
+    row_offset = curr_row + 1
 
     # xlsxwriter's add_table requires 1-based Excel coordinates (e.g., A7:K20)
     column_end = convert_columns_to_letter(len(headers))
@@ -494,9 +546,9 @@ def write_target_summary(worksheet, workbook, start_row, title, table_data, form
 
 """ MAIN EXECUTION """
 
-# 1. Prepping data
+## 1. Prepping data
 logging.info(f"Prepping data, such as loading {snakemake.input.manta}=")
-sample_name = snakemake.output.xlsx.split("/")[-1].split(".manta_new.xlsx")[0]
+sample_name = snakemake.output.xlsx.split("/")[-1].split(".manta")[0]
 
 filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "NoPairSupport", "SampleFT", "HomRef", "MaxDepth"]
 
@@ -513,6 +565,7 @@ manta_tables_maxdepth = create_maxdepth_bnd_rescue_table(
     min_support=MAXDEPTH_RESCUE_MIN_SUPPORT,
 )
 
+
 # 2. Creating xlsx workbook
 workbook = xlsxwriter.Workbook(snakemake.output.xlsx)
 logging.info(f"Creating xlsx workbook {snakemake.output.xlsx}=")
@@ -520,7 +573,20 @@ logging.info(f"Creating xlsx workbook {snakemake.output.xlsx}=")
 format_heading = workbook.add_format({"bold": True, "font_size": 18})
 format_bold = workbook.add_format({"bold": True, "text_wrap": True})
 format_overview_title = workbook.add_format({"bold": True, "font_size": 16})
+format_italic = workbook.add_format({"italic": True})
 format_2dec = workbook.add_format({"num_format": "0.00"})
+format_legend_orange = workbook.add_format({
+    "bg_color": "#ffd280",
+    "font_color": "#000000",
+    "border": 1,
+    "valign": "vcenter",
+})
+format_legend_rescue = workbook.add_format({
+    "bg_color": "#DDEBF7",
+    "font_color": "#1F4E78",
+    "border": 1,
+    "valign": "vcenter",
+})
 
 manta_tables_full["bnd"] = merge_manta_tables(manta_tables_full["bnd"], manta_tables_maxdepth)
 
@@ -605,23 +671,73 @@ for vcf in snakemake.input.vcfs_bed:
     worksheet_overview.write_url(row_idx, 0, f"internal:'{s_name}'!A1", string=f"Manta Translocations in {panel.upper()} genes")
     row_idx += 1
 
-if hasattr(snakemake.input, 'all_bed'):
-    worksheet_overview.write(row_idx + 4, 0, "ALL bedfile: " + snakemake.input.all_bed)
-if hasattr(snakemake.input, 'aml_bed'):
-    worksheet_overview.write(row_idx + 5, 0, "AML bedfile: " + snakemake.input.aml_bed)
+row_idx += 2
+
+if hasattr(snakemake.input, 'all_bed') and snakemake.input.all_bed:
+    worksheet_overview.write(row_idx, 0, "ALL bedfile: " + snakemake.input.all_bed)
+    row_idx += 1
+if hasattr(snakemake.input, 'aml_bed') and snakemake.input.aml_bed:
+    worksheet_overview.write(row_idx, 0, "AML bedfile: " + snakemake.input.aml_bed)
+    row_idx += 1
 if target_genes:
     genes_string = ", ".join(target_genes)
-    worksheet_overview.write(row_idx + 6, 0,
+    worksheet_overview.write(row_idx, 0,
                              f"Target Genes filter added: {len(target_genes)} genes loaded - [{genes_string}]")
+    row_idx += 1
 
-worksheet_overview.write(row_idx + 9, 0,
+row_idx += 1
+worksheet_overview.write(row_idx, 0,
                          "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
-worksheet_overview.write(row_idx + 10, 0, "MaxDepth calls passing rescue criteria are included.")
+row_idx += 1
+worksheet_overview.write(row_idx, 0, "MaxDepth calls passing rescue criteria are included.")
+row_idx += 1
+worksheet_overview.write(
+    row_idx,
+    0,
+    "Note: Calls with normal panel AF > 0.20 are hidden by default on data sheets (unless in target panel). "
+    "To unhide all rows in Excel: Select all (Ctrl+A / Cmd+A) -> Right-click row numbers -> Unhide.",
+    format_italic,
+)
+row_idx += 2
 
-# -------------------------------------------------------------
-# 5. Add Summary Tables for Target Panel == "Yes" on Overview
-# -------------------------------------------------------------
-row_idx += 12  # Move down below the metadata
+# Color Legend on Overview
+worksheet_overview.write(row_idx, 0, "Color Legend:", format_bold)
+row_idx += 1
+worksheet_overview.merge_range(
+    row_idx, 0, row_idx, 7,
+    "  Orange: High frequency in normal panel (manta_N_AF > 0.20, annotated via SVDB query against manta_normal_panel)",
+    format_legend_orange,
+)
+row_idx += 1
+worksheet_overview.merge_range(
+    row_idx, 0, row_idx, 7,
+    "  Light Blue: MaxDepth Rescue call passing rescue criteria",
+    format_legend_rescue,
+)
+row_idx += 2
+
+# MaxDepth Rescue Criteria on Overview
+worksheet_overview.write(row_idx, 0, "MaxDepth Rescue Criteria:", format_bold)
+row_idx += 1
+worksheet_overview.write(
+    row_idx, 0,
+    "Manta flags MaxDepth on breakpoints in regions with coverage >3x chromosome mean (often mapping/coverage artifacts). "
+    "Somatic BND events are rescued for manual review if all of the following criteria are met:"
+)
+row_idx += 1
+worksheet_overview.write(row_idx, 0, "  1. Variant support: At least one breakpoint has PR_AF or SR_AF >= 5% in the tumor sample.")
+row_idx += 1
+worksheet_overview.write(row_idx, 0, "  2. Normal panel: Zero evidence in the normal panel (manta_N_OCC == 0).")
+row_idx += 1
+worksheet_overview.write(row_idx, 0, "  3. Clean quality: No other blocking filter flags (MinQUAL, MinGQ, MinSomaticScore, Ploidy, MaxMQ0Frac, NoPairSupport, SampleFT, HomRef).")
+row_idx += 1
+worksheet_overview.write(row_idx, 0, "  4. Canonical contigs: Both breakends must be located on standard chromosomes (excluding decoy/alternate/random contigs).")
+row_idx += 1
+worksheet_overview.write(
+    row_idx, 0,
+    "Rescued calls are included on the Translocations sheets and surfaced below in the 'MaxDepth rescue calls' section."
+)
+row_idx += 3
 
 worksheet_overview.write(row_idx, 0, "Variants in gene list", format_overview_title)
 row_idx += 2

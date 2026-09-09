@@ -151,7 +151,7 @@ All results (as described in table below) are located in: `Results/{project}/{sa
 
 #### The Manta Excel report
 
-`SV/{sample}_{T,TN}.manta_new.xlsx` has one sheet per SV type (Deletions, Insertions, Duplications, Translocations)
+`SV/{sample}_{T,TN}.manta.xlsx` has one sheet per SV type (Deletions, Insertions, Duplications, Translocations)
 plus panel-restricted translocation sheets, and an Overview sheet summarising target-gene hits and known fusions.
 A few things to know before reading it:
 
