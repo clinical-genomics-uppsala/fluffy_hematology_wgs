@@ -4,6 +4,8 @@ import gzip
 from pysam import VariantFile
 import re
 
+MIN_DEL_SIZE = 100
+
 
 # VEP fields in list to get index
 def index_vep(variantfile):
@@ -126,140 +128,178 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
     return return_dict
 
 
-def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, sample_normal=""):
-    return_dict = {}
-    return_dict["filt_ann"] = ",".join(record.filter.keys())
+#  Helper functions for value extraction
+def first_info_value(record, key, default=None):
+    """Return the first scalar INFO value, or default when absent."""
+    value = record.info.get(key)
 
+    if isinstance(value, (tuple, list)):
+        value = value[0] if value else None
+
+    if value in (None, "", "."):
+        return default
+
+    return value
+
+
+def info_as_int(record, key, default=0):
+    value = first_info_value(record, key)
+    if value is None:
+        return default
     try:
-        return_dict["id"] = ":".join(record.id.split(":")[0:2])
-    except KeyError:
-        return_dict["id"] = ""
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
-    genes = []
-    details = []
+
+def info_as_float(record, key, default=0.0, decimals=None):
+    value = first_info_value(record, key)
+    if value is None:
+        return default
     try:
-        record.info["SIMPLE_ANN"]
-    except KeyError:
-        try:
-            record.info["ANN"]
-        except KeyError:
-            return_dict["genes"] = "NA"
-            return_dict["detail"] = "NA"
-        else:
-            for annotation in record.info["ANN"]:
-                annotation_values = annotation.split("|")
-                gene_name_id = (
-                    annotation_values[ann_index.index("Gene_Name")] + "(" + annotation_values[ann_index.index("Gene_ID")] + ")"
-                )
-                if gene_name_id not in genes:
-                    genes.append(gene_name_id)
+        value = float(value)
+    except (TypeError, ValueError):
+        return default
 
-            return_dict["genes"] = ", ".join(genes)
-            return_dict["detail"] = ""
-    else:
-        for annotation in record.info["SIMPLE_ANN"]:
-            annotation_values = annotation.split("|")
-            gene_name_id = (
-                annotation_values[simple_ann_index.index("GENE(s)")]
-                + "("
-                + annotation_values[simple_ann_index.index("TRANSCRIPT")]
-                + ")"
+    return round(value, decimals) if decimals is not None else value
+
+
+def support_frequency(sample, field, default=None):
+    try:
+        values = sample.get(field)
+        if not values or len(values) != 2:
+            return default
+        ref_count, alt_count = values
+        if ref_count is None or alt_count is None:
+            return default
+        total = ref_count + alt_count
+        return alt_count / total if total > 0 else default
+    except (TypeError, ValueError):
+        return default
+
+
+def index_manta_annotation_fields(variantfile, annotation_id):
+    """Read the pipe-delimited field definition from a Manta INFO header."""
+    for header_record in variantfile.header.records:
+        if header_record.key != "INFO" or header_record.get("ID") != annotation_id:
+            continue
+        description = header_record.get("Description", "")
+        match = re.search(r"'([^']+)'", description)
+        if match:
+            return [field.strip() for field in match.group(1).split("|")]
+        raise ValueError(f"{annotation_id} header has no quoted field definition")
+    return None
+
+
+def _info_values(record, key):
+    """Return all INFO values as a tuple."""
+    value = record.info.get(key)
+
+    if value in (None, "", "."):
+        return ()
+
+    if isinstance(value, (tuple, list)):
+        return tuple(value)
+
+    return (value,)
+
+
+def _extract_manta_annotations(record, ann_index, simple_ann_index):
+    """Extract compact gene labels and details, preferring SIMPLE_ANN."""
+    simple_annotations = _info_values(record, "SIMPLE_ANN")
+
+    if simple_annotations:
+        if not simple_ann_index:
+            raise ValueError(
+                "Manta VCF contains SIMPLE_ANN records "
+                "but no SIMPLE_ANN header definition"
             )
-            if gene_name_id not in genes:
-                genes.append(gene_name_id)
-            detail = annotation_values[
-                simple_ann_index.index("DETAIL (exon losses, KNOWN_FUSION, ON_PRIORITY_LIST, NOT_PRIORITISED)")
-            ]
+
+        gene_idx = simple_ann_index.index("GENE(s)")
+        transcript_idx = simple_ann_index.index("TRANSCRIPT")
+        detail_idx = simple_ann_index.index(
+            "DETAIL (exon losses, KNOWN_FUSION, "
+            "ON_PRIORITY_LIST, NOT_PRIORITISED)"
+        )
+
+        genes = []
+        details = []
+
+        for annotation in simple_annotations:
+            values = annotation.split("|")
+
+            gene_label = (
+                f"{values[gene_idx]}({values[transcript_idx]})"
+            )
+            if gene_label not in genes:
+                genes.append(gene_label)
+
+            detail = values[detail_idx]
             if detail not in details:
                 details.append(detail)
 
-        return_dict["genes"] = ", ".join(genes)
-        return_dict["detail"] = ", ".join(details)
+        return ", ".join(genes), ", ".join(details)
 
-    try:
-        return_dict["depth"] = record.info["BND_DEPTH"]
-    except KeyError:
-        return_dict["depth"] = ""
+    annotations = _info_values(record, "ANN")
 
-    # -- Add manta_AF and STR % columns --
-    try:
-        n_occ_val = record.info.get("manta_N_OCC")
-        if n_occ_val is None:
-            return_dict["manta_n_occ"] = 0
-        else:
-            val = n_occ_val[0] if isinstance(n_occ_val, tuple) else n_occ_val
-            return_dict["manta_n_occ"] = int(val)
-    except (KeyError, ValueError, TypeError):
-        return_dict["manta_n_occ"] = 0
+    if annotations:
+        if not ann_index:
+            raise ValueError(
+                "Manta VCF contains ANN records "
+                "but no ANN header definition"
+            )
 
-    try:
-        t_occ_val = record.info.get("manta_T_OCC")
-        if t_occ_val is None:
-            return_dict["manta_t_occ"] = 0
-        else:
-            val = t_occ_val[0] if isinstance(t_occ_val, tuple) else t_occ_val
-            return_dict["manta_t_occ"] = int(val)
-    except (KeyError, ValueError, TypeError):
-        return_dict["manta_t_occ"] = 0
+        gene_name_idx = ann_index.index("Gene_Name")
+        gene_id_idx = ann_index.index("Gene_ID")
 
-    try:
-        str_val = record.info["STR_PERCENT"]
-        return_dict["str_percent"] = round(str_val[0] if isinstance(str_val, tuple) else str_val, 2)
-    except KeyError:
-        return_dict["str_percent"] = 0
-    # ----------------------------------------------------
+        genes = []
 
-    try:
-        pr_values = record.samples[sample_tumor]["PR"]
-    except KeyError:
-        return_dict["pr_freq"] = ""
+        for annotation in annotations:
+            values = annotation.split("|")
+            gene_label = (
+                f"{values[gene_name_idx]}({values[gene_id_idx]})"
+            )
+            if gene_label not in genes:
+                genes.append(gene_label)
+
+        return ", ".join(genes), ""
+
+    return "NA", "NA"
+
+
+def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, sample_normal=""):
+    return_dict = {}
+    return_dict["filt_ann"] = ",".join(record.filter.keys())
+    return_dict["id"] = record.id or ""
+    return_dict["depth"] = first_info_value(record, "BND_DEPTH", default="")
+    # helper functions sets svdb vales to 0 if missing:
+    return_dict["manta_n_occ"] = info_as_int(record, "manta_N_OCC")
+    return_dict["manta_t_occ"] = info_as_int(record, "manta_T_OCC")
+    return_dict["manta_n_af"] = info_as_float(record, "manta_N_AF")
+    return_dict["manta_t_af"] = info_as_float(record, "manta_T_AF")
+    return_dict["str_percent"] = info_as_float(record, "STR_PERCENT", default=0, decimals=2)
+    return_dict["genes"], return_dict["detail"] = _extract_manta_annotations(record, ann_index, simple_ann_index)
+
+    # create a common id for BND mates
+    mate_id = first_info_value(record, "MATEID")
+    if mate_id is not None:
+        return_dict["bnd_event_id"] = "|".join(sorted([return_dict["id"], str(mate_id)]))
     else:
-        pr_denominator, pr_numerator = pr_values
-        return_dict["pr_freq"] = pr_numerator / (pr_denominator + pr_numerator) if pr_denominator + pr_numerator != 0 else None
+        return_dict["bnd_event_id"] = return_dict["id"]
 
-    try:
-        sr_values = record.samples[sample_tumor]["SR"]
-    except KeyError:
-        return_dict["sr_freq"] = ""
-    else:
-        sr_denominator, sr_numerator = sr_values
-        return_dict["sr_freq"] = sr_numerator / (sr_denominator + sr_numerator) if sr_denominator + sr_numerator != 0 else None
+    # extract paired read and spanning read frequncies
+    tumor_sample = record.samples[sample_tumor]
+    return_dict["pr_freq"] = support_frequency(tumor_sample, "PR")
+    return_dict["sr_freq"] = support_frequency(tumor_sample, "SR")
 
     if sample_normal:
-        try:
-            pr_values_n = record.samples[sample_normal]["PR"]
-        except KeyError:
-            return_dict["pr_freq_n"] = ""
-        else:
-            pr_denominator, pr_numerator = pr_values_n
-            return_dict["pr_freq_n"] = (
-                pr_numerator / (pr_denominator + pr_numerator) if pr_denominator + pr_numerator != 0 else None
-            )
+        normal_sample = record.samples[sample_normal]
+        return_dict["pr_freq_n"] = support_frequency(normal_sample, "PR")
+        return_dict["sr_freq_n"] = support_frequency(normal_sample, "SR")
 
-        try:
-            sr_values_n = record.samples[sample_normal]["SR"]
-        except KeyError:
-            return_dict["sr_freq_n"] = ""
-        else:
-            sr_denominator, sr_numerator = sr_values_n
-            return_dict["sr_freq_n"] = (
-                sr_numerator / (sr_denominator + sr_numerator) if sr_denominator + sr_numerator != 0 else None
-            )
-
-    try:
-        return_dict["svlength"] = record.info["SVLEN"][0]
-    except KeyError:
-        return_dict["svlength"] = ""
-
-    try:
-        return_dict["hom_len"] = record.info["HOMLEN"][0]
-    except KeyError:
-        return_dict["hom_len"] = ""
-
-    try:
-        return_dict["hom_seq"] = record.info["HOMSEQ"][0]
-    except KeyError:
-        return_dict["hom_seq"] = ""
+    return_dict["svlength"] = info_as_int(record, "SVLEN", default=None)
+    return_dict["hom_len"] = info_as_int(record, "HOMLEN", default=None)
+    return_dict["hom_seq"] = first_info_value(record, "HOMSEQ", default=None)
 
     return return_dict
 
@@ -406,11 +446,8 @@ def create_manta_tables(
     else:
         sample_normal = None
 
-    for header_row in vcf_file.header.records:
-        if "ID=ANN," in str(header_row):
-            ann_index = str(header_row).split("'")[1].strip().split(" | ")
-        elif "ID=SIMPLE_ANN," in str(header_row):
-            simple_ann_index = str(header_row).split("'")[1].strip().split(" | ")
+    ann_index = index_manta_annotation_fields(vcf_file, "ANN")
+    simple_ann_index = index_manta_annotation_fields(vcf_file, "SIMPLE_ANN")
 
     manta_tables = {
         "bnd": {"data": [], "headers": []},
@@ -423,6 +460,7 @@ def create_manta_tables(
         {"header": "Chr"},
         {"header": "Pos"},
         {"header": "MantaID"},
+        {"header": "BND Event ID"},
         {"header": "BreakEnd"},
         {"header": "Genes"},
         {"header": "Details"},
@@ -430,6 +468,8 @@ def create_manta_tables(
         {"header": "Annotation"},
         {"header": "manta_N_OCC"},
         {"header": "manta_T_OCC"},
+        {"header": "manta_N_AF"},
+        {"header": "manta_T_AF"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
@@ -445,6 +485,8 @@ def create_manta_tables(
         {"header": "Annotation"},
         {"header": "manta_N_OCC"},
         {"header": "manta_T_OCC"},
+        {"header": "manta_N_AF"},
+        {"header": "manta_T_AF"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
@@ -462,6 +504,8 @@ def create_manta_tables(
         {"header": "Annotation"},
         {"header": "manta_N_OCC"},
         {"header": "manta_T_OCC"},
+        {"header": "manta_N_AF"},
+        {"header": "manta_T_AF"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
@@ -480,6 +524,8 @@ def create_manta_tables(
         {"header": "Annotation"},
         {"header": "manta_N_OCC"},
         {"header": "manta_T_OCC"},
+        {"header": "manta_N_AF"},
+        {"header": "manta_T_AF"},
         {"header": "STR %"},
         {"header": "Paired-read freq"},
         {"header": "Spanning-read freq"},
@@ -512,6 +558,7 @@ def create_manta_tables(
                     str(record.contig),
                     int(record.pos),
                     record_values["id"],
+                    record_values["bnd_event_id"],
                     str(record.alts[0]),
                     record_values["genes"],
                     record_values["detail"],
@@ -519,6 +566,8 @@ def create_manta_tables(
                     record_values["filt_ann"],
                     record_values["manta_n_occ"],
                     record_values["manta_t_occ"],
+                    record_values["manta_n_af"],
+                    record_values["manta_t_af"],
                     record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
@@ -529,7 +578,11 @@ def create_manta_tables(
                 outline = outline + in_target
                 manta_tables["bnd"]["data"].append(outline)
 
-            elif "MantaDEL" in record_values["id"] and record_values["svlength"] <= -100:
+            elif (
+                "MantaDEL" in record_values["id"]
+                and record_values["svlength"] is not None
+                and record_values["svlength"] <= -MIN_DEL_SIZE
+            ):
                 outline = [
                     str(record.contig),
                     int(record.pos),
@@ -541,6 +594,8 @@ def create_manta_tables(
                     record_values["filt_ann"],
                     record_values["manta_n_occ"],
                     record_values["manta_t_occ"],
+                    record_values["manta_n_af"],
+                    record_values["manta_t_af"],
                     record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
@@ -565,6 +620,8 @@ def create_manta_tables(
                     record_values["filt_ann"],
                     record_values["manta_n_occ"],
                     record_values["manta_t_occ"],
+                    record_values["manta_n_af"],
+                    record_values["manta_t_af"],
                     record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],
@@ -590,6 +647,8 @@ def create_manta_tables(
                     record_values["filt_ann"],
                     record_values["manta_n_occ"],
                     record_values["manta_t_occ"],
+                    record_values["manta_n_af"],
+                    record_values["manta_t_af"],
                     record_values["str_percent"],
                     record_values["pr_freq"],
                     record_values["sr_freq"],

@@ -296,6 +296,29 @@ def compile_output_file_list(wildcards):
     return list(set(output_fullpath))
 
 
+def manta_report_targets(wildcards):
+    targets = []
+
+    for filedef in output_spec["files"]:
+        input_name = filedef.get("input") or ""
+
+        if not input_name.startswith("export_to_xlsx/"):
+            continue
+        if "manta" not in input_name.lower() or not input_name.endswith(".xlsx"):
+            continue
+
+        for sample in get_samples(samples):
+            unit_types = type_generator(set(get_unit_types(units, sample)))
+
+            for unit_type in unit_types:
+                if unit_type in filedef["types"]:
+                    targets.append(
+                        pathlib.Path(output_spec["directory"]) / filedef["output"].format(sample=sample, type=unit_type)
+                    )
+
+    return targets
+
+
 def generate_copy_rules(output_spec):
     output_directory = pathlib.Path(output_spec["directory"])
     rulestrings = []

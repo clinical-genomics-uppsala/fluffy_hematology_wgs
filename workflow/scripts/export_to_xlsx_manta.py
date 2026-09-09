@@ -2,13 +2,43 @@
 
 from export_to_xlsx_create_tables import *
 import xlsxwriter
+from xlsxwriter.utility import xl_col_to_name
 import datetime
-from pysam import VariantFile
 import sys
 import logging
 import os
 from collections import Counter
+from manta_maxdepth_rescue import *
 
+MAX_OVERVIEW_NORMAL_AF = 0.2
+
+COLUMN_WIDTHS = {  # This is also used to order columns on Overview
+    "Sample Name": 18,
+    "Chr": 6,
+    "Pos": 10,
+    "EndPos": 10,
+    "Ref": 12,
+    "Alt": 24,
+    "SV Length": 11,
+    "MantaID": 12,
+    "Depth": 6,
+    "In Target Panel": 6,
+    "manta_N_OCC": 6,
+    "manta_T_OCC": 6,
+    "manta_N_AF": 8,
+    "manta_T_AF": 8,
+    "STR %": 4,
+    "Paired-read freq": 6,
+    "Spanning-read freq": 6,
+    "Annotation": 16,
+    "Genes": 26,
+    "Details": 20,
+    "Hom Length": 11,
+    "Hom Sequence": 18,
+    "BreakEnd": 18,
+    "BND Event ID": 30,
+    "MaxDepth Rescue": 6,
+}
 
 logging.basicConfig(
     format="{asctime} - {levelname} - {message}",
@@ -18,6 +48,42 @@ logging.basicConfig(
 )
 
 logging.info(f"Using xlsxwriter version: {xlsxwriter.__version__} from {xlsxwriter.__file__}")
+
+
+def add_maxdepth_rescue_row_color(
+    worksheet,
+    workbook,
+    headers,
+    data,
+    row_offset,
+):
+    columns = column_indexes({"headers": headers})
+    rescue_idx = columns.get("maxdepth rescue")
+
+    if rescue_idx is None or not data:
+        return
+
+    rescue_col = xl_col_to_name(rescue_idx)
+    last_col = xl_col_to_name(len(headers) - 1)
+
+    first_data_row = row_offset + 1
+    last_data_row = row_offset + len(data)
+    data_range = f"A{first_data_row}:{last_col}{last_data_row}"
+
+    rescue_format = workbook.add_format({
+        "bg_color": "#DDEBF7",
+        "font_color": "#1F4E78",
+        "bold": True,
+    })
+
+    worksheet.conditional_format(data_range, {
+        "type": "formula",
+        "criteria": (
+            f'=${rescue_col}{first_data_row}="Yes"'
+        ),
+        "format": rescue_format,
+        "stop_if_true": True,
+    })
 
 
 def convert_columns_to_letter(nr_columns):
@@ -34,22 +100,32 @@ def convert_columns_to_letter(nr_columns):
 
 
 def load_target_genes(filepath):
-    genes = []
-    if filepath and os.path.exists(filepath):
-        try:
-            with open(filepath, 'r') as f:
-                genes = [line.strip() for line in f if line.strip()]
-            logging.info(f"Loaded {len(genes)} target genes from {filepath}")
-        except Exception as e:
-            logging.error(f"Could not load gene list: {e}")
+    if not filepath:
+        logging.warning("No target gene list supplied; target-panel summaries will be omitted.")
+        return []
+
+    try:
+        with open(filepath, encoding="utf-8") as gene_file:
+            genes = [line.strip() for line in gene_file if line.strip()]
+    except FileNotFoundError as error:
+        raise FileNotFoundError(
+            f"Target gene list does not exist: {filepath}"
+        ) from error
+    except OSError as error:
+        raise OSError(
+            f"Could not read target gene list: {filepath}"
+        ) from error
+
+    if not genes:
+        raise ValueError(f"Target gene list is empty: {filepath}")
+
+    logging.info("Loaded %d target genes from %s", len(genes), filepath)
     return genes
 
 
 def format_manta_table(table, sample_name, format_2dec):
     """
-    Pre-processes the table data to:
-    1. Prepend 'Sample Name' to all rows.
-    2. Convert any frequency columns to exactly two decimal places.
+    Pre-processes the table data to add 'Sample Name' to all rows and convert freq columns to two decimal places.
     """
     if not table or "headers" not in table:
         return
@@ -81,100 +157,37 @@ def format_manta_table(table, sample_name, format_2dec):
 
 
 def apply_compact_formatting(worksheet, headers, data):
-    """
-    Scans the data and applies sets column widths based on header name and content.
-    """
-    for col_idx, h in enumerate(headers):
-        header_str = str(h.get("header", ""))
-        max_len = len(header_str)
-
-        # Sample the first 100 rows to find max content length
-        for row in data[:100]:
-            if col_idx < len(row) and row[col_idx] is not None:
-                max_len = max(max_len, len(str(row[col_idx])))
-
-        # Apply compact constraints based on column type
-        lower_header = header_str.lower()
-        if "freq" in lower_header or "af" in lower_header or "chr" in lower_header:
-            final_width = 6
-        elif "pos" in lower_header or "length" in lower_header or "sample" in lower_header:
-            final_width = 12
-        elif "mantaid" in lower_header:
-            final_width = 16
-        elif "gene" in lower_header or "sample" in lower_header:
-            final_width = 20
-        else:
-            final_width = min(max_len + 2, 35)  # Allow slightly longer text cols but cap at 35
-
-        worksheet.set_column(col_idx, col_idx, final_width)
+    """Apply stable, field-specific widths to an exported table."""
+    for col_idx, header in enumerate(headers):
+        name = header.get("header", "")
+        width = COLUMN_WIDTHS.get(name, 14)
+        worksheet.set_column(col_idx, col_idx, width)
 
 
-def write_target_summary(worksheet, start_row, title, table_data, sample_name, format_heading):
-    """
-    Helper function to write a summary table on the Overview sheet
-    containing ONLY the variants where 'In Target Panel' is 'Yes' and manta_n_AF <= 0.2.
-    """
-    if not table_data or "headers" not in table_data:
-        return start_row
+def add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset):
+    """Color and hide rows with high normal-sample allele frequency."""
+    columns = column_indexes({"headers": headers})
+    af_idx = columns.get("manta_n_af")
 
-    headers = table_data["headers"]
-    data = table_data["data"]
+    if af_idx is None or not data:
+        return
 
-    # 1. Find the target column
-    target_col_idx = -1
-    svdb_col_idx = -1
-    for idx, h in enumerate(headers):
-        if h.get("header") == "In Target Panel":
-            target_col_idx = idx
-        elif h.get("header") == "manta_N_AF":
-            svdb_col_idx = idx
+    af_col = xl_col_to_name(af_idx)
+    last_col = xl_col_to_name(len(headers) - 1)
+    first_data_row = row_offset + 1
+    last_data_row = row_offset + len(data)
+    data_range = f"A{first_data_row}:{last_col}{last_data_row}"
 
-    if target_col_idx == -1:
-        return start_row  # Target column not found, skip
+    format_orange = workbook.add_format({"bg_color": "#ffd280"})
 
-    # 2. Extract target data
-    target_data = []
-    for row in data:
-        if row[target_col_idx] == "Yes":
-            keep_variant = True
-
-            if svdb_col_idx != -1:
-                af_val = row[svdb_col_idx]
-                if af_val is not None and str(af_val).strip() != "":
-                    try:
-                        # Convert string/int/float to float. If > 0.2, discard it.
-                        if float(af_val) > 0.2:
-                            keep_variant = False
-                    except (ValueError, TypeError):
-                        pass
-
-            if keep_variant:
-                target_data.append(row)
-
-    # Write the title
-    worksheet.write(start_row, 0, title, format_heading)
-    table_start_idx = start_row + 2  # Skip a line after title
-
-    if not target_data:
-        worksheet.write(table_start_idx, 0, "Inga target-varianter hittades för denna typ.")
-        return table_start_idx + 3
-
-    # Calculate Excel table coordinates
-    column_end = convert_columns_to_letter(len(headers))
-    excel_start_row = table_start_idx + 1
-    excel_end_row = excel_start_row + len(target_data)
-    table_area = f"A{excel_start_row}:{column_end}{excel_end_row}"
-
-    # Draw the table
-    worksheet.add_table(
-        table_area,
-        {"columns": headers, "data": target_data, "style": "Table Style Light 1"},
-    )
-
-    # Apply compact formatting to the summary table
-    apply_compact_formatting(worksheet, headers, target_data)
-    # Return the next available row (with some margin)
-    return table_start_idx + len(target_data) + 4
+    worksheet.conditional_format(data_range, {
+        "type": "formula",
+        "criteria": (
+            f"=AND(ISNUMBER(${af_col}{first_data_row}),"
+            f"${af_col}{first_data_row}>{MAX_OVERVIEW_NORMAL_AF})"
+        ),
+        "format": format_orange,
+    })
 
 
 def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, set_cols=None):
@@ -184,28 +197,23 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     worksheet = workbook.add_worksheet(sheet_name)
     format_heading = workbook.add_format({"bold": True, "font_size": 18})
 
-    # Set column widths if specified
-    if set_cols:
-        for col_range, width in set_cols.items():
-            worksheet.set_column(col_range, width)
-
     worksheet.write("A1", title, format_heading)
     worksheet.write("A3", "Sample: " + str(sample_name))
     worksheet.write("A5", "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
-    worksheet.write("A6", "MaxDepth calls are only included if they have PR or SR support >= 5% and manta_N_OCC = 0")
+    if "Translocations" in sheet_name:
+        worksheet.write("A6", "MaxDepth calls passing rescue criteria are included.")
+
     row_offset = 7
     if "Deletions" in sheet_name:
-        worksheet.write("A7", "Calls have to be longer than 100 bp to be included.")
+        worksheet.write("A7", "Deletions have to be longer than 100 bp to be included.")
         row_offset = 8
 
     headers = table_data["headers"]
     data = table_data["data"]
 
     # 1. Find columns
-    svdb_col_idx = -1
-    for idx, header_dict in enumerate(headers):
-        if header_dict.get("header") == "manta_N_AF":
-            svdb_col_idx = idx
+    columns = column_indexes(table_data)
+    svdb_col_idx = columns.get("manta_n_af")
 
     # xlsxwriter's add_table requires 1-based Excel coordinates (e.g., A7:K20)
     column_end = convert_columns_to_letter(len(headers))
@@ -215,138 +223,295 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     # Create the table with default styling. This automatically applies an autofilter.
     worksheet.add_table(
         table_area,
-        {"columns": headers, "data": data, "style": "Table Style Light 1"},
+        {"columns": excel_headers(headers), "data": data, "style": "Table Style Light 1"},
     )
 
     apply_compact_formatting(worksheet, headers, data)
 
-    # 2. Hide rows with High manta_N_AF (but leave target genes visible)
-    if svdb_col_idx != -1 and len(data) > 0:
+    add_maxdepth_rescue_row_color(worksheet, workbook, headers, data, row_offset)
+
+    add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset)
+
+    # Hide rows with high manta_N_AF, except target-gene variants
+    if svdb_col_idx is not None and data:
         for i, row_data in enumerate(data):
             excel_row_index = row_offset + i
-            try:
-                if float(row_data[svdb_col_idx]) > 0.2:
-                    worksheet.set_row(excel_row_index, options={'hidden': True})
-            except (ValueError, TypeError):
-                pass
+
+            if has_high_normal_af(row_data, svdb_col_idx) and not is_in_target_panel(row_data, columns):
+                worksheet.set_row(excel_row_index, options={"hidden": True})
 
     return worksheet
 
 
-def filter_complex_and_junk_bnd(table, max_sites=4):
-    if not table or "headers" not in table or not table["data"]:
-        return table
+def excel_headers(headers):
+    """Create display-only Excel headers."""
+    return [
+        {
+            **header,
+            "header": header.get("header", "").replace("manta_", "", 1),
+        }
+        for header in headers
+    ]
 
-    headers = table["headers"]
-    data = table["data"]
 
-    chr_idx = -1
-    partner_idx = -1
-    id_idx = -1
+def known_fusion_events(table):
+    """Return all available rows for BND events containing a KNOWN_FUSION annotation."""
+    columns = column_indexes(table)
+    details_idx = columns.get("details")
 
-    for i, h in enumerate(headers):
-        header_name = str(h.get("header", "")).lower()
-        if header_name == "chr":
-            chr_idx = i
-        elif header_name in {"breakend", "alt"}:
-            partner_idx = i
-        elif header_name == "mantaid":
-            id_idx = i
+    if details_idx is None:
+        return []
 
-    if chr_idx == -1 or id_idx == -1:
-        logging.warning("Could not filter BND table, missing Chr or MantaID")
-        return table
+    events = {}
+    for row in table.get("data", []):
+        event_id = bnd_event_key(row, columns)
+        events.setdefault(event_id, []).append(row)
 
-    id_counts = Counter(str(row[id_idx]) for row in data)
-    junk_keywords = ["chrun", "random", "gl0", "ki2"]
+    selected_rows = []
 
-    filtered_data = []
-    for row in data:
-        chr_val = str(row[chr_idx]).lower()
-        partner_val = str(row[partner_idx]).lower() if partner_idx != -1 else ""
-        manta_id = str(row[id_idx])
-
-        is_junk_contig = (
-            any(k in chr_val for k in junk_keywords) or
-            any(k in partner_val for k in junk_keywords)
+    for event_rows in events.values():
+        has_known_fusion = any(
+            "KNOWN_FUSION" in {
+                part.strip()
+                for part in str(row[details_idx]).split(",")
+            }
+            for row in event_rows
         )
 
-        has_too_many_sites = id_counts[manta_id] > max_sites
-        # use >= if you want 4-or-more removed
-
-        if not is_junk_contig and not has_too_many_sites:
-            filtered_data.append(row)
-
-    table["data"] = filtered_data
-    logging.info("Top repeated BND IDs: %s", id_counts.most_common(10))
-    return table
-
-
-def filter_maxdepth_by_support(tables_dict, min_support=0.05):
-    """
-    Removes variants flagged with 'MaxDepth' UNLESS their PR or SR frequency is >= min_support.
-    """
-    for sv_type in ["bnd", "del", "dup", "ins"]:
-        table_data = tables_dict[sv_type]
-        if not table_data["data"]:
+        if not has_known_fusion:
             continue
 
-        headers = [h["header"] for h in table_data["headers"]]
-        try:
-            ann_idx = headers.index("Annotation")
-            pr_idx = headers.index("Paired-read freq")
-            sr_idx = headers.index("Spanning-read freq")
-            occ_idx = headers.index("manta_N_OCC")
-        except ValueError:
-            continue
+        # Include both breakends of the event.
+        selected_rows.extend(event_rows)
 
-        filtered_data = []
-        for row in table_data["data"]:
-            annotation = str(row[ann_idx])
+    return selected_rows
 
-            # Check if variant is flagged with MaxDepth
-            if "MaxDepth" in annotation:
-                # Safely extract frequency floats (they might be "" if no PR/SR was found)
-                pr_freq = row[pr_idx] if isinstance(row[pr_idx], float) else 0.0
-                sr_freq = row[sr_idx] if isinstance(row[sr_idx], float) else 0.0
 
-                # Keep it only if support meets our threshold
-                if (pr_freq >= min_support or sr_freq >= min_support) and row[occ_idx] == 0:
-                    filtered_data.append(row)
-            else:
-                # Keep all other non-MaxDepth rows normally
-                filtered_data.append(row)
+def has_high_normal_af(row, normal_af_idx):
+    return (
+        normal_af_idx is not None
+        and as_float(row[normal_af_idx], default=0.0) > MAX_OVERVIEW_NORMAL_AF
+    )
 
-        tables_dict[sv_type]["data"] = filtered_data
-    return tables_dict
+
+def is_in_target_panel(row, column_indexes):
+    """
+    True when the row is flagged as belonging to the target gene panel.
+    """
+    target_idx = column_indexes.get("in target panel")
+
+    return (
+        target_idx is not None
+        and str(row[target_idx]).strip().lower() == "yes"
+    )
+
+
+def align_overview_table(table_data, selected_data):
+    """Put Overview fields in the fixed COLUMN_WIDTHS order."""
+    source_headers = table_data["headers"]
+    source_indexes = {
+        header.get("header"): index
+        for index, header in enumerate(source_headers)
+    }
+
+    headers = []
+    for name in COLUMN_WIDTHS:
+        if name in source_indexes:
+            headers.append(
+                dict(source_headers[source_indexes[name]])
+            )
+        else:
+            headers.append({"header": name})
+
+    aligned_data = [
+        [
+            row[source_indexes[name]]
+            if name in source_indexes
+            else ""
+            for name in COLUMN_WIDTHS
+        ]
+        for row in selected_data
+    ]
+
+    return headers, aligned_data
+
+
+def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=False):
+    """
+    Remove Overview candidates with normal-panel AF above the configured limit.
+
+    Target-panel rows are exempt, so gene-list calls that stay visible on the
+    data sheets are kept here as well. They are still colour-coded by
+    manta_N_AF, which flags them as frequent in the normal panel.
+
+    BND events are removed as complete events when event_atomic is True, and
+    an event is exempt when any of its breakends is in the target panel.
+    """
+    columns = column_indexes(table_data)
+    normal_af_idx = columns.get("manta_n_af")
+
+    if normal_af_idx is None:
+        return list(selected_data)
+
+    if not event_atomic:
+        return [
+            row
+            for row in selected_data
+            if not has_high_normal_af(row, normal_af_idx) or is_in_target_panel(row, columns)
+        ]
+
+    exempt_event_ids = {
+        bnd_event_key(row, columns)
+        for row in selected_data
+        if is_in_target_panel(row, columns)
+    }
+
+    excluded_event_ids = {
+        bnd_event_key(row, columns)
+        for row in selected_data
+        if has_high_normal_af(row, normal_af_idx)
+    } - exempt_event_ids
+
+    return [
+        row
+        for row in selected_data
+        if bnd_event_key(row, columns) not in excluded_event_ids
+    ]
+
+
+def write_overview_summary(
+    worksheet,
+    workbook,
+    start_row,
+    title,
+    table_data,
+    selected_data,
+    format_heading,
+    empty_message=None,
+    event_atomic=False,
+):
+    """
+    Apply the common Overview filters and write a summary table.
+
+    BND summaries are filtered as complete events when event_atomic is True.
+    When no rows remain, the section is omitted unless empty_message is given.
+    """
+    if not table_data or "headers" not in table_data:
+        return start_row
+
+    selected_data = _filter_overview_rows_by_normal_af(
+        table_data,
+        selected_data,
+        event_atomic=event_atomic,
+    )
+
+    if not selected_data and empty_message is None:
+        return start_row
+
+    headers, selected_data = align_overview_table(
+        table_data,
+        selected_data,
+    )
+    worksheet.write(start_row, 0, title, format_heading)
+    table_start_row = start_row + 2
+
+    if not selected_data:
+        worksheet.write(
+            table_start_row,
+            0,
+            empty_message,
+        )
+        return table_start_row + 3
+
+    column_end = convert_columns_to_letter(len(headers))
+    excel_start_row = table_start_row + 1
+    excel_end_row = excel_start_row + len(selected_data)
+    table_area = f"A{excel_start_row}:{column_end}{excel_end_row}"
+
+    worksheet.add_table(
+        table_area,
+        {
+            "columns": excel_headers(headers),
+            "data": selected_data,
+            "style": "Table Style Light 1",
+        },
+    )
+
+    apply_compact_formatting(worksheet, headers, selected_data)
+    add_maxdepth_rescue_row_color(worksheet, workbook, headers, selected_data, excel_start_row)
+    add_manta_af_row_colors(worksheet, workbook, headers, selected_data, excel_start_row)
+
+    return table_start_row + len(selected_data) + 4
+
+
+def write_target_summary(worksheet, workbook, start_row, title, table_data, format_heading, event_atomic=False):
+    """
+    Select target-panel variants and write them to the Overview sheet.
+    When event_atomic is True, all rows belonging to a selected BND event
+    are included if at least one breakend is in the target panel.
+    """
+    if not table_data or "headers" not in table_data:
+        return start_row
+
+    data = table_data.get("data", [])
+
+    columns = column_indexes(table_data)
+
+    if "in target panel" not in columns:
+        return start_row
+
+    target_data = [
+        row
+        for row in data
+        if is_in_target_panel(row, columns)
+    ]
+
+    if event_atomic and target_data:
+
+        selected_event_ids = {
+            bnd_event_key(row, columns)
+            for row in target_data
+        }
+
+        target_data = [
+            row
+            for row in data
+            if bnd_event_key(row, columns) in selected_event_ids
+        ]
+
+    return write_overview_summary(
+        worksheet,
+        workbook,
+        start_row,
+        title,
+        table_data,
+        target_data,
+        format_heading,
+        empty_message="No target-variants found for this type.",
+        event_atomic=event_atomic,
+    )
 
 
 """ MAIN EXECUTION """
 
 # 1. Prepping data
 logging.info(f"Prepping data, such as loading {snakemake.input.manta}=")
-sample_name = snakemake.output.xlsx.split("/")[-1].split(".manta.xlsx")[0]
+sample_name = snakemake.output.xlsx.split("/")[-1].split(".manta_new.xlsx")[0]
 
-filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "NoPairSupport", "SampleFT", "HomRef"]
-
-manta_N_total, manta_T_total = 0, 0
-with VariantFile(snakemake.input.manta) as vcf:
-    for rec in vcf:
-        if "manta_N_OCC" in rec.info and rec.info.get("manta_N_AF") > 0:
-            manta_N_total = int(round(rec.info["manta_N_OCC"] / rec.info["manta_N_AF"]))
-            manta_T_total = int(round(rec.info["manta_T_OCC"] / rec.info["manta_T_AF"]))
-            break
+filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "NoPairSupport", "SampleFT", "HomRef", "MaxDepth"]
 
 # Load target genes for easy filtering in Excel
-target_genes = []
-target_genes_path = getattr(snakemake.params, "target_genes", "") or getattr(snakemake.input, "target_genes", "")
-if target_genes_path:
-    target_genes = load_target_genes(target_genes_path)
+target_genes_path = getattr(snakemake.input, "target_genes", "") or getattr(snakemake.params, "target_genes", "")
+target_genes = load_target_genes(target_genes_path)
 
 manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
-manta_tables_full = filter_maxdepth_by_support(manta_tables_full, 0.05)
-manta_tables_full["bnd"] = filter_complex_and_junk_bnd(manta_tables_full["bnd"], max_sites=4)
-
+manta_tables_all = create_manta_tables(snakemake.input.manta, avoid_filterflags=[], target_genes=target_genes)
+blocking_filter_flags = set(filter_flags) - {"MaxDepth"}
+manta_tables_maxdepth = create_maxdepth_bnd_rescue_table(
+    manta_tables_all,
+    blocking_filter_flags,
+    min_support=MAXDEPTH_RESCUE_MIN_SUPPORT,
+)
 
 # 2. Creating xlsx workbook
 workbook = xlsxwriter.Workbook(snakemake.output.xlsx)
@@ -357,15 +522,30 @@ format_bold = workbook.add_format({"bold": True, "text_wrap": True})
 format_overview_title = workbook.add_format({"bold": True, "font_size": 16})
 format_2dec = workbook.add_format({"num_format": "0.00"})
 
+manta_tables_full["bnd"] = merge_manta_tables(manta_tables_full["bnd"], manta_tables_maxdepth)
+
+panel_tables_dict = {}
+
+for vcf in snakemake.input.vcfs_bed:
+    panel = vcf.split(".")[-3]
+
+    panel_tables = create_manta_tables(vcf, filter_flags, target_genes=target_genes)
+    panel_tables_all = create_manta_tables(vcf, avoid_filterflags=[], target_genes=target_genes)
+    panel_rescue = select_rescue_events_for_panel(manta_tables_maxdepth, panel_tables_all["bnd"])
+
+    panel_tables["bnd"] = merge_manta_tables(panel_tables["bnd"], panel_rescue)
+    add_maxdepth_rescue_column(panel_tables["bnd"], panel_rescue)
+    format_manta_table(panel_tables["bnd"], sample_name, format_2dec)
+
+    panel_tables_dict[panel] = panel_tables
+
+add_maxdepth_rescue_column(manta_tables_full["bnd"], manta_tables_maxdepth)
+add_maxdepth_rescue_column(manta_tables_maxdepth, manta_tables_maxdepth)
+
 for sv_key in ["del", "ins", "dup", "bnd"]:
     format_manta_table(manta_tables_full[sv_key], sample_name, format_2dec)
 
-panel_tables_dict = {}
-for vcf in snakemake.input.vcfs_bed:
-    panel = vcf.split(".")[-3]
-    panel_tables = create_manta_tables(vcf, filter_flags, target_genes=target_genes)
-    format_manta_table(panel_tables["bnd"], sample_name, format_2dec)
-    panel_tables_dict[panel] = panel_tables
+format_manta_table(manta_tables_maxdepth, sample_name, format_2dec)
 
 worksheet_overview = workbook.add_worksheet("Overview")
 
@@ -391,8 +571,7 @@ create_sheet(
 for vcf in snakemake.input.vcfs_bed:
     panel = vcf.split(".")[-3]
     logging.debug(f"Creating {panel} sheet")
-    panel_tables = create_manta_tables(vcf, filter_flags, target_genes=target_genes)
-    panel_tables["bnd"] = filter_complex_and_junk_bnd(panel_tables["bnd"], max_sites=4)
+    panel_tables = panel_tables_dict[panel]
     sheet_title = "Translocations in " + panel.upper() + " genes"
     sheet_name = "Translocations " + panel.upper()
     create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"], {"B:B": 12, "C:D": 15})
@@ -434,10 +613,10 @@ if target_genes:
     genes_string = ", ".join(target_genes)
     worksheet_overview.write(row_idx + 6, 0,
                              f"Target Genes filter added: {len(target_genes)} genes loaded - [{genes_string}]")
-worksheet_overview.write(row_idx + 8, 0,
-                         f"Number of samples in manta_N: {manta_N_total} and manta_T: {manta_T_total}")
+
 worksheet_overview.write(row_idx + 9, 0,
                          "Only calls NOT containing the following annotation are included: " + ", ".join(filter_flags))
+worksheet_overview.write(row_idx + 10, 0, "MaxDepth calls passing rescue criteria are included.")
 
 # -------------------------------------------------------------
 # 5. Add Summary Tables for Target Panel == "Yes" on Overview
@@ -457,12 +636,47 @@ summaries = [
 for sv_key, sv_title in summaries:
     row_idx = write_target_summary(
         worksheet_overview,
+        workbook,
         row_idx,
         sv_title,
         manta_tables_full[sv_key],
-        sample_name,
-        format_bold
+        format_bold,
+        event_atomic=(sv_key == "bnd"),
     )
+
+known_fusion_rows = known_fusion_events(manta_tables_full["bnd"])
+
+known_fusion_start = row_idx + 2
+
+new_row_idx = write_overview_summary(
+    worksheet_overview,
+    workbook,
+    known_fusion_start,
+    "Translocations (KNOWN_FUSION)",
+    manta_tables_full["bnd"],
+    known_fusion_rows,
+    format_overview_title,
+    event_atomic=True,
+)
+
+if new_row_idx != known_fusion_start:
+    row_idx = new_row_idx
+
+maxdepth_start = row_idx + 2
+
+new_row_idx = write_overview_summary(
+    worksheet_overview,
+    workbook,
+    maxdepth_start,
+    "MaxDepth rescue calls",
+    manta_tables_maxdepth,
+    manta_tables_maxdepth.get("data", []),
+    format_overview_title,
+    event_atomic=True,
+)
+
+if new_row_idx != maxdepth_start:
+    row_idx = new_row_idx
 
 workbook.set_size(1800, 1200)
 workbook.close()
