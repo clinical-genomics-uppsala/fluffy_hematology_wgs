@@ -105,12 +105,8 @@ rule export_to_xlsx_rna_fusions:
         arriba="fusions/arriba/{sample}_R.fusions.tsv",
         fusioncatcher="fusions/fusioncatcher/{sample}_R/final-list_candidate-fusion-genes.txt",
         star_fusion="fusions/star_fusion/{sample}_R/star-fusion.fusion_predictions.abridged.coding_effect.tsv",
-        dux4_igh_counts="fusions/fusioncatcher/{sample}_R/dux4_counts.txt",
-        dux4_igh_calls="fusions/fusioncatcher/{sample}_R/dux4_hits.txt",
     output:
         xlsx=temp("export_to_xlsx/rna/{sample}.rna_fusions.xlsx"),
-    params:
-        extra=config.get("export_to_xlsx_rna_fusions", {}).get("extra", ""),
     log:
         "export_to_xlsx/rna/{sample}.rna_fusions.xlsx.log",
     benchmark:
@@ -118,6 +114,8 @@ rule export_to_xlsx_rna_fusions:
             "export_to_xlsx/rna/{sample}.rna_fusions.xlsx.benchmark.tsv",
             config.get("export_to_xlsx_rna_fusions", {}).get("benchmark_repeats", 1),
         )
+    container:
+        config.get("export_to_xlsx_rna_fusions", {}).get("container", config["default_container"])
     threads: config.get("export_to_xlsx_rna_fusions", {}).get("threads", config["default_resources"]["threads"])
     resources:
         mem_mb=config.get("export_to_xlsx_rna_fusions", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
@@ -125,8 +123,9 @@ rule export_to_xlsx_rna_fusions:
         partition=config.get("export_to_xlsx_rna_fusions", {}).get("partition", config["default_resources"]["partition"]),
         threads=config.get("export_to_xlsx_rna_fusions", {}).get("threads", config["default_resources"]["threads"]),
         time=config.get("export_to_xlsx_rna_fusions", {}).get("time", config["default_resources"]["time"]),
-    container:
-        config.get("export_to_xlsx_rna_fusions", {}).get("container", config["default_container"])
+    params:
+        fusioncatcher_genelist=config.get("export_to_xlsx_rna_fusions", {}).get("fusioncatcher_genelist", None),
+        extra=config.get("export_to_xlsx_rna_fusions", {}).get("extra", ""),
     message:
         "{rule}: merge RNA fusions for {wildcards.sample} into {output.xlsx}"
     script:
