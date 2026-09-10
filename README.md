@@ -12,12 +12,13 @@ Snakemake workflow to analyse hematological malignancies in whole genome data
 This snakemake workflow uses modules from [hydra-genetics](https://github.com/hydra-genetics/) to process `.fastq` files and call SNVs, indels, CNVs and SVs from whole genome DNA, plus fusions from RNA. Alongside diagnosis-filtered `.vcf` files, the workflow produces produces Excel reports for manual review, a MultiQC report `.html` file and CNV plots. One of the modules contains the **commercial**
 [parabricks toolkit](https://docs.nvidia.com/clara/parabricks/3.7.0/index.html) which can be replaced by sentieon or opensource GATK tools if required.
 
-The workflow runs in two modes depending on what `units.tsv` provides for a sample:
+The workflow runs in three modes depending on what `units.tsv` provides for a sample:
 
 - **Tumor/normal (`tn`)** — matched tumor and normal DNA. Somatic calling subtracts the patient's own germline, and
   Manta's somatic scoring is available.
 - **Tumor-only (`t`)** — DNA only, no matched normal. Somatic/germline separation relies on population allele
   frequency and the normal-panel annotations described below.
+- **RNA (`r`)** - Whole Exome sequencing of tumor RNA
 
 The following hydra-genetics modules are part of this pipeline: `alignment`, `annotation`, `cnv_sv`, `compression`,
 `filtering`, `fusions`, `misc`, `parabricks` (or `sentieon`), `prealignment`, `qc`, `reports`.
@@ -56,7 +57,7 @@ The following information need to be added to these files:
 | fastq1/2                  | absolute path to forward and reverse reads                                                       |
 | adapter                   | adapter sequences to be trimmed, separated by comma                                              |
 
-A sample with only a `T` unit is run tumor-only; a sample with both `T` and `N` units is run tumor/normal.
+A sample with only a `T` unit is run tumor-only; a sample with both `T` and `N` units is run tumor/normal and tumor-only.
 
 ### Reference data
 
