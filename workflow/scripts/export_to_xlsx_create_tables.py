@@ -214,56 +214,57 @@ def _extract_manta_annotations(record, ann_index, simple_ann_index):
                 "Manta VCF contains SIMPLE_ANN records "
                 "but no SIMPLE_ANN header definition"
             )
-
-        gene_idx = simple_ann_index.index("GENE(s)")
-        transcript_idx = simple_ann_index.index("TRANSCRIPT")
-        detail_idx = simple_ann_index.index(
-            "DETAIL (exon losses, KNOWN_FUSION, "
-            "ON_PRIORITY_LIST, NOT_PRIORITISED)"
-        )
-
+        
+        try:
+            gene_idx = simple_ann_index.index("GENE(s)")
+            transcript_idx = simple_ann_index.index("TRANSCRIPT")
+            detail_idx = simple_ann_index.index(
+                "DETAIL (exon losses, KNOWN_FUSION, "
+                "ON_PRIORITY_LIST, NOT_PRIORITISED)"
+            )
+        except ValueError as err:
+            raise ValueError(
+                f"SIMPLE_ANN header missing expected field: {err}"
+            ) from err
+        
         genes = []
         details = []
 
         for annotation in simple_annotations:
             values = annotation.split("|")
-
-            gene_label = (
-                f"{values[gene_idx]}({values[transcript_idx]})"
-            )
-            if gene_label not in genes:
+            gene = values[gene_idx] if gene_idx < len(values) else ""
+            transcript = values[transcript_idx] if transcript_idx < len(values) else ""
+            gene_label = f"{gene}({transcript})" if gene or transcript else ""
+            if gene_label and gene_label not in genes:
                 genes.append(gene_label)
-
-            detail = values[detail_idx]
-            if detail not in details:
+            detail = values[detail_idx] if detail_idx < len(values) else ""
+            if detail and detail not in details:
                 details.append(detail)
-
-        return ", ".join(genes), ", ".join(details)
-
+        return ", ".join(genes) if genes else "NA", ", ".join(details)
+    
     annotations = _info_values(record, "ANN")
-
+    
     if annotations:
         if not ann_index:
             raise ValueError(
                 "Manta VCF contains ANN records "
                 "but no ANN header definition"
             )
-
-        gene_name_idx = ann_index.index("Gene_Name")
-        gene_id_idx = ann_index.index("Gene_ID")
-
+        try:
+            gene_name_idx = ann_index.index("Gene_Name")
+            gene_id_idx = ann_index.index("Gene_ID")
+        except ValueError as err:
+            raise ValueError(f"ANN header missing expected field: {err}") from err
         genes = []
-
         for annotation in annotations:
             values = annotation.split("|")
-            gene_label = (
-                f"{values[gene_name_idx]}({values[gene_id_idx]})"
-            )
-            if gene_label not in genes:
+            gene_name = values[gene_name_idx] if gene_name_idx < len(values) else ""
+            gene_id = values[gene_id_idx] if gene_id_idx < len(values) else ""
+            gene_label = f"{gene_name}({gene_id})" if gene_name or gene_id else ""
+            if gene_label and gene_label not in genes:
                 genes.append(gene_label)
-
-        return ", ".join(genes), ""
-
+        return ", ".join(genes) if genes else "NA", ""
+    
     return "NA", "NA"
 
 

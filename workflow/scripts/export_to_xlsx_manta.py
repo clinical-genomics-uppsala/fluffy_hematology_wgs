@@ -30,6 +30,8 @@ COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "STR %": 4,
     "Paired-read freq": 6,
     "Spanning-read freq": 6,
+    "Paired-read Normal Freq": 6,
+    "Spanning-read Normal Freq": 6,
     "Annotation": 16,
     "Genes": 26,
     "Details": 20,
@@ -155,7 +157,7 @@ def format_manta_table(table, sample_name, format_2dec):
         table["data"][row_idx] = new_row
 
 
-def apply_compact_formatting(worksheet, headers, data):
+def apply_compact_formatting(worksheet, headers):
     """Apply stable, field-specific widths to an exported table."""
     for col_idx, header in enumerate(headers):
         name = header.get("header", "")
@@ -189,7 +191,7 @@ def add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset):
     })
 
 
-def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, set_cols=None):
+def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data):
     if not table_data or "headers" not in table_data:
         return None
 
@@ -278,7 +280,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
         {"columns": excel_headers(headers), "data": data, "style": "Table Style Light 1"},
     )
 
-    apply_compact_formatting(worksheet, headers, data)
+    apply_compact_formatting(worksheet, headers)
 
     add_maxdepth_rescue_row_color(worksheet, workbook, headers, data, row_offset)
 
@@ -366,8 +368,17 @@ def align_overview_table(table_data, selected_data):
         for index, header in enumerate(source_headers)
     }
 
+    # Only include normal frequency columns on Overview if present in the data (tumor-normal runs)
+    normal_freq_cols = {"Paired-read Normal Freq", "Spanning-read Normal Freq"}
+    has_normal_freqs = any(name in source_indexes for name in normal_freq_cols)
+
+    overview_columns = [
+        name for name in COLUMN_WIDTHS
+        if has_normal_freqs or name not in normal_freq_cols
+    ]
+
     headers = []
-    for name in COLUMN_WIDTHS:
+    for name in overview_columns:
         if name in source_indexes:
             headers.append(
                 dict(source_headers[source_indexes[name]])
@@ -380,7 +391,7 @@ def align_overview_table(table_data, selected_data):
             row[source_indexes[name]]
             if name in source_indexes
             else ""
-            for name in COLUMN_WIDTHS
+            for name in overview_columns
         ]
         for row in selected_data
     ]
@@ -489,7 +500,7 @@ def write_overview_summary(
         },
     )
 
-    apply_compact_formatting(worksheet, headers, selected_data)
+    apply_compact_formatting(worksheet, headers)
     add_maxdepth_rescue_row_color(worksheet, workbook, headers, selected_data, excel_start_row)
     add_manta_af_row_colors(worksheet, workbook, headers, selected_data, excel_start_row)
 
@@ -618,19 +629,19 @@ worksheet_overview = workbook.add_worksheet("Overview")
 # 3. Create Data Sheets
 create_sheet(
     workbook, "Deletions", "Deletions found by Manta",
-    sample_name, filter_flags, manta_tables_full["del"],  {"B:C": 12, "E:E": 12}
+    sample_name, filter_flags, manta_tables_full["del"]
 )
 create_sheet(
     workbook, "Insertions", "Insertions found by Manta",
-    sample_name, filter_flags, manta_tables_full["ins"], {"B:B": 12, "F:F": 12}
+    sample_name, filter_flags, manta_tables_full["ins"]
 )
 create_sheet(
     workbook, "Duplications", "Duplications found by Manta",
-    sample_name, filter_flags, manta_tables_full["dup"], {"B:C": 12, "E:E": 12}
+    sample_name, filter_flags, manta_tables_full["dup"]
 )
 create_sheet(
     workbook, "Translocations", "Translocations found by Manta",
-    sample_name, filter_flags, manta_tables_full["bnd"], {"B:B": 12, "C:D": 15}
+    sample_name, filter_flags, manta_tables_full["bnd"]
 )
 
 # Translocations (Panels from BED)
@@ -640,7 +651,7 @@ for vcf in snakemake.input.vcfs_bed:
     panel_tables = panel_tables_dict[panel]
     sheet_title = "Translocations in " + panel.upper() + " genes"
     sheet_name = "Translocations " + panel.upper()
-    create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"], {"B:B": 12, "C:D": 15})
+    create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"])
 
 # 4. Populate Overview Sheet
 logging.debug(f"Populating Overview sheet")
@@ -726,7 +737,7 @@ worksheet_overview.write(
 )
 row_idx += 1
 worksheet_overview.write(
-    row_idx, 0, "  1. Variant support: At least one breakpoint has PR_AF or SR_AF >= 5% in the tumor sample.")
+    row_idx, 0, "  1. Variant support: Every MaxDepth breakpoint has PR_AF or SR_AF >= 5% in the tumor sample.")
 row_idx += 1
 worksheet_overview.write(
     row_idx, 0, "  2. Normal panel: Zero evidence in the normal panel (manta_N_OCC == 0).")
