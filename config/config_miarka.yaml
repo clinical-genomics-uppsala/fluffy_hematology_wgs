@@ -503,7 +503,7 @@ snpeff:
   db: "{{REFERENCE_DATA}}/fluffy/snpeff/GRCh38.99"
 
 somalier_extract:
-  container: "{{APPTAINER_CACHE}}/somalier_v0.2.18.sif"
+  container: "{{APPTAINER_CACHE}}/somalier_0.2.18.sif"
   sites: "{{REFERENCE_DATA}}/fluffy/somalier/sites.hg38.vcf.gz"
   extra: ""
 
@@ -511,7 +511,7 @@ somalier_mqc:
   config: "{{FLUFFY_HOME}}/config/somalier_mqc.yaml"
 
 somalier_relate: 
-  container: "{{APPTAINER_CACHE}}/somalier_v0.2.18.sif"
+  container: "{{APPTAINER_CACHE}}/somalier_0.2.18.sif"
   extra: "--infer"
   
 sortmerna:
@@ -534,7 +534,7 @@ star:
   extra: "--quantMode GeneCounts --sjdbGTFfile {{REFERENCE_DATA}}/fluffy/Homo_sapiens.GRCh38.115.chr.gtf --outSAMtype BAM SortedByCoordinate --chimSegmentMin 10 --chimOutType WithinBAM SoftClip --chimJunctionOverhangMin 10 --chimScoreMin 1 --chimScoreDropMax 30 --chimScoreJunctionNonGTAG 0 --chimScoreSeparation 1 --alignSJstitchMismatchNmax 5 -1 5 5 --chimSegmentReadGapMax 3"
 
 star_fusion:
-  container: "{{APPTAINER_CACHE}}/starfusion_1.15.1.sif"
+  container: "{{APPTAINER_CACHE}}/star-fusion_1.15.1.sif"
   extra: "--examine_coding_effect"
   genome_path: "{{REFERENCE_DATA}}/fluffy/star-fusion/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play/ctat_genome_lib_build_dir"
 
