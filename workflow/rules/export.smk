@@ -14,6 +14,9 @@ rule export_to_xlsx_snvs:
         tm_bed=config.get("bcftools_SNV", {}).get("tm", ""),
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.snvs.xlsx"),
+    params:
+        filterfile=config.get("filter_vcf", {}).get("somatic", ""),
+        extra=config.get("export_to_xlsx_snvs", {}).get("extra", ""),
     log:
         "export_to_xlsx/{analysis}/{sample}.snvs.xslx.log",
     benchmark:
@@ -21,8 +24,6 @@ rule export_to_xlsx_snvs:
             "export_to_xlsx/{analysis}/{sample}.snvs.xslx.benchmark.tsv",
             config.get("export_to_xlsx_snvs", {}).get("benchmark_repeats", 1),
         )
-    container:
-        config.get("export_to_xlsx_snvs", {}).get("container", config["default_container"])
     threads: config.get("export_to_xlsx_snvs", {}).get("threads", config["default_resources"]["threads"])
     resources:
         mem_mb=config.get("export_to_xlsx_snvs", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
@@ -30,9 +31,8 @@ rule export_to_xlsx_snvs:
         partition=config.get("export_to_xlsx_snvs", {}).get("partition", config["default_resources"]["partition"]),
         threads=config.get("export_to_xlsx_snvs", {}).get("threads", config["default_resources"]["threads"]),
         time=config.get("export_to_xlsx_snvs", {}).get("time", config["default_resources"]["time"]),
-    params:
-        filterfile=config.get("filter_vcf", {}).get("somatic", ""),
-        extra=config.get("export_to_xlsx_snvs", {}).get("extra", ""),
+    container:
+        config.get("export_to_xlsx_snvs", {}).get("container", config["default_container"])
     message:
         "{rule}: merge {input.vcfs} into {output.xlsx}"
     script:
@@ -48,14 +48,14 @@ rule annotate_manta_str:
         vcf="cnv_sv/manta_run_workflow_{analysis}/{sample}.ssa.svdb_query.str_annotated.vcf",
     log:
         "logs/annotate_str/manta_{analysis}_{sample}.log",
-    container:
-        config.get("annotate_str", {}).get("container", config["default_container"])
     resources:
         partition=config.get("annotate_str", {}).get("partition", config.get("default_resources", {}).get("partition")),
         time=config.get("annotate_str", {}).get("time", config.get("default_resources", {}).get("time")),
         mem_mb=config.get("annotate_str", {}).get("mem_mb", config.get("default_resources", {}).get("mem_mb")),
         mem_per_cpu=config.get("annotate_str", {}).get("mem_per_cpu", config.get("default_resources", {}).get("mem_per_cpu")),
         threads=config.get("annotate_str", {}).get("threads", config.get("default_resources", {}).get("threads")),
+    container:
+        config.get("annotate_str", {}).get("container", config["default_container"])
     script:
         "../scripts/annotate_str.py"
 
@@ -73,8 +73,11 @@ rule export_to_xlsx_manta:
         ),
         all_bed=config.get("bcftools_SV", {}).get("all", ""),
         aml_bed=config.get("bcftools_SV", {}).get("aml", ""),
+        target_genes=lambda wildcards: config.get("reference", {}).get("target_genes") or [],
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.manta.xlsx"),
+    params:
+        extra=config.get("export_to_xlsx_manta", {}).get("extra", ""),
     log:
         "export_to_xlsx/{analysis}/{sample}.manta.xlsx.log",
     benchmark:
@@ -82,8 +85,6 @@ rule export_to_xlsx_manta:
             "export_to_xlsx/{analysis}/{sample}.manta.xlsx.benchmark.tsv",
             config.get("export_to_xlsx_manta", {}).get("benchmark_repeats", 1),
         )
-    container:
-        config.get("export_to_xlsx_manta", {}).get("container", config["default_container"])
     threads: config.get("export_to_xlsx_manta", {}).get("threads", config["default_resources"]["threads"])
     resources:
         mem_mb=config.get("export_to_xlsx_manta", {}).get("mem_mb", config["default_resources"]["mem_mb"]),
@@ -91,9 +92,8 @@ rule export_to_xlsx_manta:
         partition=config.get("export_to_xlsx_manta", {}).get("partition", config["default_resources"]["partition"]),
         threads=config.get("export_to_xlsx_manta", {}).get("threads", config["default_resources"]["threads"]),
         time=config.get("export_to_xlsx_manta", {}).get("time", config["default_resources"]["time"]),
-    params:
-        target_genes=config.get("reference", {}).get("target_genes", ""),
-        extra=config.get("export_to_xlsx_manta", {}).get("extra", ""),
+    container:
+        config.get("export_to_xlsx_manta", {}).get("container", config["default_container"])
     message:
         "{rule}: merge {input.vcfs_bed} and {input.manta} into {output.xlsx}"
     script:
