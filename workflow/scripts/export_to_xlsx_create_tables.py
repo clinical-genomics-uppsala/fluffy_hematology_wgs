@@ -214,7 +214,7 @@ def _extract_manta_annotations(record, ann_index, simple_ann_index):
                 "Manta VCF contains SIMPLE_ANN records "
                 "but no SIMPLE_ANN header definition"
             )
-        
+
         try:
             gene_idx = simple_ann_index.index("GENE(s)")
             transcript_idx = simple_ann_index.index("TRANSCRIPT")
@@ -226,7 +226,7 @@ def _extract_manta_annotations(record, ann_index, simple_ann_index):
             raise ValueError(
                 f"SIMPLE_ANN header missing expected field: {err}"
             ) from err
-        
+
         genes = []
         details = []
 
@@ -241,9 +241,9 @@ def _extract_manta_annotations(record, ann_index, simple_ann_index):
             if detail and detail not in details:
                 details.append(detail)
         return ", ".join(genes) if genes else "NA", ", ".join(details)
-    
+
     annotations = _info_values(record, "ANN")
-    
+
     if annotations:
         if not ann_index:
             raise ValueError(
@@ -264,7 +264,7 @@ def _extract_manta_annotations(record, ann_index, simple_ann_index):
             if gene_label and gene_label not in genes:
                 genes.append(gene_label)
         return ", ".join(genes) if genes else "NA", ""
-    
+
     return "NA", "NA"
 
 
