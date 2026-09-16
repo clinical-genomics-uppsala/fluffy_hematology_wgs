@@ -61,6 +61,11 @@ rule all:
         unpack(compile_output_file_list),
 
 
+rule manta_reports:
+    input:
+        manta_report_targets,
+
+
 module alignment:
     snakefile:
         get_module_snakefile(
