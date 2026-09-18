@@ -1,0 +1,12 @@
+jobs: 200
+keep-going: True
+restart-times: 1
+rerun-incomplete: True
+use-singularity: True
+max-jobs-per-second: 50
+resources: load=100
+max-status-checks-per-second: 100
+singularity-args: "-e --cleanenv -B /proj -B $HOME --nv"
+drmaa: " -A ngi2024001 -N 1-1 -t {resources.time} -n {resources.threads} --mem={resources.mem_mb} --mem-per-cpu={resources.mem_per_cpu} --mem-per-cpu={resources.mem_per_cpu} --partition={resources.partition} -J {rule} {resources.gres} -e slurm_out/{rule}_%j.err -o slurm_out/{rule}_%j.out"
+default-resources: [gres=""]
+drmaa-log-dir: "slurm_out"
