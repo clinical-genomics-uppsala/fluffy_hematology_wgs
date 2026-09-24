@@ -434,13 +434,9 @@ somalier_extract:
   sites:
     checksum: aba14164be7c2c2ed7458277374bb95c
     path: GRCh38/annotation/somalier/sites.hg38.vcf.gz
+    requires_index: false
     type: file
     url: file:/data/ref_data/somalier/v0.2.18/sites.hg38.vcf.gz
-  sites_tbi:
-    checksum: null
-    path: GRCh38/annotation/somalier/sites.hg38.vcf.gz.tbi
-    type: file
-    url: file:/data/ref_data/somalier/v0.2.18/sites.hg38.vcf.gz.tbi
 sortmerna:
   data:
     content_checksum:
