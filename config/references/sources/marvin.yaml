@@ -10,7 +10,7 @@ arriba:
     type: file
     url: file:/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.dna.primary_assembly.fa
   assembly_fai:
-    checksum: null
+    checksum: d527f3eb6b664020cf4d882b5820056f
     path: GRCh38/genome/Homo_sapiens.GRCh38.dna.primary_assembly/Homo_sapiens.GRCh38.dna.primary_assembly.fa.fai
     type: file
     url: file:/data/ref_genomes/GRCh38/arriba/Homo_sapiens.GRCh38.dna.primary_assembly.fa.fai
@@ -314,7 +314,7 @@ reference:
     type: file
     url: file:/data/ref_genomes/GRCh38/gatk/hg38.preprocessed.20250926.interval_list
   dict:
-    checksum: null
+    checksum: 9b29cf8d279437ee2832a6375b6634a1
     path: GRCh38/genome/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.dict
     type: file
     url: file:/data/ref_genomes/GRCh38/GRCmasked/GCA_000001405.15_GRCh38_no_alt_analysis_set_GRCmasked.dict
@@ -350,7 +350,7 @@ reference:
     type: folder
     url: file:/data/ref_genomes/GRCh38/reference_grasnatter/homo_sapiens_star
   simple_repeats:
-    checksum: null
+    checksum: 96856e40c9dc025732c84d86669ea4f5
     path: GRCh38/annotation/simple_sv_annotation/simple_repeats.merged.bed.gz
     type: file
     url: file:/data/ref_genomes/GRCh38/simple_sv_annotation/simple_repeats.merged.bed.gz
@@ -360,12 +360,12 @@ reference:
     type: file
     url: file:/data/ref_genomes/GRCh38/GRCmasked/Homo_sapiens_assembly38.known_indels.vcf.gz
   sites_tbi:
-    checksum: null
+    checksum: 1a55fdfa6533ae5cbc70e8188e779229
     path: GRCh38/annotation/known_indels/Homo_sapiens_assembly38.known_indels.vcf.gz.tbi
     type: file
     url: file:/data/ref_genomes/GRCh38/GRCmasked/Homo_sapiens_assembly38.known_indels.vcf.gz.tbi
   target_genes:
-    checksum: null
+    checksum: c0bf88de70b0858b4804840f2f80713f
     path: pipelines/fluffy/gene_panels/fluffy_genes.txt
     type: file
     url: file:/data/ref_genomes/GRCh38/gene_lists/fluffy_genes.txt
@@ -613,22 +613,22 @@ star-fusion:
     url: file:/data/ref_genomes/GRCh38/star_fusion/GRCh38_gencode_v37_CTAT_lib_Mar012021.plug-n-play
 svdb_query:
   db_manta:
-    checksum: null
+    checksum: e0c83b2cd4c5054c26ef8039c913058a
     path: pipelines/fluffy/pon/manta_T_135.sorted.vcf.gz
     type: file
     url: file:/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz
   db_manta_2:
-    checksum: null
+    checksum: c32d360b7b539bfc2a4fe5e47f0c9a19
     path: pipelines/fluffy/pon/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz
     type: file
     url: file:/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz
   db_manta_tbi:
-    checksum: null
+    checksum: 245267de93f84f7269dc1e91c1800a23
     path: pipelines/fluffy/pon/manta_T_135.sorted.vcf.gz.tbi
     type: file
     url: file:/data/ref_data/wp2/fluffy/svdb/manta_T_135.sorted.vcf.gz.tbi
   db_manta_tbi_2:
-    checksum: null
+    checksum: 0a8b7c669c9a2aef4ad1bcbdd1f21512
     path: pipelines/fluffy/pon/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz.tbi
     type: file
     url: file:/data/ref_data/wp3/svdb/svdb_create_novaseqx/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz.tbi
