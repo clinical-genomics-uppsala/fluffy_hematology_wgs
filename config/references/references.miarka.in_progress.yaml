@@ -406,13 +406,13 @@ manta_config_t:
     path: fluffy/GRCh38_chromosomes.bed.gz
     checksum: 9f5c616f44f601bf7be983cc17ead95d 
     type: file
-    url: file: /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz
 
   call_region_tbi:
     path: fluffy/GRCh38_chromosomes.bed.gz.tbi
     checksum: 3b115d2350fe850cb051a6133ee3659a
     type: file
-    url: file: /beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz.tbi
+    url: file:/beegfs-storage/data/ref_genomes/GRCh38/GRCmasked/GRCh38_chromosomes.bed.gz.tbi
     
 merge_cnv_json:
   ref_genes:
