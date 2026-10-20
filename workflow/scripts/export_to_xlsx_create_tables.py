@@ -87,7 +87,14 @@ def extract_vcf_values(record, csq_index, sample_tumor, sample_normal=""):
             return_dict["coding_name"] = csq[csq_index.index("HGVSc")].split(":")[1]
         else:
             return_dict["coding_name"] = ""
-        return_dict["ensp"] = csq[csq_index.index("HGVSp")]
+
+        hgvsp = csq[csq_index.index("HGVSp")].replace("%3D", "=")
+        if ":p." in hgvsp and not hgvsp.endswith(")"):
+            protein_id, protein_change = hgvsp.split(":p.", 1)
+            return_dict["ensp"] = f"{protein_id}:p.({protein_change})"
+        else:
+            return_dict["ensp"] = hgvsp
+
         return_dict["consequence"] = csq[csq_index.index("Consequence")]
 
         existing = csq[csq_index.index("Existing_variation")].split("&")
