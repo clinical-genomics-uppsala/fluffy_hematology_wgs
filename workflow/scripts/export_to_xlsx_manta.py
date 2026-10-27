@@ -242,7 +242,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     worksheet.write(
         curr_row,
         0,
-        "Note: Calls with normal panel AF > 0.20 are hidden by default to reduce recurrent noise (unless in target panel). "
+        "Note: Calls with Normal pool AF > 0.20 are hidden by default to reduce recurrent noise (unless in target panel). "
         "To unhide all rows in Excel: Select all (Ctrl+A / Cmd+A) -> Right-click row numbers -> Unhide.",
         format_italic,
     )
@@ -253,7 +253,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 
     worksheet.merge_range(
         curr_row, 0, curr_row, legend_end_col,
-        "  Orange: High frequency in normal panel (manta_N_AF > 0.20, annotated via SVDB query against manta_normal_panel)",
+        "  Orange: High frequency in the Normal pool (N_AF > 0.20, annotated via SVDB query against the Normal pool)",
         format_legend_orange,
     )
     curr_row += 1
@@ -401,11 +401,11 @@ def align_overview_table(table_data, selected_data):
 
 def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=False):
     """
-    Remove Overview candidates with normal-panel AF above the configured limit.
+    Remove Overview candidates with Normal pool AF above the configured limit.
 
     Target-panel rows are exempt, so gene-list calls that stay visible on the
     data sheets are kept here as well. They are still colour-coded by
-    manta_N_AF, which flags them as frequent in the normal panel.
+    manta_N_AF, which flags them as frequent in the Normal pool.
 
     BND events are removed as complete events when event_atomic is True, and
     an event is exempt when any of its breakends is in the target panel.
@@ -705,7 +705,7 @@ row_idx += 1
 worksheet_overview.write(
     row_idx,
     0,
-    "Note: Calls with normal panel AF > 0.20 are hidden by default on data sheets (unless in target panel). "
+    "Note: Calls with Normal pool AF > 0.20 are hidden by default on data sheets (unless in target panel). "
     "To unhide all rows in Excel: Select all (Ctrl+A / Cmd+A) -> Right-click row numbers -> Unhide.",
     format_italic,
 )
@@ -716,7 +716,7 @@ worksheet_overview.write(row_idx, 0, "Color Legend:", format_bold)
 row_idx += 1
 worksheet_overview.merge_range(
     row_idx, 0, row_idx, 7,
-    "  Orange: High frequency in normal panel (manta_N_AF > 0.20, annotated via SVDB query against manta_normal_panel)",
+    "  Orange: High frequency in the Normal pool (N_AF > 0.20, annotated via SVDB query against the Normal pool)",
     format_legend_orange,
 )
 row_idx += 1
@@ -740,7 +740,7 @@ worksheet_overview.write(
     row_idx, 0, "  1. Variant support: Every MaxDepth breakpoint has PR_AF or SR_AF >= 5% in the tumor sample.")
 row_idx += 1
 worksheet_overview.write(
-    row_idx, 0, "  2. Normal panel: Zero evidence in the normal panel (manta_N_OCC == 0).")
+    row_idx, 0, "  2. Normal pool: Zero evidence in the Normal pool (manta_N_OCC == 0).")
 row_idx += 1
 worksheet_overview.write(
     row_idx, 0, "  3. Clean quality: No other blocking filter flags")
