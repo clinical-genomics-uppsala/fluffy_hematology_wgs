@@ -311,6 +311,20 @@ def get_svdb_db_files(db_string, config_key="svdb_query"):
     return [db_file for db_file in match.group(1).split(",") if db_file]
 
 
+# svdb --query defaults (SVDB 2.6.0) for the options that define a Similar call
+SVDB_QUERY_DEFAULTS = {"bnd_distance": 10000, "overlap": 0.6, "ins_distance": 50}
+
+
+def get_svdb_query_thresholds(extra):
+    """Return the svdb --query thresholds set in an svdb option string, falling back to SVDB's defaults."""
+    thresholds = dict(SVDB_QUERY_DEFAULTS)
+    for option, value_type in [("bnd_distance", int), ("ins_distance", int), ("overlap", float)]:
+        match = re.search(rf"--{option}[\s=]+(\S+)", extra or "")
+        if match is not None:
+            thresholds[option] = value_type(match.group(1))  # e.g. int("10000") -> 10000
+    return thresholds
+
+
 def manta_report_targets(wildcards):
     targets = []
 

@@ -127,6 +127,29 @@ def load_target_genes(filepath):
     return genes
 
 
+def similar_call_criteria(thresholds):
+    """Describe, per SV type, when SVDB counts a reference pool call as a Similar call."""
+    bnd_distance = thresholds["bnd_distance"]
+    ins_distance = thresholds["ins_distance"]
+    overlap = f"{float(thresholds['overlap']) * 100:g}%"
+    intra = (f"same SV type on the same chromosome, both breakpoints within {bnd_distance} bp and the shared length "
+             f"at least {overlap} of the combined length of the two calls")
+    return {
+        "Deletions": intra,
+        "Duplications": intra,
+        "Insertions": f"same SV type on the same chromosome, position within {ins_distance} bp",
+        "Translocations": (f"same SV type between the same chromosomes, both breakpoints within {bnd_distance} bp "
+                           f"(breakends on the same chromosome must also share at least {overlap} of their combined length)"),
+    }
+
+
+def similar_call_line(sheet_name, criteria):
+    for sv_type, criterion in criteria.items():
+        if sheet_name.startswith(sv_type):
+            return f"Similar call in a reference pool: {criterion}."
+    return None
+
+
 def display_table(headers, data):
     """
     Return the headers and rows as written to a sheet: internal-only columns
@@ -209,7 +232,7 @@ def add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset):
     })
 
 
-def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data):
+def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, similar_criteria):
     if not table_data or "headers" not in table_data:
         return None
 
@@ -255,6 +278,11 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 
     if "Translocations" in sheet_name:
         worksheet.write(curr_row, 0, "MaxDepth calls passing rescue criteria are included.")
+        curr_row += 1
+
+    similar_line = similar_call_line(sheet_name, similar_criteria)
+    if similar_line:
+        worksheet.write(curr_row, 0, similar_line)
         curr_row += 1
 
     worksheet.write(
@@ -588,6 +616,9 @@ filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "
 target_genes_path = getattr(snakemake.input, "target_genes", "") or getattr(snakemake.params, "target_genes", "")
 target_genes = load_target_genes(target_genes_path)
 
+# SVDB thresholds that define a Similar call, as used by svdb --query
+similar_criteria = similar_call_criteria(snakemake.params.svdb_thresholds)
+
 manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
 manta_tables_all = create_manta_tables(snakemake.input.manta, avoid_filterflags=[], target_genes=target_genes)
 blocking_filter_flags = set(filter_flags) - {"MaxDepth"}
@@ -650,19 +681,23 @@ worksheet_overview = workbook.add_worksheet("Overview")
 # 3. Create Data Sheets
 create_sheet(
     workbook, "Deletions", "Deletions found by Manta",
-    sample_name, filter_flags, manta_tables_full["del"]
+    sample_name, filter_flags, manta_tables_full["del"],
+    similar_criteria
 )
 create_sheet(
     workbook, "Insertions", "Insertions found by Manta",
-    sample_name, filter_flags, manta_tables_full["ins"]
+    sample_name, filter_flags, manta_tables_full["ins"],
+    similar_criteria
 )
 create_sheet(
     workbook, "Duplications", "Duplications found by Manta",
-    sample_name, filter_flags, manta_tables_full["dup"]
+    sample_name, filter_flags, manta_tables_full["dup"],
+    similar_criteria
 )
 create_sheet(
     workbook, "Translocations", "Translocations found by Manta",
-    sample_name, filter_flags, manta_tables_full["bnd"]
+    sample_name, filter_flags, manta_tables_full["bnd"],
+    similar_criteria
 )
 
 # Translocations (Panels from BED)
@@ -672,7 +707,8 @@ for vcf in snakemake.input.vcfs_bed:
     panel_tables = panel_tables_dict[panel]
     sheet_title = "Translocations in " + panel.upper() + " genes"
     sheet_name = "Translocations " + panel.upper()
-    create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"])
+    create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"],
+                 similar_criteria)
 
 # 4. Populate Overview Sheet
 logging.debug(f"Populating Overview sheet")
@@ -747,6 +783,18 @@ worksheet_overview.merge_range(
     format_legend_rescue,
 )
 row_idx += 2
+
+# Reference pools on Overview
+worksheet_overview.write(row_idx, 0, "A call in a reference pool counts as a Similar call when it has:")
+row_idx += 1
+for sv_types, criterion in [
+    ("Deletions and Duplications", similar_criteria["Deletions"]),
+    ("Insertions", similar_criteria["Insertions"]),
+    ("Translocations", similar_criteria["Translocations"]),
+]:
+    worksheet_overview.write(row_idx, 0, f"  {sv_types}: {criterion}.")
+    row_idx += 1
+row_idx += 1
 
 # MaxDepth Rescue Criteria on Overview
 worksheet_overview.write(row_idx, 0, "MaxDepth Rescue Criteria:", format_bold)

@@ -78,6 +78,7 @@ rule export_to_xlsx_manta:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.manta.xlsx"),
     params:
         extra=config.get("export_to_xlsx_manta", {}).get("extra", ""),
+        svdb_thresholds=get_svdb_query_thresholds(config.get("svdb_query", {}).get("extra_manta", "")),
     log:
         "export_to_xlsx/{analysis}/{sample}.manta.xlsx.log",
     benchmark:
