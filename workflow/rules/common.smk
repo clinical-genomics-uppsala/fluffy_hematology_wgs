@@ -296,6 +296,21 @@ def compile_output_file_list(wildcards):
     return list(set(output_fullpath))
 
 
+def get_svdb_db_files(db_string, config_key="svdb_query"):
+    """
+    Return the database files given to svdb --query, in --db order.
+
+    db_string is the svdb option string from config, e.g.
+    "--db normal.vcf.gz,tumour.vcf.gz --out_frq ...". The files are declared as
+    rule inputs so a missing database fails at DAG build and a replaced
+    database triggers a rerun.
+    """
+    match = re.search(r"--db[\s=]+(\S+)", db_string or "")
+    if match is None:
+        raise ValueError(f"No '--db <file>[,<file>...]' found in {config_key}: '{db_string}'")
+    return [db_file for db_file in match.group(1).split(",") if db_file]
+
+
 def manta_report_targets(wildcards):
     targets = []
 
