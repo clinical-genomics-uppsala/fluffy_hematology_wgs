@@ -74,6 +74,12 @@ rule export_to_xlsx_manta:
         all_bed=config.get("bcftools_SV", {}).get("all", ""),
         aml_bed=config.get("bcftools_SV", {}).get("aml", ""),
         target_genes=lambda wildcards: config.get("reference", {}).get("target_genes") or [],
+        normal_pool_db=get_manta_pool_dbs(
+            config.get("svdb_query", {}).get("db_manta", ""), config.get("svdb_query", {}).get("extra_manta", "")
+        )["normal"],
+        tumour_pool_db=get_manta_pool_dbs(
+            config.get("svdb_query", {}).get("db_manta", ""), config.get("svdb_query", {}).get("extra_manta", "")
+        )["tumour"],
     output:
         xlsx=temp("export_to_xlsx/{analysis}/{sample}.manta.xlsx"),
     params:

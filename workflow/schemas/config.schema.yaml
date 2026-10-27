@@ -1070,7 +1070,7 @@ properties:
         description: >
           svdb --query options naming the Manta reference pool databases, "--db <file>,<file>", in the same
           order as the tags in extra_manta (the file paired with manta_N_AF is the Normal pool).
-          The --db files are rule inputs
+          The --db files are rule inputs; their NSAMPLES gives the pool sizes shown in the manta xlsx
       extra:
         type: string
         description: extra svdb --query options for the CNV query

@@ -325,6 +325,32 @@ def get_svdb_query_thresholds(extra):
     return thresholds
 
 
+def get_manta_pool_dbs(db_string, extra):
+    """
+    Return the Manta reference pool databases as {"normal": file, "tumour": file}.
+
+    svdb --query pairs each --db file with the tag at the same position in
+    --out_frq, so the Normal pool is the file paired with manta_N_AF and the
+    Tumour pool the file paired with manta_T_AF, whatever order they are listed in.
+    """
+    db_files = get_svdb_db_files(db_string, "svdb_query.db_manta")
+    match = re.search(r"--out_frq[\s=]+(\S+)", extra or "")
+    if match is None:
+        raise ValueError(f"No '--out_frq <tag>,<tag>' found in svdb_query.extra_manta: '{extra}'")
+    out_frq_tags = match.group(1).split(",")
+    if len(out_frq_tags) != len(db_files):
+        raise ValueError(
+            f"svdb_query: {len(db_files)} --db files in db_manta but {len(out_frq_tags)} --out_frq tags in extra_manta"
+        )
+
+    pool_dbs = {}
+    for pool, tag in [("normal", "manta_N_AF"), ("tumour", "manta_T_AF")]:
+        if tag not in out_frq_tags:
+            raise ValueError(f"svdb_query.extra_manta --out_frq has no {tag} tag: '{match.group(1)}'")
+        pool_dbs[pool] = db_files[out_frq_tags.index(tag)]
+    return pool_dbs
+
+
 def manta_report_targets(wildcards):
     targets = []
 

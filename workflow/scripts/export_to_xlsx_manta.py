@@ -8,6 +8,7 @@ import sys
 import logging
 import os
 from collections import Counter
+from pysam import VariantFile
 from manta_maxdepth_rescue import *
 
 MAX_OVERVIEW_NORMAL_AF = 0.2
@@ -127,6 +128,33 @@ def load_target_genes(filepath):
     return genes
 
 
+def read_pool_size(pool_db):
+    """
+    Number of samples a Reference pool database was built from.
+
+    SVDB writes NSAMPLES on every record of a database it builds; otherwise
+    fall back to the number of sample columns. A missing count is an error,
+    so the report never shows a guessed pool size.
+    """
+    with VariantFile(pool_db) as vcf:
+        if "NSAMPLES" in vcf.header.info:
+            for record in vcf:
+                nsamples = record.info.get("NSAMPLES")
+                if nsamples is not None:
+                    return int(nsamples)
+                break
+        if len(vcf.header.samples) > 0:
+            return len(vcf.header.samples)
+
+    raise ValueError(f"Cannot determine the number of samples in reference pool database {pool_db}: "
+                     "no NSAMPLES INFO value and no sample columns")
+
+
+def pool_size_line(pool_sizes):
+    return (f"Reference pools: Normal pool n = {pool_sizes['normal']} samples · "
+            f"Tumour pool n = {pool_sizes['tumour']} samples")
+
+
 def similar_call_criteria(thresholds):
     """Describe, per SV type, when SVDB counts a reference pool call as a Similar call."""
     bnd_distance = thresholds["bnd_distance"]
@@ -232,7 +260,7 @@ def add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset):
     })
 
 
-def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, similar_criteria):
+def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, pool_sizes, similar_criteria):
     if not table_data or "headers" not in table_data:
         return None
 
@@ -279,6 +307,9 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     if "Translocations" in sheet_name:
         worksheet.write(curr_row, 0, "MaxDepth calls passing rescue criteria are included.")
         curr_row += 1
+
+    worksheet.write(curr_row, 0, pool_size_line(pool_sizes))
+    curr_row += 1
 
     similar_line = similar_call_line(sheet_name, similar_criteria)
     if similar_line:
@@ -616,6 +647,13 @@ filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "
 target_genes_path = getattr(snakemake.input, "target_genes", "") or getattr(snakemake.params, "target_genes", "")
 target_genes = load_target_genes(target_genes_path)
 
+# Reference pool sizes, from the pool databases the rule matched to manta_N_AF / manta_T_AF
+pool_sizes = {
+    "normal": read_pool_size(snakemake.input.normal_pool_db),
+    "tumour": read_pool_size(snakemake.input.tumour_pool_db),
+}
+logging.info(f"Reference pool sizes: {pool_sizes}")
+
 # SVDB thresholds that define a Similar call, as used by svdb --query
 similar_criteria = similar_call_criteria(snakemake.params.svdb_thresholds)
 
@@ -682,22 +720,22 @@ worksheet_overview = workbook.add_worksheet("Overview")
 create_sheet(
     workbook, "Deletions", "Deletions found by Manta",
     sample_name, filter_flags, manta_tables_full["del"],
-    similar_criteria
+    pool_sizes, similar_criteria
 )
 create_sheet(
     workbook, "Insertions", "Insertions found by Manta",
     sample_name, filter_flags, manta_tables_full["ins"],
-    similar_criteria
+    pool_sizes, similar_criteria
 )
 create_sheet(
     workbook, "Duplications", "Duplications found by Manta",
     sample_name, filter_flags, manta_tables_full["dup"],
-    similar_criteria
+    pool_sizes, similar_criteria
 )
 create_sheet(
     workbook, "Translocations", "Translocations found by Manta",
     sample_name, filter_flags, manta_tables_full["bnd"],
-    similar_criteria
+    pool_sizes, similar_criteria
 )
 
 # Translocations (Panels from BED)
@@ -708,7 +746,7 @@ for vcf in snakemake.input.vcfs_bed:
     sheet_title = "Translocations in " + panel.upper() + " genes"
     sheet_name = "Translocations " + panel.upper()
     create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"],
-                 similar_criteria)
+                 pool_sizes, similar_criteria)
 
 # 4. Populate Overview Sheet
 logging.debug(f"Populating Overview sheet")
@@ -785,6 +823,8 @@ worksheet_overview.merge_range(
 row_idx += 2
 
 # Reference pools on Overview
+worksheet_overview.write(row_idx, 0, pool_size_line(pool_sizes), format_bold)
+row_idx += 1
 worksheet_overview.write(row_idx, 0, "A call in a reference pool counts as a Similar call when it has:")
 row_idx += 1
 for sv_types, criterion in [
