@@ -12,6 +12,9 @@ from manta_maxdepth_rescue import *
 
 MAX_OVERVIEW_NORMAL_AF = 0.2
 
+# Columns used internally (filtering, Overview selection) but never written to a sheet
+INTERNAL_COLUMNS = {"In Target Panel"}
+
 COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "Sample Name": 18,
     "Chr": 6,
@@ -22,7 +25,6 @@ COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "SV Length": 11,
     "MantaID": 12,
     "Depth": 6,
-    "In Target Panel": 6,
     "manta_N_AF": 8,
     "manta_T_AF": 8,
     "STR %": 4,
@@ -120,6 +122,19 @@ def load_target_genes(filepath):
 
     logging.info("Loaded %d target genes from %s", len(genes), filepath)
     return genes
+
+
+def display_table(headers, data):
+    """
+    Return the headers and rows as written to a sheet: internal-only columns removed.
+    """
+    names = [header.get("header", "") for header in headers]
+    keep = [i for i, name in enumerate(names) if name not in INTERNAL_COLUMNS]
+
+    return (
+        [headers[i] for i in keep],
+        [[row[i] for i in keep] for row in data],
+    )
 
 
 def format_manta_table(table, sample_name, format_2dec):
@@ -267,24 +282,27 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     curr_row += 1
     row_offset = curr_row + 1
 
+    # Rows keep their order; only the columns differ between the table and what is written
+    sheet_headers, sheet_data = display_table(headers, data)
+
     # xlsxwriter's add_table requires 1-based Excel coordinates (e.g., A7:K20)
-    column_end = convert_columns_to_letter(len(headers))
-    end_row = len(data) + row_offset if len(data) > 0 else row_offset + 1
+    column_end = convert_columns_to_letter(len(sheet_headers))
+    end_row = len(sheet_data) + row_offset if len(sheet_data) > 0 else row_offset + 1
     table_area = f"A{row_offset}:{column_end}{end_row}"
 
     # Create the table with default styling. This automatically applies an autofilter.
     worksheet.add_table(
         table_area,
-        {"columns": excel_headers(headers), "data": data, "style": "Table Style Light 1"},
+        {"columns": excel_headers(sheet_headers), "data": sheet_data, "style": "Table Style Light 1"},
     )
 
-    apply_compact_formatting(worksheet, headers)
+    apply_compact_formatting(worksheet, sheet_headers)
 
-    add_maxdepth_rescue_row_color(worksheet, workbook, headers, data, row_offset)
+    add_maxdepth_rescue_row_color(worksheet, workbook, sheet_headers, sheet_data, row_offset)
 
-    add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset)
+    add_manta_af_row_colors(worksheet, workbook, sheet_headers, sheet_data, row_offset)
 
-    # Hide rows with high manta_N_AF, except target-gene variants
+    # Hide rows with high manta_N_AF, except target-gene variants (uses the full table, incl. internal columns)
     if svdb_col_idx is not None and data:
         for i, row_data in enumerate(data):
             excel_row_index = row_offset + i
