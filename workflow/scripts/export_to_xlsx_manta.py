@@ -23,8 +23,6 @@ COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "MantaID": 12,
     "Depth": 6,
     "In Target Panel": 6,
-    "manta_N_OCC": 6,
-    "manta_T_OCC": 6,
     "manta_N_AF": 8,
     "manta_T_AF": 8,
     "STR %": 4,
@@ -740,7 +738,7 @@ worksheet_overview.write(
     row_idx, 0, "  1. Variant support: Every MaxDepth breakpoint has PR_AF or SR_AF >= 5% in the tumor sample.")
 row_idx += 1
 worksheet_overview.write(
-    row_idx, 0, "  2. Normal pool: Zero evidence in the Normal pool (manta_N_OCC == 0).")
+    row_idx, 0, "  2. Normal pool: No similar call in the Normal pool (N_AF == 0).")
 row_idx += 1
 worksheet_overview.write(
     row_idx, 0, "  3. Clean quality: No other blocking filter flags")

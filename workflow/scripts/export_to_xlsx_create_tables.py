@@ -281,8 +281,6 @@ def extract_manta_vcf_values(record, ann_index, simple_ann_index, sample_tumor, 
     return_dict["id"] = record.id or ""
     return_dict["depth"] = first_info_value(record, "BND_DEPTH", default="")
     # helper functions sets svdb vales to 0 if missing:
-    return_dict["manta_n_occ"] = info_as_int(record, "manta_N_OCC")
-    return_dict["manta_t_occ"] = info_as_int(record, "manta_T_OCC")
     return_dict["manta_n_af"] = info_as_float(record, "manta_N_AF")
     return_dict["manta_t_af"] = info_as_float(record, "manta_T_AF")
     return_dict["str_percent"] = info_as_float(record, "STR_PERCENT", default=0, decimals=2)
@@ -474,8 +472,6 @@ def create_manta_tables(
         {"header": "Details"},
         {"header": "Depth"},
         {"header": "Annotation"},
-        {"header": "manta_N_OCC"},
-        {"header": "manta_T_OCC"},
         {"header": "manta_N_AF"},
         {"header": "manta_T_AF"},
         {"header": "STR %"},
@@ -491,8 +487,6 @@ def create_manta_tables(
         {"header": "Genes"},
         {"header": "Details"},
         {"header": "Annotation"},
-        {"header": "manta_N_OCC"},
-        {"header": "manta_T_OCC"},
         {"header": "manta_N_AF"},
         {"header": "manta_T_AF"},
         {"header": "STR %"},
@@ -510,8 +504,6 @@ def create_manta_tables(
         {"header": "Hom Length"},
         {"header": "Hom Sequence"},
         {"header": "Annotation"},
-        {"header": "manta_N_OCC"},
-        {"header": "manta_T_OCC"},
         {"header": "manta_N_AF"},
         {"header": "manta_T_AF"},
         {"header": "STR %"},
@@ -530,8 +522,6 @@ def create_manta_tables(
         {"header": "Hom Length"},
         {"header": "Hom Sequence"},
         {"header": "Annotation"},
-        {"header": "manta_N_OCC"},
-        {"header": "manta_T_OCC"},
         {"header": "manta_N_AF"},
         {"header": "manta_T_AF"},
         {"header": "STR %"},
@@ -572,8 +562,6 @@ def create_manta_tables(
                     record_values["detail"],
                     record_values["depth"],
                     record_values["filt_ann"],
-                    record_values["manta_n_occ"],
-                    record_values["manta_t_occ"],
                     record_values["manta_n_af"],
                     record_values["manta_t_af"],
                     record_values["str_percent"],
@@ -600,8 +588,6 @@ def create_manta_tables(
                     record_values["genes"],
                     record_values["detail"],
                     record_values["filt_ann"],
-                    record_values["manta_n_occ"],
-                    record_values["manta_t_occ"],
                     record_values["manta_n_af"],
                     record_values["manta_t_af"],
                     record_values["str_percent"],
@@ -626,8 +612,6 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
-                    record_values["manta_n_occ"],
-                    record_values["manta_t_occ"],
                     record_values["manta_n_af"],
                     record_values["manta_t_af"],
                     record_values["str_percent"],
@@ -653,8 +637,6 @@ def create_manta_tables(
                     record_values["hom_len"],
                     record_values["hom_seq"],
                     record_values["filt_ann"],
-                    record_values["manta_n_occ"],
-                    record_values["manta_t_occ"],
                     record_values["manta_n_af"],
                     record_values["manta_t_af"],
                     record_values["str_percent"],
