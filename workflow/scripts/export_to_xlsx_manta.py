@@ -8,9 +8,16 @@ import sys
 import logging
 import os
 from collections import Counter
+from pysam import VariantFile
 from manta_maxdepth_rescue import *
 
 MAX_OVERVIEW_NORMAL_AF = 0.2
+
+# Columns used internally (filtering, Overview selection) but never written to a sheet
+INTERNAL_COLUMNS = {"In Target Panel"}
+
+# Always the last column on every sheet
+LAST_COLUMN = "STR %"
 
 COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "Sample Name": 18,
@@ -22,12 +29,8 @@ COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "SV Length": 11,
     "MantaID": 12,
     "Depth": 6,
-    "In Target Panel": 6,
-    "manta_N_OCC": 6,
-    "manta_T_OCC": 6,
     "manta_N_AF": 8,
     "manta_T_AF": 8,
-    "STR %": 4,
     "Paired-read freq": 6,
     "Spanning-read freq": 6,
     "Paired-read Normal Freq": 6,
@@ -40,6 +43,7 @@ COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "BreakEnd": 18,
     "BND Event ID": 30,
     "MaxDepth Rescue": 6,
+    LAST_COLUMN: 4,
 }
 
 logging.basicConfig(
@@ -124,6 +128,71 @@ def load_target_genes(filepath):
     return genes
 
 
+def read_pool_size(pool_db):
+    """
+    Number of samples a Reference pool database was built from.
+
+    SVDB writes NSAMPLES on every record of a database it builds; otherwise
+    fall back to the number of sample columns. A missing count is an error,
+    so the report never shows a guessed pool size.
+    """
+    with VariantFile(pool_db) as vcf:
+        if "NSAMPLES" in vcf.header.info:
+            for record in vcf:
+                nsamples = record.info.get("NSAMPLES")
+                if nsamples is not None:
+                    return int(nsamples)
+                break
+        if len(vcf.header.samples) > 0:
+            return len(vcf.header.samples)
+
+    raise ValueError(f"Cannot determine the number of samples in reference pool database {pool_db}: "
+                     "no NSAMPLES INFO value and no sample columns")
+
+
+def pool_size_line(pool_sizes):
+    return (f"Reference pools: Normal pool n = {pool_sizes['normal']} samples · "
+            f"Tumour pool n = {pool_sizes['tumour']} samples")
+
+
+def similar_call_criteria(thresholds):
+    """Describe, per SV type, when SVDB counts a reference pool call as a Similar call."""
+    bnd_distance = thresholds["bnd_distance"]
+    ins_distance = thresholds["ins_distance"]
+    overlap = f"{float(thresholds['overlap']) * 100:g}%"
+    intra = (f"same SV type on the same chromosome, both breakpoints within {bnd_distance} bp and the shared length "
+             f"at least {overlap} of the combined length of the two calls")
+    return {
+        "Deletions": intra,
+        "Duplications": intra,
+        "Insertions": f"same SV type on the same chromosome, position within {ins_distance} bp",
+        "Translocations": (f"same SV type between the same chromosomes, both breakpoints within {bnd_distance} bp "
+                           f"(breakends on the same chromosome must also share at least {overlap} of their combined length)"),
+    }
+
+
+def similar_call_line(sheet_name, criteria):
+    for sv_type, criterion in criteria.items():
+        if sheet_name.startswith(sv_type):
+            return f"Similar call in a reference pool: {criterion}."
+    return None
+
+
+def display_table(headers, data):
+    """
+    Return the headers and rows as written to a sheet: internal-only columns
+    removed and STR % moved to the end.
+    """
+    names = [header.get("header", "") for header in headers]
+    keep = [i for i, name in enumerate(names) if name not in INTERNAL_COLUMNS and name != LAST_COLUMN]
+    keep += [i for i, name in enumerate(names) if name == LAST_COLUMN]
+
+    return (
+        [headers[i] for i in keep],
+        [[row[i] for i in keep] for row in data],
+    )
+
+
 def format_manta_table(table, sample_name, format_2dec):
     """
     Pre-processes the table data to add 'Sample Name' to all rows and convert freq columns to two decimal places.
@@ -191,7 +260,7 @@ def add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset):
     })
 
 
-def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data):
+def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_data, pool_sizes, similar_criteria):
     if not table_data or "headers" not in table_data:
         return None
 
@@ -239,10 +308,18 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
         worksheet.write(curr_row, 0, "MaxDepth calls passing rescue criteria are included.")
         curr_row += 1
 
+    worksheet.write(curr_row, 0, pool_size_line(pool_sizes))
+    curr_row += 1
+
+    similar_line = similar_call_line(sheet_name, similar_criteria)
+    if similar_line:
+        worksheet.write(curr_row, 0, similar_line)
+        curr_row += 1
+
     worksheet.write(
         curr_row,
         0,
-        "Note: Calls with normal panel AF > 0.20 are hidden by default to reduce recurrent noise (unless in target panel). "
+        "Note: Calls with Normal pool AF > 0.20 are hidden by default to reduce recurrent noise (unless in target panel). "
         "To unhide all rows in Excel: Select all (Ctrl+A / Cmd+A) -> Right-click row numbers -> Unhide.",
         format_italic,
     )
@@ -253,7 +330,7 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
 
     worksheet.merge_range(
         curr_row, 0, curr_row, legend_end_col,
-        "  Orange: High frequency in normal panel (manta_N_AF > 0.20, annotated via SVDB query against manta_normal_panel)",
+        "  Orange: High frequency in the Normal pool (N_AF > 0.20, annotated via SVDB query against the Normal pool)",
         format_legend_orange,
     )
     curr_row += 1
@@ -269,24 +346,27 @@ def create_sheet(workbook, sheet_name, title, sample_name, filter_flags, table_d
     curr_row += 1
     row_offset = curr_row + 1
 
+    # Rows keep their order; only the columns differ between the table and what is written
+    sheet_headers, sheet_data = display_table(headers, data)
+
     # xlsxwriter's add_table requires 1-based Excel coordinates (e.g., A7:K20)
-    column_end = convert_columns_to_letter(len(headers))
-    end_row = len(data) + row_offset if len(data) > 0 else row_offset + 1
+    column_end = convert_columns_to_letter(len(sheet_headers))
+    end_row = len(sheet_data) + row_offset if len(sheet_data) > 0 else row_offset + 1
     table_area = f"A{row_offset}:{column_end}{end_row}"
 
     # Create the table with default styling. This automatically applies an autofilter.
     worksheet.add_table(
         table_area,
-        {"columns": excel_headers(headers), "data": data, "style": "Table Style Light 1"},
+        {"columns": excel_headers(sheet_headers), "data": sheet_data, "style": "Table Style Light 1"},
     )
 
-    apply_compact_formatting(worksheet, headers)
+    apply_compact_formatting(worksheet, sheet_headers)
 
-    add_maxdepth_rescue_row_color(worksheet, workbook, headers, data, row_offset)
+    add_maxdepth_rescue_row_color(worksheet, workbook, sheet_headers, sheet_data, row_offset)
 
-    add_manta_af_row_colors(worksheet, workbook, headers, data, row_offset)
+    add_manta_af_row_colors(worksheet, workbook, sheet_headers, sheet_data, row_offset)
 
-    # Hide rows with high manta_N_AF, except target-gene variants
+    # Hide rows with high manta_N_AF, except target-gene variants (uses the full table, incl. internal columns)
     if svdb_col_idx is not None and data:
         for i, row_data in enumerate(data):
             excel_row_index = row_offset + i
@@ -401,11 +481,11 @@ def align_overview_table(table_data, selected_data):
 
 def _filter_overview_rows_by_normal_af(table_data, selected_data, event_atomic=False):
     """
-    Remove Overview candidates with normal-panel AF above the configured limit.
+    Remove Overview candidates with Normal pool AF above the configured limit.
 
     Target-panel rows are exempt, so gene-list calls that stay visible on the
     data sheets are kept here as well. They are still colour-coded by
-    manta_N_AF, which flags them as frequent in the normal panel.
+    manta_N_AF, which flags them as frequent in the Normal pool.
 
     BND events are removed as complete events when event_atomic is True, and
     an event is exempt when any of its breakends is in the target panel.
@@ -567,6 +647,16 @@ filter_flags = ["MinQUAL", "MinGQ", "MinSomaticScore", "Ploidy", "MaxMQ0Frac", "
 target_genes_path = getattr(snakemake.input, "target_genes", "") or getattr(snakemake.params, "target_genes", "")
 target_genes = load_target_genes(target_genes_path)
 
+# Reference pool sizes, from the pool databases the rule matched to manta_N_AF / manta_T_AF
+pool_sizes = {
+    "normal": read_pool_size(snakemake.input.normal_pool_db),
+    "tumour": read_pool_size(snakemake.input.tumour_pool_db),
+}
+logging.info(f"Reference pool sizes: {pool_sizes}")
+
+# SVDB thresholds that define a Similar call, as used by svdb --query
+similar_criteria = similar_call_criteria(snakemake.params.svdb_thresholds)
+
 manta_tables_full = create_manta_tables(snakemake.input.manta, filter_flags, target_genes=target_genes)
 manta_tables_all = create_manta_tables(snakemake.input.manta, avoid_filterflags=[], target_genes=target_genes)
 blocking_filter_flags = set(filter_flags) - {"MaxDepth"}
@@ -629,19 +719,23 @@ worksheet_overview = workbook.add_worksheet("Overview")
 # 3. Create Data Sheets
 create_sheet(
     workbook, "Deletions", "Deletions found by Manta",
-    sample_name, filter_flags, manta_tables_full["del"]
+    sample_name, filter_flags, manta_tables_full["del"],
+    pool_sizes, similar_criteria
 )
 create_sheet(
     workbook, "Insertions", "Insertions found by Manta",
-    sample_name, filter_flags, manta_tables_full["ins"]
+    sample_name, filter_flags, manta_tables_full["ins"],
+    pool_sizes, similar_criteria
 )
 create_sheet(
     workbook, "Duplications", "Duplications found by Manta",
-    sample_name, filter_flags, manta_tables_full["dup"]
+    sample_name, filter_flags, manta_tables_full["dup"],
+    pool_sizes, similar_criteria
 )
 create_sheet(
     workbook, "Translocations", "Translocations found by Manta",
-    sample_name, filter_flags, manta_tables_full["bnd"]
+    sample_name, filter_flags, manta_tables_full["bnd"],
+    pool_sizes, similar_criteria
 )
 
 # Translocations (Panels from BED)
@@ -651,7 +745,8 @@ for vcf in snakemake.input.vcfs_bed:
     panel_tables = panel_tables_dict[panel]
     sheet_title = "Translocations in " + panel.upper() + " genes"
     sheet_name = "Translocations " + panel.upper()
-    create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"])
+    create_sheet(workbook, sheet_name, sheet_title, sample_name, filter_flags, panel_tables["bnd"],
+                 pool_sizes, similar_criteria)
 
 # 4. Populate Overview Sheet
 logging.debug(f"Populating Overview sheet")
@@ -705,7 +800,7 @@ row_idx += 1
 worksheet_overview.write(
     row_idx,
     0,
-    "Note: Calls with normal panel AF > 0.20 are hidden by default on data sheets (unless in target panel). "
+    "Note: Calls with Normal pool AF > 0.20 are hidden by default on data sheets (unless in target panel). "
     "To unhide all rows in Excel: Select all (Ctrl+A / Cmd+A) -> Right-click row numbers -> Unhide.",
     format_italic,
 )
@@ -716,7 +811,7 @@ worksheet_overview.write(row_idx, 0, "Color Legend:", format_bold)
 row_idx += 1
 worksheet_overview.merge_range(
     row_idx, 0, row_idx, 7,
-    "  Orange: High frequency in normal panel (manta_N_AF > 0.20, annotated via SVDB query against manta_normal_panel)",
+    "  Orange: High frequency in the Normal pool (N_AF > 0.20, annotated via SVDB query against the Normal pool)",
     format_legend_orange,
 )
 row_idx += 1
@@ -726,6 +821,20 @@ worksheet_overview.merge_range(
     format_legend_rescue,
 )
 row_idx += 2
+
+# Reference pools on Overview
+worksheet_overview.write(row_idx, 0, pool_size_line(pool_sizes), format_bold)
+row_idx += 1
+worksheet_overview.write(row_idx, 0, "A call in a reference pool counts as a Similar call when it has:")
+row_idx += 1
+for sv_types, criterion in [
+    ("Deletions and Duplications", similar_criteria["Deletions"]),
+    ("Insertions", similar_criteria["Insertions"]),
+    ("Translocations", similar_criteria["Translocations"]),
+]:
+    worksheet_overview.write(row_idx, 0, f"  {sv_types}: {criterion}.")
+    row_idx += 1
+row_idx += 1
 
 # MaxDepth Rescue Criteria on Overview
 worksheet_overview.write(row_idx, 0, "MaxDepth Rescue Criteria:", format_bold)
@@ -740,7 +849,7 @@ worksheet_overview.write(
     row_idx, 0, "  1. Variant support: Every MaxDepth breakpoint has PR_AF or SR_AF >= 5% in the tumor sample.")
 row_idx += 1
 worksheet_overview.write(
-    row_idx, 0, "  2. Normal panel: Zero evidence in the normal panel (manta_N_OCC == 0).")
+    row_idx, 0, "  2. Normal pool: No similar call in the Normal pool (N_AF == 0).")
 row_idx += 1
 worksheet_overview.write(
     row_idx, 0, "  3. Clean quality: No other blocking filter flags")

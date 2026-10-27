@@ -296,6 +296,61 @@ def compile_output_file_list(wildcards):
     return list(set(output_fullpath))
 
 
+def get_svdb_db_files(db_string, config_key="svdb_query"):
+    """
+    Return the database files given to svdb --query, in --db order.
+
+    db_string is the svdb option string from config, e.g.
+    "--db normal.vcf.gz,tumour.vcf.gz --out_frq ...". The files are declared as
+    rule inputs so a missing database fails at DAG build and a replaced
+    database triggers a rerun.
+    """
+    match = re.search(r"--db[\s=]+(\S+)", db_string or "")
+    if match is None:
+        raise ValueError(f"No '--db <file>[,<file>...]' found in {config_key}: '{db_string}'")
+    return [db_file for db_file in match.group(1).split(",") if db_file]
+
+
+# svdb --query defaults (SVDB 2.6.0) for the options that define a Similar call
+SVDB_QUERY_DEFAULTS = {"bnd_distance": 10000, "overlap": 0.6, "ins_distance": 50}
+
+
+def get_svdb_query_thresholds(extra):
+    """Return the svdb --query thresholds set in an svdb option string, falling back to SVDB's defaults."""
+    thresholds = dict(SVDB_QUERY_DEFAULTS)
+    for option, value_type in [("bnd_distance", int), ("ins_distance", int), ("overlap", float)]:
+        match = re.search(rf"--{option}[\s=]+(\S+)", extra or "")
+        if match is not None:
+            thresholds[option] = value_type(match.group(1))  # e.g. int("10000") -> 10000
+    return thresholds
+
+
+def get_manta_pool_dbs(db_string, extra):
+    """
+    Return the Manta reference pool databases as {"normal": file, "tumour": file}.
+
+    svdb --query pairs each --db file with the tag at the same position in
+    --out_frq, so the Normal pool is the file paired with manta_N_AF and the
+    Tumour pool the file paired with manta_T_AF, whatever order they are listed in.
+    """
+    db_files = get_svdb_db_files(db_string, "svdb_query.db_manta")
+    match = re.search(r"--out_frq[\s=]+(\S+)", extra or "")
+    if match is None:
+        raise ValueError(f"No '--out_frq <tag>,<tag>' found in svdb_query.extra_manta: '{extra}'")
+    out_frq_tags = match.group(1).split(",")
+    if len(out_frq_tags) != len(db_files):
+        raise ValueError(
+            f"svdb_query: {len(db_files)} --db files in db_manta but {len(out_frq_tags)} --out_frq tags in extra_manta"
+        )
+
+    pool_dbs = {}
+    for pool, tag in [("normal", "manta_N_AF"), ("tumour", "manta_T_AF")]:
+        if tag not in out_frq_tags:
+            raise ValueError(f"svdb_query.extra_manta --out_frq has no {tag} tag: '{match.group(1)}'")
+        pool_dbs[pool] = db_files[out_frq_tags.index(tag)]
+    return pool_dbs
+
+
 def manta_report_targets(wildcards):
     targets = []
 

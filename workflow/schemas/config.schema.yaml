@@ -1064,7 +1064,21 @@ properties:
         description: name or path to docker/singularity container
       db_string:
         type: string
-        description: parameters to db
+        description: svdb --query options naming the CNV database(s), e.g. "--db <file> --out_frq ...". The --db files are rule inputs
+      db_manta:
+        type: string
+        description: >
+          svdb --query options naming the Manta reference pool databases, "--db <file>,<file>", in the same
+          order as the tags in extra_manta (the file paired with manta_N_AF is the Normal pool).
+          The --db files are rule inputs; their NSAMPLES gives the pool sizes shown in the manta xlsx
+      extra:
+        type: string
+        description: extra svdb --query options for the CNV query
+      extra_manta:
+        type: string
+        description: >
+          extra svdb --query options for the Manta query. --bnd_distance, --overlap and --ins_distance
+          define a Similar call and are described in the manta xlsx (SVDB defaults if absent)
     required:
       - container
       - db_string
