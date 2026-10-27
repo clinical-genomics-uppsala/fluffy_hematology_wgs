@@ -15,6 +15,9 @@ MAX_OVERVIEW_NORMAL_AF = 0.2
 # Columns used internally (filtering, Overview selection) but never written to a sheet
 INTERNAL_COLUMNS = {"In Target Panel"}
 
+# Always the last column on every sheet
+LAST_COLUMN = "STR %"
+
 COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "Sample Name": 18,
     "Chr": 6,
@@ -27,7 +30,6 @@ COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "Depth": 6,
     "manta_N_AF": 8,
     "manta_T_AF": 8,
-    "STR %": 4,
     "Paired-read freq": 6,
     "Spanning-read freq": 6,
     "Paired-read Normal Freq": 6,
@@ -40,6 +42,7 @@ COLUMN_WIDTHS = {  # This is also used to order columns on Overview
     "BreakEnd": 18,
     "BND Event ID": 30,
     "MaxDepth Rescue": 6,
+    LAST_COLUMN: 4,
 }
 
 logging.basicConfig(
@@ -126,10 +129,12 @@ def load_target_genes(filepath):
 
 def display_table(headers, data):
     """
-    Return the headers and rows as written to a sheet: internal-only columns removed.
+    Return the headers and rows as written to a sheet: internal-only columns
+    removed and STR % moved to the end.
     """
     names = [header.get("header", "") for header in headers]
-    keep = [i for i, name in enumerate(names) if name not in INTERNAL_COLUMNS]
+    keep = [i for i, name in enumerate(names) if name not in INTERNAL_COLUMNS and name != LAST_COLUMN]
+    keep += [i for i, name in enumerate(names) if name == LAST_COLUMN]
 
     return (
         [headers[i] for i in keep],
