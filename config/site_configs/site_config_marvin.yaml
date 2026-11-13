@@ -1,0 +1,24 @@
+# ---------------------------------------------------------------------------
+#  Site-config - Marvin
+#
+#  Anvands som: --configfile config/site_configs/site_config_marvin.yaml
+#  efter config/config.yaml och config/reference_files/reference_files_marvin.yaml.
+#
+#  Allt som beror pa klustret men inte pa assayen.
+# ---------------------------------------------------------------------------
+
+# Containerbiblioteket. Fylls av tools/build_containers.sh vid installation.
+CONTAINER_DIR: /projects/cgu/library/containers
+
+resources: "{{FLUFFY_HOME}}/config/resources_marvin.yaml"
+
+# Modulerna laggs lokalt vid installation (tagg maste finnas, klona med --tags).
+hydra_local_path: /projects/bin/wp2_iht/fluffy/{{PIPELINE_VERSION}}/hydra-genetics
+
+# Parabricks anvander nodens lokala /tmp. Satts inte pa Miarka.
+pbrun_fq2bam_recal:
+  tmp_dir: "/tmp/"
+pbrun_mutectcaller_t:
+  tmp_dir: "/tmp/"
+pbrun_mutectcaller_tn:
+  tmp_dir: "/tmp/"

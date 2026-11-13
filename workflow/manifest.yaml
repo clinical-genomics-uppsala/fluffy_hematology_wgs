@@ -14,6 +14,16 @@ layout:
   local_scripts_dir: workflow/scripts
   schemas_dir: workflow/schemas
   report: null
+  output_spec: config/output_files.yaml
+  container_manifest: containers/manifest.yaml
+
+site:
+  sites:
+    - marvin
+    - miarka
+  site_config_pattern: config/site_configs/site_config_{site}.yaml
+  reference_files_pattern: config/reference_files/reference_files_{site}.yaml
+  profile_pattern: profile/{site}
 
 rule_groups:
   common: workflow/rules/common.smk
@@ -33,7 +43,7 @@ rule_groups:
 hydra_modules:
   source: config.modules
   loader: hydra_genetics.utils.misc.get_module_snakefile
-  local_module_root_config_key: module_root
+  local_module_root_config_key: hydra_local_path
   modules:
     - alignment
     - annotation
@@ -68,6 +78,8 @@ scripts:
     - workflow/scripts/sample_order_multiqc.py
 
 harmonization_notes:
+  - config/config.yaml is the one production config; site differences live in site_configs/ and reference_files/.
+  - Offline (phase 2) is done; references still use legacy per-site paths until the D14 library is built (phase 3).
   - Largest wp2/wp3 legacy workflow in this comparison set; use it as the stress test, not the first refactor.
   - Snakefile has extensive module overrides that encode real clinical workflow behavior.
   - common.smk currently owns many pipeline-specific helper functions plus output expansion and copy rules.

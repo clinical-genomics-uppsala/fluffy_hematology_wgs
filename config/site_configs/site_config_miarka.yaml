@@ -1,0 +1,14 @@
+# ---------------------------------------------------------------------------
+#  Site-config - Miarka
+#
+#  Anvands som: --configfile config/site_configs/site_config_miarka.yaml
+#  efter config/config.yaml och config/reference_files/reference_files_miarka.yaml.
+# ---------------------------------------------------------------------------
+
+# Containerbiblioteket. Fylls av tools/build_containers.sh vid installation.
+CONTAINER_DIR: /proj/ngi2024001/nobackup/cgu/library/containers
+
+resources: "{{FLUFFY_HOME}}/config/resources_miarka.yaml"
+
+# Modulerna laggs lokalt vid installation (tagg maste finnas, klona med --tags).
+hydra_local_path: /proj/ngi2024001/nobackup/bin/wp2_iht/{{PIPELINE_VERSION}}/hydra-genetics

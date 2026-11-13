@@ -1,0 +1,89 @@
+# Genererad av tools/gen_container_manifest.py ur config/**/*.yaml.
+# Sif-namnen följer CGU:s offline-cache-konvention på Miarka.
+# Kör om verktyget när config ändras; CI kontrollerar med --check.
+
+containers:
+  arriba:
+    source: docker://hydragenetics/arriba:2.5.1
+    sif: hydragenetics__arriba_2.5.1.sif
+  bbduk:
+    source: docker://hydragenetics/bbduk:38.98
+    sif: hydragenetics__bbduk_38.98.sif
+  clara-parabricks:
+    source: docker://nvcr.io/nvidia/clara/clara-parabricks:4.5.1-1
+    sif: nvcr.io__nvidia__clara__clara-parabricks_4.5.1-1.sif
+  cnvkit:
+    source: docker://hydragenetics/cnvkit:0.9.9
+    sif: hydragenetics__cnvkit_0.9.9.sif
+  common:
+    source: docker://hydragenetics/common:1.8.1
+    sif: hydragenetics__common_1.8.1.sif
+  crumble:
+    source: docker://hydragenetics/crumble:0.8.3
+    sif: hydragenetics__crumble_0.8.3.sif
+  fastp:
+    source: docker://hydragenetics/fastp:0.20.1
+    sif: hydragenetics__fastp_0.20.1.sif
+  fastqc:
+    source: docker://hydragenetics/fastqc:0.11.9
+    sif: hydragenetics__fastqc_0.11.9.sif
+  fusioncatcher:
+    source: docker://hydragenetics/fusioncatcher:1.33
+    sif: hydragenetics__fusioncatcher_1.33.sif
+  gatk4:
+    source: docker://hydragenetics/gatk4:4.2.2.0
+    sif: hydragenetics__gatk4_4.2.2.0.sif
+  manta:
+    source: docker://hydragenetics/manta:1.6.0
+    sif: hydragenetics__manta_1.6.0.sif
+  mosdepth:
+    source: docker://hydragenetics/mosdepth:0.3.2
+    sif: hydragenetics__mosdepth_0.3.2.sif
+  multiqc:
+    source: docker://hydragenetics/multiqc:1.25.1
+    sif: hydragenetics__multiqc_1.25.1.sif
+  peddy:
+    source: docker://hydragenetics/peddy:0.4.8
+    sif: hydragenetics__peddy_0.4.8.sif
+  pelops:
+    source: docker://hydragenetics/pelops:0.8.0
+    sif: hydragenetics__pelops_0.8.0.sif
+  picard:
+    source: docker://hydragenetics/picard:2.25.0
+    sif: hydragenetics__picard_2.25.0.sif
+  pindel:
+    source: docker://hydragenetics/pindel:0.2.5b9
+    sif: hydragenetics__pindel_0.2.5b9.sif
+  rseqc:
+    source: docker://hydragenetics/rseqc:4.0.0
+    sif: hydragenetics__rseqc_4.0.0.sif
+  simple_sv_annotation:
+    source: docker://hydragenetics/simple_sv_annotation:2019.02.18
+    sif: hydragenetics__simple_sv_annotation_2019.02.18.sif
+  snpeff:
+    source: docker://hydragenetics/snpeff:5.0
+    sif: hydragenetics__snpeff_5.0.sif
+  somalier:
+    source: docker://hydragenetics/somalier:0.2.18
+    sif: hydragenetics__somalier_0.2.18.sif
+  sortmerna:
+    source: docker://hydragenetics/sortmerna:4.3.4
+    sif: hydragenetics__sortmerna_4.3.4.sif
+  spring:
+    source: docker://hydragenetics/spring:1.1.1
+    sif: hydragenetics__spring_1.1.1.sif
+  star:
+    source: docker://hydragenetics/star:2.7.10a
+    sif: hydragenetics__star_2.7.10a.sif
+  star-fusion:
+    source: docker://hydragenetics/star-fusion:1.15.1
+    sif: hydragenetics__star-fusion_1.15.1.sif
+  svdb:
+    source: docker://hydragenetics/svdb:2.6.0
+    sif: hydragenetics__svdb_2.6.0.sif
+  vep:
+    source: docker://hydragenetics/vep:111.0
+    sif: hydragenetics__vep_111.0.sif
+  vt:
+    source: docker://hydragenetics/vt:2015.11.10
+    sif: hydragenetics__vt_2015.11.10.sif
