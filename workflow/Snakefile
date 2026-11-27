@@ -180,9 +180,9 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
     output:
         vcf=temp("cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf"),
     log:
-        "logs/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.log",
+        "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.log",
     benchmark:
-        "benchmarks/cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.tsv"
+        "cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.benchmark.tsv"
     params:
         db_string=config.get("svdb_query", {}).get("db_manta", ""),
         extra=config.get("svdb_query", {}).get("extra_manta", ""),
@@ -195,9 +195,9 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
     output:
         vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf"),
     log:
-        "logs/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.log",
+        "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.log",
     benchmark:
-        "benchmarks/cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.tsv"
+        "cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.benchmark.tsv"
     params:
         db_string=config.get("svdb_query", {}).get("db_manta", ""),
         extra=config.get("svdb_query", {}).get("extra_manta", ""),
