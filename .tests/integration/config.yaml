@@ -100,5 +100,9 @@ star:
 star_fusion:
   genome_path: "reference/"
 
+svdb_query:
+  db_string: "--db reference/svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
+  db_manta: "--db reference/manta_normal_pool.vcf.gz,reference/manta_tumour_pool.vcf.gz"
+
 vep:
   vep_cache: "reference/vep"

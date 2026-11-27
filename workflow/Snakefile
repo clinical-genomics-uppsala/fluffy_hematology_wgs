@@ -174,9 +174,16 @@ module cnv_sv:
 use rule * from cnv_sv exclude cnvkit_call, cnvkit_scatter, gatk_denoise_read_counts, gatk_collect_allelic_counts as cnv_sv_*
 
 
+use rule svdb_query from cnv_sv as cnv_sv_svdb_query with:
+    input:
+        vcf="cnv_sv/svdb_merge/{sample}_{type}.{tc_method}.merged.vcf",
+        db=get_svdb_db_files(config.get("svdb_query", {}).get("db_string", ""), "svdb_query.db_string"),
+
+
 use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
     input:
         vcf="cnv_sv/manta_run_workflow_tn/{sample}.ssa.vcf.gz",
+        db=get_svdb_db_files(config.get("svdb_query", {}).get("db_manta", ""), "svdb_query.db_manta"),
     output:
         vcf=temp("cnv_sv/manta_run_workflow_tn/{sample}.ssa.svdb_query.vcf"),
     log:
@@ -192,6 +199,7 @@ use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_tn with:
 use rule svdb_query from cnv_sv as cnv_sv_svdb_query_manta_t with:
     input:
         vcf="cnv_sv/manta_run_workflow_t/{sample}.ssa.vcf.gz",
+        db=get_svdb_db_files(config.get("svdb_query", {}).get("db_manta", ""), "svdb_query.db_manta"),
     output:
         vcf=temp("cnv_sv/manta_run_workflow_t/{sample}.ssa.svdb_query.vcf"),
     log:

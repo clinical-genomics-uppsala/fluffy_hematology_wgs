@@ -550,7 +550,7 @@ svdb_query:
   container: "{{APPTAINER_CACHE}}/svdb_2.6.0.sif"
   db_string: "--db {{REFERENCE_DATA}}/fluffy/230601_svdb_cnv.vcf --out_frq Normal_AF --out_occ Normal_OCC"
   db_manta: "--db {{REFERENCE_DATA}}/fluffy/manta_wgs_hg38_novaseqX_v2.0.sorted.vcf.gz,{{REFERENCE_DATA}}/fluffy/manta_T_135.sorted.vcf.gz"
-  extra_manta: "--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC"
+  extra_manta: "--in_frq FRQ,FRQ --in_occ OCC,OCC --out_frq manta_N_AF,manta_T_AF --out_occ manta_N_OCC,manta_T_OCC --bnd_distance 10000 --overlap 0.6 --ins_distance 50"
 
 vep:
   container: "{{APPTAINER_CACHE}}/vep_111.0.sif"

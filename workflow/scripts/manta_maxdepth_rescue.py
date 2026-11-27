@@ -95,7 +95,8 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
     - at least one breakpoint is flagged MaxDepth;
     - no breakpoint has another blocking filter;
     - every MaxDepth breakpoint has PR or SR frequency >= min_support (0.05);
-    - neither breakpoint is present in the normal pane or in a junk/alternate contig.
+    - neither breakpoint has a similar call in the Normal pool (manta_N_AF == 0)
+      or lies on a junk/alternate contig.
 
     When accepted, every row belonging to the BND event is returned.
     """
@@ -122,7 +123,7 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
         "annotation",
         "paired-read freq",
         "spanning-read freq",
-        "manta_n_occ",
+        "manta_n_af",
     }
 
     missing_columns = required_columns - columns.keys()
@@ -166,8 +167,8 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
             for row in maxdepth_rows
         )
 
-        event_has_normal_panel_hit = any(
-            as_float(row[columns["manta_n_occ"]]) != 0
+        event_has_normal_pool_hit = any(
+            as_float(row[columns["manta_n_af"]]) != 0
             for row in event_rows
         )
 
@@ -180,8 +181,8 @@ def create_maxdepth_bnd_rescue_table(tables_dict, blocking_filter_flags, min_sup
             rescue_stats["other_filter"] += 1
         elif not all_maxdepth_rows_have_support:
             rescue_stats["low_support"] += 1
-        elif event_has_normal_panel_hit:
-            rescue_stats["normal_panel"] += 1
+        elif event_has_normal_pool_hit:
+            rescue_stats["normal_pool"] += 1
         elif has_junk_contig:
             rescue_stats["junk_contig"] += 1
         else:
